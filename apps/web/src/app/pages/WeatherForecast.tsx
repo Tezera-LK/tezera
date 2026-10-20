@@ -47,6 +47,10 @@ export default async function WeatherPage() {
                     ))}
                 </tbody>
             </table>
+
+            <p style={{ color: "#666", fontSize: 14 }}>
+                Built from {process.env.BUILD_BRANCH} @ {process.env.BUILD_COMMIT} · data : Open-Meteo
+            </p>
         </main>
     )
 }
