@@ -1,0 +1,14 @@
+node_modules/
+.turbo/
+dist/
+.next/
+.expo/
+apps/mobile/ios/
+apps/mobile/android/
+amplify_outputs.json
+.amplify/
+.env
+.env.*
+!.env.example
+*.pem
+.DS_Store
