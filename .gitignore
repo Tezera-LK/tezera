@@ -3,13 +3,10 @@ node_modules/
 dist/
 .next/
 .expo/
-# Expo builds the native projects for us
 apps/mobile/ios/
 apps/mobile/android/
-# Amplify: per-developer, never commit
 amplify_outputs.json
 .amplify/
-# Secrets
 .env
 .env.*
 !.env.example
