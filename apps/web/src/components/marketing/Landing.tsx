@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback, use } from "react";
 import { useLenis } from "lenis/react";
-
+import "@/components/marketing/Landing.module.css";
 
 // random number generator to keep a fixed scatter of tiles, on every reload
 const makeRng = (seed: number) => {
@@ -62,7 +62,7 @@ export default function Landing() {
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < 12; x++) {
         const el = document.createElement("i");
-        el.style.background = range() < 0.2 ? "rgba(255,255,255,.1)" : "rgba(255,255,255,.28)";
+        el.style.background = range() < 0.2 ? "#e8e9ebb0" : "#ffffff47";
         if (y % 2 === 0 && x === 0) el.className = "off";
         host.append(el);
         list.push({
@@ -162,7 +162,7 @@ export default function Landing() {
           <div className="base" />
           <div className="cover-layer" ref={coverRef}>
             <div className="bg" ref={(el) => { blobRefs.current[0] = el; }} />
-            <div className="blob" ref={(el) => { blobRefs.current[1] = el; }} style={{ width: "70vw", height: "70vw", left: "-20vw", top: "-25vw", background: "#526c80" }} />
+            <div className="blob" ref={(el) => { blobRefs.current[1] = el; }} style={{ width: "70vw", height: "70vw", left: "-20vw", top: "-25vw", background: "#7999b1" }} />
             <div className="blob" ref={(el) => { blobRefs.current[2] = el; }} style={{ width: "60vw", height: "60vw", right: "-18vw", top: "5vw", background: "#d77e70" }} />
             <div className="blob" ref={(el) => { blobRefs.current[3] = el; }} style={{ width: "70vw", height: "70vw", left: "15vw", bottom: "-38vw", background: "#70a992" }} />
             <div className="tiles" ref={tilesRef} />
