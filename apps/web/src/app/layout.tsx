@@ -1,25 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-});
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-bricolage",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "Tezera",
-  description: "dev",
+  title: { default: "Tezera", template: "%s | Tezera" },
+  description: "Every event in Sri Lanka, in one place.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${bricolage.variable}`}>
       <body>{children}</body>
     </html>
   );
