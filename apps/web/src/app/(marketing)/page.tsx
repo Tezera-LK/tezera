@@ -5,10 +5,8 @@ import ReactLenis from "lenis/react";
 export default function Home() {
   return (
     <>
-      <ReactLenis root>
-        <Landing />;
-        <About />
-      </ReactLenis>
+      <Landing />;
+      <About />
     </>
   )
 }

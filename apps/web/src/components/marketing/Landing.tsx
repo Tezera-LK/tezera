@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useCallback, use } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useLenis } from "lenis/react";
-import "@/components/marketing/Landing.module.css";
+import "@/components/marketing/Landing.css";
 
 // random number generator to keep a fixed scatter of tiles, on every reload
 const makeRng = (seed: number) => {
@@ -28,7 +28,7 @@ const WORD = "tezera";
 
 export default function Landing() {
   // tall runway, read its height to compute progress
-  const introRef = useRef<HTMLAnchorElement>(null);
+  const introRef = useRef<HTMLElement>(null);
   // cover layer hidden at the end
   const coverRef = useRef<HTMLDivElement>(null);
   // grid container for inserting tiles
@@ -109,7 +109,7 @@ export default function Landing() {
     const backgroundFade = 1 - soft(clamp((P - 0.08) / 0.86));
     blobRefs.current.forEach((b) => b && (b.style.opacity = String(backgroundFade)));
     // loop through each tile until the last tile
-    for (let i = 0; i < tiles.current.length - 1; i++) {
+    for (let i = 0; i < tiles.current.length; i++) {
       // asign each tile an index
       const t = tiles.current[i];
       // a tile's personal 0->1 progress 
@@ -141,7 +141,7 @@ export default function Landing() {
   // mount effect
   useEffect(() => {
     // checks user's motions preference and stores it
-    reduce.current = window.matchMedia("(prefers-reduced-motion: reduce").matches;
+    reduce.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // build the tiles
     build();
     // if reduced motion => stop animation
