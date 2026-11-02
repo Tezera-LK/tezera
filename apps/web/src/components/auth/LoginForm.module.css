@@ -1,0 +1,30 @@
+/*only what's special to the login page
+
+/* Stacks the login form and the Forgot password panel. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* The pink "Forgot password" box. */
+.forgotPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--att-s) 45%, var(--att-b));
+}
+
+.forgotTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.forgotText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--auth-muted);
+}

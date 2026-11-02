@@ -13,6 +13,10 @@
     padding: 24px;
     background: var(--att-b);
     color: var(--att-t);
+    --auth-surface: #ffffff;    /* inputs and the outline button */
+    --auth-line: #e2c9c4;       /* borders */
+    --auth-muted: #6e6670;      /* secondary text (subtitles, hints) */
+    --auth-error: #b42318;      /* error messages and red borders */
 }
 
 .formSide{
@@ -112,6 +116,14 @@
 .d { background: color-mix(in srgb, var(--att-p) 80%, #000); }
 .w { background: color-mix(in srgb, #fff 80%, var(--att-p)); }
 
+@media (prefers-color-scheme: dark) {
+  .page {
+    --auth-surface: #1f1512;
+    --auth-line: #3e2c26;
+    --auth-muted: #a096a4;
+    --auth-error: #ff8a80;
+  }
+}
 
 @media (max-width: 900px){
 
@@ -132,7 +144,7 @@
         margin-top: 32px;
         font-size: 26px;
     }
-    .titles{
+    .tiles{
         display: none;
     }
 }

@@ -1,0 +1,177 @@
+
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 4px 0 24px;         /* 4px above, 24px gap before the form */
+  font-size: 15px;
+  color: var(--auth-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/*  TEXT FIELD (label + input + message) */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* space between label, input and message */
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.input {
+  height: 46px;
+  box-sizing: border-box; /* padding + border count inside the 46px */
+  padding: 0 14px;
+  border: 1px solid var(--auth-line);
+  border-radius: 12px;
+  background: var(--auth-surface);
+  color: var(--att-t);
+  font: inherit; /* inputs don't inherit the font by default */
+  font-size: 15px;
+}
+
+.input::placeholder {
+  color: var(--auth-muted);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--att-p);
+  outline-offset: 1px;
+  border-color: var(--att-p);
+}
+
+/* [aria-invalid="true"] = an ATTRIBUTE SELECTOR. It matches inputs
+   that TextField marks as invalid, so the border turns red. */
+.input[aria-invalid="true"] {
+  border-color: var(--auth-error);
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--auth-muted);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--auth-error);
+}
+
+/* Base styles every button shares. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 999px; 
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer; /* hand cursor on hover */
+}
+
+/* Solid coral button: the main action (Log in, Create account). */
+.primary {
+  background: var(--att-p);
+  color: var(--btn-ink); 
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--att-p) 88%, #000); 
+}
+
+/*Continue with Google. */
+.outline {
+  height: 44px;
+  background: var(--auth-surface);
+  border-color: var(--auth-line);
+  color: var(--att-t);
+}
+
+.outline:hover {
+  border-color: var(--att-p);
+}
+
+/*full width of the form.*/
+.block {
+  width: 100%;
+}
+
+/* Not full width: only as wide as its text (e.g. Send reset code). */
+.button:not(.block) {
+  align-self: flex-start;
+}
+
+/* Greyed out while busy or not allowed. */
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* A flex row: line, the word "or", line.
+   The lines are ::before and ::after pseudo-elements. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--auth-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;                    /* each line grows to fill the spare space */
+  height: 1px;
+  background: var(--auth-line);
+}
+
+/* A <button> that looks like a link. Used for actions that stay on the
+   same page (e.g. opening Forgot password), where <a> would be wrong. */
+.linkButton {
+  align-self: flex-start;     /* don't stretch across the form */
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--auth-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* "New to Tezera? Create an account" */
+.footer {
+  margin: 0;
+  font-size: 14px;
+}
+
+.footer a {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* Success or info message after submitting. */
+.status {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--att-a) 35%, var(--att-b)); /* soft gold */
+  font-size: 14px;
+}
