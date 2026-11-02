@@ -1,0 +1,51 @@
+{
+  "heading": "Are you one of these?",
+  "subheading": "Every event requires all three. Tezera gives each of them their own account.",
+  "cards": [
+    {
+      "title": "Organiser",
+      "userLine": "I run events",
+      "points": [
+        "Publish and promote events",
+        "Hire verified vendors and crews",
+        "Fill stalls and share venue maps",
+        "Post a job and compare quotes",
+        "Find providers by rating and district",
+        "Approve stall applications and assign numbers",
+        "Keep every booking’s terms on record",
+        "Share events to Instagram and WhatsApp"
+      ],
+      "button": "Join as an Organiser"
+    },
+    {
+      "title": "Vendor/Freelancer",
+      "userLine": "I offer a service, a skill or a stall",
+      "points": [
+        "Get found through your portfolio",
+        "Quote on jobs with the full brief",
+        "Apply for stall slots",
+        "Answer booking requests directly",
+        "List your services, districts and prices",
+        "See payment terms before you accept",
+        "Earn reviews, badges and a ranking",
+        "Keep bookings and calendar in one place"
+      ],
+      "button": "Join as an Vendor or Freelancer"
+    },
+    {
+      "title": "Attendee",
+      "userLine": "I like partying",
+      "points": [
+        "A feed shaped by your interests",
+        "See which friends are going",
+        "Live updates and maps on the day",
+        "Search by date, district, category or price",
+        "Follow the organisers you like",
+        "Join event chats and community groups",
+        "Search the venue map for what you need",
+        "Review events you went to"
+      ],
+      "button": "Join as an Attendee"
+    }
+  ]
+}

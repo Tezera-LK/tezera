@@ -1,0 +1,22 @@
+[
+  {
+    "name": "HOME",
+    "href": "/#home"
+  },
+  {
+    "name": "FOR WHOM",
+    "href": "/#audience"
+  },
+  {
+    "name": "ORGANISER",
+    "href": "/organiser"
+  },
+  {
+    "name": "TEAM",
+    "href": "/team"
+  },
+  {
+    "name": "CONTACT",
+    "href": "/#contact"
+  }
+]
