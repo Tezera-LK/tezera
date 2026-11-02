@@ -27,11 +27,11 @@ type Tile = {
 const WORD = site.wordmark;
 
 // timing (ms)
-const MIN_LOAD = 1400; // the loader shows at least this long, so it never just flashes
-const HOLD = 900; // after the loader leaves, the wordmark sits still this long before the dissolve
+const MIN_LOAD = 1400; // the blinking boxes show at least this long, so they never just flash
+const HOLD = 400; // after the boxes fade out, the wordmark sits still this long before the dissolve
 const PLAY = 2600; // how long the opening animation runs
 
-// loading: the three boxes | playing: loader fades out, then the opening animation | done: cover removed
+// loading: wordmark + blinking boxes | playing: boxes fade out, then the opening animation | done: cover removed
 type Phase = "loading" | "playing" | "done";
 
 export default function Opening() {
@@ -201,13 +201,12 @@ export default function Opening() {
         </div>
       </div>
 
-      {/* loading screen: covers everything until the page is ready, then fades out */}
+      {/* four boxes that blink while the page loads, then fade out */}
       <div className={`loader${phase === "loading" ? "" : " loader-out"}`} role="status" aria-label="Loading">
-        <div className="loader-boxes">
-          <span className="loader-box loader-box-1" />
-          <span className="loader-box loader-box-2" />
-          <span className="loader-box loader-box-3" />
-        </div>
+        <span className="loader-box" />
+        <span className="loader-box" />
+        <span className="loader-box" />
+        <span className="loader-box" />
       </div>
     </div>
   );
