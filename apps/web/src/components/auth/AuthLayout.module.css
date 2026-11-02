@@ -1,0 +1,138 @@
+/* var(--att-...) are the attendee colours from src/app/globals.css.
+   They switch automatically between light and dark mode:
+     --att-b background   --att-t text   --att-p coral
+     --att-s pink         --att-a gold */
+
+.page{
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: grid;
+    /* column 2: "1fr" = all the remaining space */
+    grid-template-columns: minmax(0,616px) 1fr; 
+    gap: 24px;
+    padding: 24px;
+    background: var(--att-b);
+    color: var(--att-t);
+}
+
+.formSide{
+    display: flex;
+    justify-content: center;
+    padding: 64px 24px;
+}
+
+.formBox{
+    width: 100%;
+    max-width: 460px;
+}
+
+.panel{
+    position: relative;
+    /* clip tiles that run past the rounded edge */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 48px;
+    border-radius: 32px;
+    background: var(--att-p);
+    color: #fff;
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--att-t);
+    text-decoration: none;
+}
+
+.dots{
+    position: relative;
+    width: 38px;
+    height: 24px;
+}
+
+.dots::before, .dots::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.dots::before{
+    left: 0;
+    background: #ee6b6e;
+    z-index: 1;
+}
+
+.dots::after{
+    left: 14px;
+    background: #f5c2c4;
+}
+
+.headline{
+    margin: 72px 0 0;
+    /* "ch" = width of one character */
+    max-width: 14ch;
+    font-size: 34px;
+    line-height: 1.24;
+    font-weight: 700;
+}
+
+.sub{
+    margin: 24px 0 0;
+    max-width: 44ch;
+    font-size: 15px;
+}
+
+.tiles{
+    /* top auto pushes the tiles to the BOTTOM of the panel
+                 (in a flex column, an auto margin takes all spare space).
+                 The negative right and bottom margins cancel the panel's
+                 padding, so the tiles run off the edge, as in the design. */
+    margin: auto -48px -48px -24px;
+    padding-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6 equal columns */
+    gap: 8px;
+}
+
+.tile{
+    aspect-ratio: 92/84;
+    border-radius: 22px;
+}
+
+.g{background: var(--att-a);}
+.p{background: color-mix(in srgb, var(--att-s) 70%, var(--att-p));}
+.l { background: color-mix(in srgb, #fff 45%, var(--att-p)); }
+.d { background: color-mix(in srgb, var(--att-p) 80%, #000); }
+.w { background: color-mix(in srgb, #fff 80%, var(--att-p)); }
+
+
+@media (max-width: 900px){
+
+    .page{
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .formSide{
+        padding: 32px 0;
+    }
+
+    .panel{
+        padding: 28px;
+    }
+
+    .headline{
+        margin-top: 32px;
+        font-size: 26px;
+    }
+    .titles{
+        display: none;
+    }
+}
