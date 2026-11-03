@@ -1,0 +1,190 @@
+.freelance {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 48px;
+  padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
+  /* no overflow rule here: overflow hidden or auto on a parent breaks sticky */
+}
+
+.freelance-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.freelance-text {
+  position: sticky;
+  top: 88px;
+  /* same as the first card's pin, so their tops line up */
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+
+.freelance-text h1 {
+  margin: 14px 0 0;
+  color: var(--page-ink);
+  font-size: var(--header-size);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.freelance-text h3 {
+  margin: 14px 0 0;
+  color: rgba(40, 40, 41, 0.72);
+}
+
+.freelance-text p {
+  text-align: start;
+}
+
+.freelance-cards {
+  flex: 1.3;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24vh;
+}
+
+.freelance-card {
+  position: sticky;
+  top: calc(88px + var(--i) * 18px);
+  /* each card pins 18px lower than the one before */
+  flex: none;
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--bg);
+  transform-origin: top center;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* inner shadow, tinted from each card's own colour */
+.freelance-card::before {
+  --shade: color-mix(in srgb, var(--bg) 65%, black);
+  /* the card colour, darkened */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--shade) 35%, transparent),
+    inset 0 20px 30px -14px color-mix(in srgb, var(--shade) 55%, transparent),
+    inset 0 -50px 60px -30px color-mix(in srgb, var(--shade) 70%, transparent);
+}
+
+/* the darkening layer, driven by --dim from the script */
+.freelance-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  /* new */
+  background: #000;
+  opacity: var(--dim, 0);
+  pointer-events: none;
+}
+
+
+/* the picture covers the whole card */
+.freelance-img {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* the shadow and the text, hidden until hover */
+.freelance-info {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+  color: var(--ink);
+  background: linear-gradient(to top,
+      color-mix(in srgb, var(--bg) 95%, transparent) 30%,
+      color-mix(in srgb, var(--bg) 35%, transparent) 100%);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.freelance-card:hover .freelance-info,
+.freelance-card:focus-visible .freelance-info {
+  opacity: 1;
+  transform: none;
+}
+
+.freelance-card:hover .freelance-img {
+  transform: scale(1.04);
+  /* optional: a slight zoom */
+}
+
+
+.freelance-info h3 {
+  margin: 0 0 8px;
+  font-size: clamp(26px, 2.8vw, 42px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.freelance-info p {
+  margin: 0;
+  font-size: clamp(15px, 1.3vw, 20px);
+  line-height: 1.4;
+}
+
+/* each word sits in a mask, so it slides up from behind a line */
+.freelance-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  /* stops the bottom of letters like g and y being cut off */
+  margin-bottom: -0.12em;
+}
+
+.freelance-word>span {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* touch screens have no hover, so always show the text */
+@media (hover: none) {
+  .freelance-info {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .freelance-img,
+  .freelance-info {
+    transition: none;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .freelance {
+    flex-direction: column;
+    /* text above, cards below */
+    align-items: stretch;
+  }
+
+  .freelance-text {
+    position: static;
+    /* a sticky text block would cover the cards on a phone */
+  }
+}

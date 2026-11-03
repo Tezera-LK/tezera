@@ -1,6 +1,6 @@
 {
   "img": "./tezera.svg",
-  "href": "#/home",
+  "home": "/#home",
   "links": [
     {
       "name": "HOME",

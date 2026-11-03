@@ -4,6 +4,7 @@ import Navigation from "@/components/marketing/Navigation";
 import Audience from "@/components/marketing/Audience";
 import Organiser from "@/components/marketing/Organiser";
 import Vendor from "@/components/marketing/Vendor";
+import Freelance from "@/components/marketing/Freelance";
 
 export default function Home() {
   return (
@@ -22,6 +23,9 @@ export default function Home() {
         </section>
         <section id="vendor">
           <Vendor />
+        </section>
+        <section id="freelance">
+          <Freelance />
         </section>
       </main>
     </>
