@@ -27,13 +27,6 @@
   gap: clamp(20px, 3vw, 40px);
 }
 
-/* wide screens: the generous gaps from the design */
-@media (min-width: 1200px) {
-  .audience-cards {
-    gap: clamp(40px, 8.8vw, 155px);
-  }
-}
-
 .audience-card {
   position: relative;
   display: flex;
@@ -126,22 +119,6 @@
   border-radius: 28%;
 }
 
-/* ---------- Mobile / small tablets ---------- */
-@media (max-width: 900px) {
-  .audience-heading {
-    font-size: clamp(36px, 10vw, 56px);
-  }
-
-  .audience-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .audience-card {
-    min-height: 380px;
-    padding-top: 64px;
-  }
-}
-
 .audience-body {
   display: flex;
   flex: 1;
@@ -158,12 +135,12 @@
 }
 
 .audience-card:nth-child(2) {
-  --card-delay: 0.3s;
+  --card-delay: 0.1s;
   --tilt: -24deg;
 }
 
 .audience-card:nth-child(3) {
-  --card-delay: 0.5s;
+  --card-delay: 0.1s;
   --tilt: 24deg;
 }
 
@@ -171,13 +148,13 @@
 .audience.is-armed .audience-top {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .audience.is-armed .audience-card {
   opacity: 0;
   transform: perspective(1200px) rotateY(var(--tilt)) translateY(30px);
-  transition: opacity 0.3s ease, transform 0.4s ease;
+  transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
 .audience.is-armed .audience-tiles {
@@ -194,7 +171,7 @@
 .audience-tiles i {
   --t: calc(var(--card-delay) + 0.5s + var(--d));
   border-radius: 24%;
-  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0s;
+  transition: transform 0.2s ease, opacity 0.2s ease, visibility 0s;
   /* mosaic closes again quickly */
 }
 
@@ -213,14 +190,14 @@
 .audience.is-armed .audience-top.is-in {
   opacity: 1;
   transform: none;
-  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .audience.is-armed .audience-card.is-in {
   opacity: 1;
   transform: perspective(1200px) rotateY(0deg) translateY(0);
   transition:
-    opacity 0.6s ease var(--card-delay),
+    opacity 0.3s ease var(--card-delay),
     transform 1s cubic-bezier(0.2, 0.7, 0.2, 1) var(--card-delay);
 }
 
@@ -229,17 +206,17 @@
   opacity: 0;
   visibility: hidden;
   transition:
-    transform 0.8s ease-in-out var(--t),
-    opacity 0.8s ease-in-out var(--t),
-    visibility 0s linear calc(var(--t) + 0.8s);
+    transform 0.2s ease-in-out var(--t),
+    opacity 0.2s ease-in-out var(--t),
+    visibility 0s linear calc(var(--t) + 0.2s);
 }
 
 .audience.is-armed .audience-card.is-in .audience-body {
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.7s ease calc(var(--card-delay) + 1s),
-    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--card-delay) + 1s);
+    opacity 0.2s ease calc(var(--card-delay) + 1s),
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--card-delay) + 1s);
 }
 
 .audience.is-armed .audience-card.is-in .audience-chip {
@@ -250,5 +227,28 @@
 @media (max-width: 900px) {
   .audience-card:nth-child(n) {
     --card-delay: 0s;
+  }
+}
+
+/* wide screens: the generous gaps from the design */
+@media (min-width: 1200px) {
+  .audience-cards {
+    gap: clamp(40px, 8.8vw, 155px);
+  }
+}
+
+/* ---------- Mobile / small tablets ---------- */
+@media (max-width: 900px) {
+  .audience-heading {
+    font-size: clamp(36px, 10vw, 56px);
+  }
+
+  .audience-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-card {
+    min-height: 380px;
+    padding-top: 64px;
   }
 }

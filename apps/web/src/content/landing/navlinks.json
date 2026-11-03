@@ -1,5 +1,6 @@
 {
   "img": "./tezera.svg",
+  "href": "#/home",
   "links": [
     {
       "name": "HOME",
@@ -12,6 +13,14 @@
     {
       "name": "ORGANISER",
       "href": "/#organiser"
+    },
+    {
+      "name": "VENDOR",
+      "href": "/#vendor"
+    },
+    {
+      "name": "FREELANCER",
+      "href": "/#freelancer"
     },
     {
       "name": "TEAM",

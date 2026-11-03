@@ -1,6 +1,7 @@
 {
   "heading": "Run the whole show.",
   "subheading": "Plan it, staff it, fill it and keep everyone in the loop, all from one place.",
+  "details": "Become one of our organisers and build your event from the first idea to the last guest. Publish your schedule, line-up and photos, then find and hire verified vendors and freelancers without chasing contacts. Manage stall applications, allocate spaces and keep everyone updated from one place.",
   "cards": [
     {
       "title": "Event creation & promotion",
@@ -21,7 +22,7 @@
       "point": "Manage stall applications, allocate spaces and connect with vendors.",
       "img": "/images/marketing/organiser/organiser-3.png",
       "bg": "#70a98c",
-      "ink": "#282829"
+      "ink": "#ffff"
     },
     {
       "title": "Centralised communication",

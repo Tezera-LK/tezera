@@ -19,6 +19,7 @@ export default function Organiser() {
     const root = rootRef.current!;
     const text = root.querySelector<HTMLElement>(".organiser-text")!;
     const sub = root.querySelector<HTMLElement>(".organiser-text h3")!;
+    const paragraph = root.querySelector<HTMLElement>(".organiser-text p")!;
     const grid = root.querySelector<HTMLElement>(".organiser-cards")!;
     const wordEls = [...root.querySelectorAll<HTMLElement>(".organiser-word > span")];
     const cards = [...root.querySelectorAll<HTMLElement>(".organiser-card")];
@@ -42,6 +43,8 @@ export default function Organiser() {
       const s = clamp((pt - 0.5) / 0.4);
       sub.style.opacity = String(s);
       sub.style.transform = `translateY(${(1 - s) * 16}px)`;
+      paragraph.style.opacity = String(s);
+      paragraph.style.transform = `translateY(${(1 - s) * 16}px)`;
 
       // cards: drop in like blocks, bottom row first
       const pc = progress(grid);
@@ -76,6 +79,7 @@ export default function Organiser() {
           ))}
         </h1>
         <h3>{organiser.subheading}</h3>
+        <p>{organiser.details}</p>
       </div>
 
       <div className="organiser-cards">
