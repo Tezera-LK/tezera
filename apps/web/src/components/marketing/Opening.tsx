@@ -108,13 +108,13 @@ export default function Opening() {
     blobRefs.current.forEach((b) => b && (b.style.opacity = String(backgroundFade)));
 
     // each tile flips and fades on its own slice of the timeline
-    for (const t of tiles.current) {
+    tiles.current.forEach((t) => {
       const k = clamp((P - (0.03 + t.order * 0.62)) / 0.34);
       const e = soft(k);
       t.el.style.visibility = k >= 1 ? "hidden" : "";
       t.el.style.transform = k > 0 ? `rotate${t.axis}(${t.dir * e * 180}deg) scale(${1 - e * 0.1})` : "";
       t.el.style.opacity = k > 0 ? String(1 - e) : "";
-    }
+    });
   }, []);
 
   // lock scrolling (and hide the scrollbar) while the cover is up, release it when it's gone
