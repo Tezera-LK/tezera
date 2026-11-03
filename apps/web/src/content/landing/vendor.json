@@ -6,28 +6,28 @@
     {
       "title": "Business profiles",
       "point": "Showcase your services, products, prices and business details.",
-      "img": "/images/marketing/organiser/organiser-1.png",
+      "img": "/images/marketing/vendor/vendor-1.png",
       "bg": "#70a992",
       "ink": "#ffff"
     },
     {
       "title": "Stall applications",
       "point": "Discover and apply for available event stalls.",
-      "img": "/images/marketing/organiser/organiser-2.png",
+      "img": "/images/marketing/vendor/vendor-2.png",
       "bg": "#658095",
       "ink": "#ffff"
     },
     {
       "title": "Job opportunities",
       "point": "Find relevant opportunities and connect with event organisers.",
-      "img": "/images/marketing/organiser/organiser-3.png",
+      "img": "/images/marketing/vendor/vendor-3.png",
       "bg": "#b6c3a7",
       "ink": "#1b1b28"
     },
     {
       "title": "Reviews & ratings",
       "point": "Build credibility through reviews from completed jobs.",
-      "img": "/images/marketing/organiser/organiser-4.png",
+      "img": "/images/marketing/vendor/vendor-4.png",
       "bg": "#ffff",
       "ink": "0000"
     }
