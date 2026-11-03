@@ -7,8 +7,11 @@ import "./Navigation.css"
 export default function Navigation() {
   return (
     <nav>
+      <Link href="/" className="nav-logo" aria-label="Tezera home">
+        <img src={navLinks.img} alt="" className="nav-icon" />
+      </Link>
       <ul className="nav">
-        {navLinks.map((link) => (
+        {navLinks.links.map((link) => (
           <li key={link.name}>
             {link.href.includes('#') ? (
               <a href={link.href}>{link.name}</a>

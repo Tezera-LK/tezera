@@ -4,13 +4,16 @@ nav {
   left: 0;
   width: 100%;
   z-index: 1000;
-  padding: 5px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 8px clamp(16px, 3.7vw, 65px);
   background-color: var(--page-bg);
 }
 
 .nav {
   display: flex;
-  gap: 100px;
+  gap: 50px;
   justify-content: center;
   position: relative;
   margin: 0;
@@ -61,4 +64,30 @@ nav {
 
 .nav li:hover::before {
   transform: scale(1);
+}
+
+.nav-logo {
+  display: flex;
+  flex: 1;
+  /* equal width to .nav-spacer, so the links stay centred */
+}
+
+.nav-icon {
+  display: block;
+  height: 40px;
+  /* sets the size; width follows the shape */
+  width: auto;
+}
+
+.nav {
+  display: flex;
+  gap: 50px;
+  justify-content: center;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-spacer {
+  flex: 1;
 }

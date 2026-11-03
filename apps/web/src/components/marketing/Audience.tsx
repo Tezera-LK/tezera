@@ -5,55 +5,10 @@ import type { CSSProperties } from "react";
 import audience from "@/content/landing/audience.json";
 import "./Audience.css";
 
-// one colour scheme per card, in the same order as audience.cards
-const variants = ["organiser", "vendor", "attendee"] as const;
-type Variant = (typeof variants)[number];
+type Variant = "organiser" | "vendor" | "attendee";
 
-// decorative chips in the top-right corner of each card: two rows of six
-const chipColours: Record<Variant, string[][]> = {
-  organiser: [
-    ["#7b9a8d", "#8ea79a", "#7a8fa6", "#8397ad", "#7b9a8d", "#e3e8ee"],
-    ["#72b08e", "#dfe5ee", "#7b9a8d", "#8ea79a", "#dfe5ee", "#7b9a8d"],
-  ],
-  vendor: [
-    ["#b9c4a7", "#e8ece6", "#b9c4a7", "#b9c4a7", "#e8ece6", "#6f86a0"],
-    ["#b9c4a7", "#4f8b73", "#b9c4a7", "#e8ece6", "#6f86a0", "#6f86a0"],
-  ],
-  attendee: [
-    ["#c46f68", "#e6c86a", "#e6c86a", "#eea0b8", "#eea0b8", "#e6c86a"],
-    ["#e6c86a", "#eea0b8", "#e6c86a", "#eea0b8", "#e6c86a", "#f7f0ed"],
-  ],
-};
-
-// the mosaic that covers each card before it opens: 3 columns x 4 rows, row by row
-const tileColours: Record<Variant, string[]> = {
-  organiser: [
-    "#6f908a", "#536f82", "#6f908a",
-    "#536f82", "#536f82", "#536f82",
-    "#536f82", "#70a98c", "#536f82",
-    "#536f82", "#536f82", "#536f82",
-  ],
-  vendor: [
-    "#b8c4a8", "#66809a", "#66809a",
-    "#70aa90", "#70aa90", "#70aa90",
-    "#66809a", "#70aa90", "#70aa90",
-    "#70aa90", "#70aa90", "#70aa90",
-  ],
-  attendee: [
-    "#d77e70", "#d77e70", "#d77e70",
-    "#d77e70", "#d77e70", "#f09fb2",
-    "#d77e70", "#e6c76a", "#e6c76a",
-    "#f09fb2", "#d77e70", "#d77e70",
-  ],
-};
-
-// fixed "random" values, so the server and the browser render the same thing
-const tileDelays = [0.52, 0.12, 0.7, 0.3, 0.05, 0.62, 0.4, 0.78, 0.22, 0.56, 0.1, 0.68];
-const tileFlips = [
-  "rotateY(180deg)", "rotateX(180deg)", "rotateY(-180deg)", "rotateX(-180deg)",
-  "rotateY(180deg)", "rotateY(-180deg)", "rotateX(180deg)", "rotateY(180deg)",
-  "rotateX(-180deg)", "rotateY(-180deg)", "rotateY(180deg)", "rotateX(180deg)",
-];
+const variants = audience.variants as Variant[];
+const { chipColours, tileColours, tileDelays, tileFlips } = audience;
 
 export default function Audience() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -75,12 +30,13 @@ export default function Audience() {
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          io.unobserve(entry.target);
-          // desktop: heading and all cards start in the same instant
-          // stacked on mobile: each piece starts when it reaches the screen
-          if (stacked) entry.target.classList.add("is-in");
-          else items.forEach((el) => el.classList.add("is-in"));
+          // out of view and below the screen means the person scrolled back up past it
+          const below = entry.boundingClientRect.top > 0;
+          if (!entry.isIntersecting && !below) continue; // scrolled past it downwards: stay open
+
+          // desktop: heading and all cards switch together; stacked: each piece on its own
+          const group = stacked ? [entry.target] : items;
+          group.forEach((el) => el.classList.toggle("is-in", entry.isIntersecting));
         }
       },
       { rootMargin: "0px 0px -25% 0px" },
@@ -101,6 +57,7 @@ export default function Audience() {
       <div className="audience-cards">
         {audience.cards.map((card, i) => {
           const variant = variants[i % variants.length];
+
           return (
             <article
               key={card.title}
@@ -130,7 +87,10 @@ export default function Audience() {
                       <span
                         key={c}
                         className="audience-chip"
-                        style={{ background: colour, "--i": r * 6 + c } as CSSProperties}
+                        style={{
+                          background: colour,
+                          "--i": r * 6 + c,
+                        } as CSSProperties}
                       />
                     ))}
                   </div>

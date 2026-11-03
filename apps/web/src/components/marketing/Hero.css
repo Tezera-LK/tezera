@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 20;
 }
 
 .left {
@@ -19,7 +20,6 @@
   font-weight: 800;
 }
 
-/* the stage: keeps the design's proportions, everything inside is positioned in % */
 .right {
   position: relative;
   width: min(100%, 540px);
@@ -28,7 +28,6 @@
   container-type: inline-size;
 }
 
-/* ---------- floating ---------- */
 .card,
 .chip {
   position: absolute;
@@ -37,7 +36,6 @@
   will-change: transform;
 }
 
-/* travels from -amp to +amp, so the element bobs around its resting position */
 @keyframes float {
   from {
     transform: translateY(calc(var(--amp, 10px) * -1));
@@ -48,7 +46,6 @@
   }
 }
 
-/* ---------- small squares ---------- */
 .chip {
   aspect-ratio: 1;
   border-radius: 24%;
@@ -70,7 +67,6 @@
   background: #8fbcc4;
 }
 
-/* ---------- cards ---------- */
 .card {
   box-sizing: border-box;
   --amp: 6px;
@@ -91,7 +87,6 @@
   letter-spacing: 0.02em;
 }
 
-/* .card prefix beats `.card p { margin: 0 }` */
 .card .card-title {
   margin-top: 3.8cqw;
   font-weight: 700;
@@ -126,7 +121,6 @@
   background: #d77e70;
 }
 
-/* progress bar inside the organiser card */
 .bar {
   margin-top: 1.6cqw;
   height: 2cqw;
@@ -141,7 +135,6 @@
   background: #4f86f7;
 }
 
-/* ---------- sign up row ---------- */
 .signup {
   display: flex;
   align-items: center;

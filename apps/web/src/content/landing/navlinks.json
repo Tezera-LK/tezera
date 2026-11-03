@@ -1,22 +1,25 @@
-[
-  {
-    "name": "HOME",
-    "href": "/#home"
-  },
-  {
-    "name": "FOR WHOM",
-    "href": "/#audience"
-  },
-  {
-    "name": "ORGANISER",
-    "href": "/organiser"
-  },
-  {
-    "name": "TEAM",
-    "href": "/team"
-  },
-  {
-    "name": "CONTACT",
-    "href": "/#contact"
-  }
-]
+{
+  "img": "./tezera.svg",
+  "links": [
+    {
+      "name": "HOME",
+      "href": "/#home"
+    },
+    {
+      "name": "PEOPLE",
+      "href": "/#audience"
+    },
+    {
+      "name": "ORGANISER",
+      "href": "/#organiser"
+    },
+    {
+      "name": "TEAM",
+      "href": "/team"
+    },
+    {
+      "name": "CONTACT",
+      "href": "/#contact"
+    }
+  ]
+}
