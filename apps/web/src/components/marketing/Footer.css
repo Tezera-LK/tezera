@@ -7,6 +7,7 @@
   color: var(--page-bg);
 }
 
+/* ---------- top band ---------- */
 .footer-top {
   display: flex;
   flex-wrap: wrap;

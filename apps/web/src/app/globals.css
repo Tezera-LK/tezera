@@ -3,6 +3,9 @@
   --page-bg: #f7f0ed;
   --page-ink: #282829;
   --focus: #6f908b;
+  --accent: #9bc1ae;
+  --red: #e96b58;
+  /* same green as your nav hover */
   --header-size: 4.5rem;
   --font: var(--font-bricolage), "Segoe UI", system-ui, sans-serif;
 }
@@ -11,7 +14,17 @@ html.lenis,
 html.lenis body {
   margin: 0;
   height: auto;
-  scroll-behavior: smooth;
+}
+
+html {
+  scrollbar-gutter: stable;
+  /* stops the page shifting sideways when the bar appears */
+}
+
+/* loading screen: no scrolling, no scrollbar, no reserved gutter */
+html.is-loading {
+  overflow: hidden;
+  scrollbar-gutter: auto;
 }
 
 body {
@@ -23,6 +36,34 @@ body {
   display: flex;
   flex-direction: column;
   gap: 30vh;
+}
+
+/* ---------- scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--page-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--red) 55%, transparent);
+  border-radius: 999px;
+  border: 3px solid var(--page-bg);
+  /* gap around the thumb makes it look slimmer */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Firefox only: browsers that support ::-webkit-scrollbar skip this */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--page-ink) 55%, transparent) var(--page-bg);
+  }
 }
 
 a:focus-visible,

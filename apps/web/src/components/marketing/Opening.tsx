@@ -117,18 +117,17 @@ export default function Opening() {
     }
   }, []);
 
-  // lock scrolling while the cover is up, release it when it's gone
+  // lock scrolling (and hide the scrollbar) while the cover is up, release it when it's gone
   useEffect(() => {
+    const root = document.documentElement;
     if (phase === "done") {
       lenis?.start();
-      document.documentElement.style.overflow = "";
+      root.classList.remove("is-loading");
       return;
     }
     lenis?.stop();
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = "";
-    };
+    root.classList.add("is-loading");
+    return () => root.classList.remove("is-loading");
   }, [phase, lenis]);
 
   // mount: build tiles, wait for the page to load, then play the animation
