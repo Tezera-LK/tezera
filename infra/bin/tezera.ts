@@ -11,7 +11,8 @@ if (app.node.tryGetContext('github') === 'true') {
   // One-time setup, run by hand: `pnpm run deploy:github`.
   // Lets GitHub Actions deploy the API stacks without stored AWS keys.
   new GithubDeployStack(app, 'TezeraGithubDeploy', {
-    repo: 'Tezera-LK/Tezera',
+    // Repo Tezera-LK/tezera, in GitHub's immutable subject format (owner and repo IDs).
+    subjectPrefix: 'repo:Tezera-LK@345625587/tezera@1420195528',
     branches: ['dev', 'main'],
     env,
   });

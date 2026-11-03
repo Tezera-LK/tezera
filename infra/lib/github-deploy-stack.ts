@@ -3,8 +3,13 @@ import { OidcProviderNative, PolicyStatement, Role, WebIdentityPrincipal } from 
 import { Construct } from 'constructs';
 
 interface GithubDeployStackProps extends StackProps {
-  /** GitHub repository as owner/name. */
-  repo: string;
+  /**
+   * The start of the OIDC token's `sub` claim for the repository. The repo uses GitHub's
+   * immutable subject format, `repo:<owner>@<owner id>/<repo>@<repo id>`, so renaming the
+   * repo or owner doesn't hand the role to a new repo with the old name.
+   * Check it with: gh api repos/Tezera-LK/tezera/actions/oidc/customization/sub
+   */
+  subjectPrefix: string;
   /** Only workflows running on these branches can use the role. */
   branches: string[];
 }
@@ -28,14 +33,14 @@ export class GithubDeployStack extends Stack {
 
     const role = new Role(this, 'GithubDeployRole', {
       roleName: 'tezera-github-deploy',
-      description: `GitHub Actions deploys from ${props.repo} (${props.branches.join(', ')})`,
+      description: `GitHub Actions deploys from ${props.subjectPrefix} (${props.branches.join(', ')})`,
       maxSessionDuration: Duration.hours(1),
       assumedBy: new WebIdentityPrincipal(provider.oidcProviderArn, {
         StringEquals: {
           'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
           // Any one of these values matches: a push to one of the listed branches.
           'token.actions.githubusercontent.com:sub': props.branches.map(
-            (branch) => `repo:${props.repo}:ref:refs/heads/${branch}`,
+            (branch) => `${props.subjectPrefix}:ref:refs/heads/${branch}`,
           ),
         },
       }),
