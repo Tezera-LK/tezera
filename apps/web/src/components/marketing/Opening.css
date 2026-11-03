@@ -1,0 +1,201 @@
+/* Opening.css: loading screen + opening animation, kept next to Opening.tsx.
+   Relies on --slate, which stays defined in globals.css. */
+
+/* ---------- Cover ---------- */
+
+/* full-screen cover on top of the page; Opening.tsx removes it when the animation ends */
+.opening {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* solid slate behind the blobs */
+.opening-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--slate);
+}
+
+/* soft colour blobs */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+}
+
+/* sizes use vmax so they scale with the longer screen side (same as vw on landscape desktop) */
+.blob-a {
+  width: 90vmax;
+  height: 70vmax;
+  left: -20vmax;
+  top: -25vmax;
+  background: #7999b1;
+}
+
+.blob-b {
+  width: 75vmax;
+  height: 106vmax;
+  right: -24vmax;
+  top: -7vmax;
+  background: #d77e70;
+}
+
+.blob-c {
+  width: 103vmax;
+  height: 48vmax;
+  left: -10vmax;
+  bottom: -21vmax;
+  background: #70a992;
+}
+
+/* portrait (phones, tablets): size blobs relative to the cover so the three colours
+   stack as bands and overlap enough to leave no gaps */
+@media (orientation: portrait) {
+  .blob-a {
+    width: 150%;
+    height: 65%;
+    left: -25%;
+    top: -15%;
+  }
+
+  .blob-b {
+    width: 130%;
+    height: 75%;
+    right: -25%;
+    top: 12.5%;
+  }
+
+  .blob-c {
+    width: 140%;
+    height: 60%;
+    left: -20%;
+    bottom: -15%;
+  }
+}
+
+/* ---------- Tile mosaic ---------- */
+
+/* 25 columns + 5px gap must match the maths in build() in Opening.tsx */
+.tiles {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(25, 1fr);
+  gap: 5px;
+  align-content: start;
+  /* gives the flip a 3D feel */
+  perspective: 1400px;
+}
+
+/* each tile is 2 of the 25 columns wide */
+.tiles i {
+  display: block;
+  aspect-ratio: 1 / .92;
+  border-radius: 24%;
+  grid-column: span 2;
+  will-change: transform, opacity;
+  transform-origin: 50% 50%;
+  /* tiles are built in JS after hydration, so fade them in instead of popping */
+  animation: tile-in .5s ease backwards;
+}
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* first tile of even rows starts one column in (brick offset) */
+.tiles i.off {
+  grid-column: 2 / span 2;
+}
+
+/* ---------- Wordmark ---------- */
+.wordmark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #fff;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+.wordmark-text {
+  font-weight: 800;
+  font-size: clamp(72px, 17vw, 240px);
+  line-height: .9;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  text-shadow: 0 2px 0 rgba(40, 40, 41, .18), 0 12px 60px rgba(40, 40, 41, .45);
+}
+
+/* each letter animates on its own */
+.wordmark-text span {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+/* ---------- Loader (blinking boxes) ---------- */
+
+/* sits just under the wordmark; --box scales with the screen like the wordmark does */
+.loader {
+  --box: clamp(30px, 4.2vw, 56px);
+  position: absolute;
+  left: 50%;
+  /* wordmark centre + half its height + a gap */
+  top: calc(50% + clamp(32px, 7.65vw, 108px) + clamp(24px, 3vw, 48px));
+  transform: translateX(-50%);
+  display: flex;
+  gap: calc(var(--box) * .22);
+  z-index: 5;
+  transition: opacity .3s ease;
+}
+
+.loader-out {
+  opacity: 0;
+}
+
+.loader-box {
+  width: var(--box);
+  height: var(--box);
+  border-radius: 28%;
+  background: #fff;
+  animation: loader-blink 1.2s ease-in-out infinite;
+}
+
+/* each box starts a little after the previous one, so the blink travels left to right */
+.loader-box:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.loader-box:nth-child(3) {
+  animation-delay: .3s;
+}
+
+.loader-box:nth-child(4) {
+  animation-delay: .45s;
+}
+
+@keyframes loader-blink {
+
+  0%,
+  100% {
+    opacity: .2;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+/* reduced motion: no blinking, just a steady row */
+@media (prefers-reduced-motion: reduce) {
+  .loader-box {
+    animation: none;
+    opacity: .6;
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "brand": "tezera",
+  "tagline": "Stream line events in Sri Lanka",
+  "columns": [
+    {
+      "title": "Explore",
+      "links": [
+        {
+          "label": "Attendee",
+          "href": "/#attendee"
+        },
+        {
+          "label": "Team",
+          "href": "/#team"
+        }
+      ]
+    },
+    {
+      "title": "Contact",
+      "links": [
+        {
+          "label": "hello@yourdomain.com",
+          "href": "mailto:hello@yourdomain.com"
+        },
+        {
+          "label": "Instagram",
+          "href": "https://instagram.com/yourhandle"
+        }
+      ]
+    }
+  ],
+  "legal": [
+    {
+      "label": "Privacy",
+      "href": "/privacy"
+    },
+    {
+      "label": "Terms",
+      "href": "/terms"
+    }
+  ]
+}

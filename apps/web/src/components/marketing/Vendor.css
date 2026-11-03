@@ -1,0 +1,130 @@
+.vendor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
+  overflow-x: clip;
+  /* cards start off screen; this stops a sideways scrollbar */
+}
+
+.vendor-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vendor-text h1 {
+  margin: 0;
+  color: var(--page-ink);
+  font-size: var(--header-size);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.vendor-text h3 {
+  margin: 14px 0 0;
+  color: rgba(40, 40, 41, 0.72);
+}
+
+.vendor-text p {
+  text-align: center;
+}
+
+.vendor-cards {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vendor-card {
+  position: relative;
+  flex: 0 0 calc(50% - 8px);
+  aspect-ratio: 5 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--bg);
+  will-change: transform, opacity;
+}
+
+/* the picture covers the whole card */
+.vendor-img {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* the shadow and the text, hidden until hover */
+.vendor-info {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+  color: var(--ink);
+  background: linear-gradient(to top,
+      color-mix(in srgb, var(--bg) 95%, transparent) 30%,
+      color-mix(in srgb, var(--bg) 35%, transparent) 100%);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.vendor-card:hover .vendor-info,
+.vendor-card:focus-visible .vendor-info {
+  opacity: 1;
+  transform: none;
+}
+
+.vendor-card:hover .vendor-img {
+  transform: scale(1.04);
+  /* optional: a slight zoom */
+}
+
+
+.vendor-info p {
+  margin: 0;
+  font-size: clamp(13px, 0.95vw, 15px);
+}
+
+/* each word sits in a mask, so it slides up from behind a line */
+.vendor-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  /* stops the bottom of letters like g and y being cut off */
+  margin-bottom: -0.12em;
+}
+
+.vendor-word>span {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* touch screens have no hover, so always show the text */
+@media (hover: none) {
+  .vendor-info {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .vendor-img,
+  .vendor-info {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .vendor {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

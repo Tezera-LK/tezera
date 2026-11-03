@@ -1,0 +1,275 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20;
+}
+
+.left {
+  flex: 0.7;
+}
+
+.headline h1 {
+  color: var(--page-ink);
+  font-size: var(--header-size);
+  text-align: left;
+}
+
+.headline h1 .highlight-red {
+  color: #e96b58;
+  font-weight: 800;
+}
+
+.right {
+  position: relative;
+  width: min(100%, 540px);
+  aspect-ratio: 541 / 566;
+  /* lets font sizes use cqw */
+  container-type: inline-size;
+}
+
+.card,
+.chip {
+  position: absolute;
+  animation: float var(--dur, 5s) ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+}
+
+@keyframes float {
+  from {
+    transform: translateY(calc(var(--amp, 10px) * -1));
+  }
+
+  to {
+    transform: translateY(var(--amp, 10px));
+  }
+}
+
+.chip {
+  aspect-ratio: 1;
+  border-radius: 24%;
+}
+
+.chip-gray {
+  background: #a19e9e;
+}
+
+.chip-green {
+  background: #a3c7b6;
+}
+
+.chip-red {
+  background: #d77e70;
+}
+
+.chip-blue {
+  background: #8fbcc4;
+}
+
+.card {
+  box-sizing: border-box;
+  --amp: 6px;
+  padding: 4.6cqw 4.4cqw;
+  border-radius: 7cqw;
+  color: #fff;
+  box-shadow: 0.7cqw 1cqw 1.4cqw rgba(40, 40, 41, 0.35);
+}
+
+.card p {
+  margin: 0;
+}
+
+.card-label {
+  text-align: center;
+  font-weight: 700;
+  font-size: 2.9cqw;
+  letter-spacing: 0.02em;
+}
+
+.card .card-title {
+  margin-top: 3.8cqw;
+  font-weight: 700;
+  font-size: 3.1cqw;
+  line-height: 1.25;
+}
+
+.card .card-sub {
+  margin-top: 3.4cqw;
+  font-size: 3cqw;
+  opacity: 0.92;
+}
+
+.organiser-box {
+  left: 12.4%;
+  top: 19.4%;
+  width: 40.8%;
+  background: #7fb0b8;
+}
+
+.vendor-box {
+  left: 56.4%;
+  top: 23%;
+  width: 38.8%;
+  background: #9bc1ae;
+}
+
+.attendee-box {
+  left: 22%;
+  top: 55.8%;
+  width: 36.8%;
+  background: #d77e70;
+}
+
+.bar {
+  margin-top: 1.6cqw;
+  height: 2cqw;
+  border-radius: 99px;
+  background: #d8d8d8;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: #4f86f7;
+}
+
+.signup {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.signup button {
+  padding: 18px 44px;
+  border: 0;
+  border-radius: 999px;
+  background: #7fb0b8;
+  color: #fff;
+  font: inherit;
+  /* buttons don't inherit the page font by default */
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.signup button:hover {
+  background: #a3c7b6;
+  transform: translateY(-2px);
+}
+
+.signup button:active {
+  transform: translateY(0);
+}
+
+.signup button:focus-visible,
+.signup a:focus-visible {
+  outline: 3px solid var(--page-ink);
+  outline-offset: 3px;
+}
+
+.signup a {
+  color: var(--page-ink);
+  font-size: 18px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.signup a:hover {
+  text-decoration-thickness: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+  .chip {
+    animation: none;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 640px) {
+  .hero {
+    padding: 0 20px;
+    gap: 32px;
+  }
+
+  .headline {
+    justify-content: center;
+  }
+
+  .headline h1 {
+    font-size: clamp(34px, 9.5vw, 52px);
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  /* taller stage, so the cards can be bigger and still not overlap much */
+  .right {
+    width: 100%;
+    max-width: 440px;
+    aspect-ratio: 1 / 1.35;
+  }
+
+  .card {
+    --amp: 8px;
+    padding: 5cqw;
+    border-radius: 8cqw;
+  }
+
+  /* bigger type: ~15px on a 340px-wide stage */
+  .card-label {
+    font-size: 4.2cqw;
+  }
+
+  .card .card-title {
+    margin-top: 3.5cqw;
+    font-size: 4.6cqw;
+  }
+
+  .card .card-sub {
+    margin-top: 3cqw;
+    font-size: 4.4cqw;
+  }
+
+  .bar {
+    margin-top: 2.5cqw;
+    height: 2.6cqw;
+  }
+
+  /* stacked, slightly staggered left / right / left */
+  .organiser-box {
+    left: 0;
+    top: 3%;
+    width: 68%;
+  }
+
+  .vendor-box {
+    left: auto;
+    right: 0;
+    top: 30%;
+    width: 66%;
+  }
+
+  .attendee-box {
+    left: 6%;
+    top: 56%;
+    width: 62%;
+  }
+
+  .signup {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .signup button {
+    padding: 14px 36px;
+    font-size: 18px;
+  }
+}

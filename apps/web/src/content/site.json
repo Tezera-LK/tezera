@@ -1,0 +1,40 @@
+{
+  "name": "Tezera",
+  "wordmark": "tezera",
+  "tagline": "Every event in Sri Lanka, in one place.",
+  "url": "https://tezera.lk/",
+  "contactEmail": "hello@tezera.lk",
+  "footer": {
+    "links": [
+      {
+        "label": "Explore events",
+        "href": "/#join"
+      },
+      {
+        "label": "For organisers",
+        "href": "/#audience-organiser"
+      },
+      {
+        "label": "For vendors",
+        "href": "/#audience-vendor"
+      },
+      {
+        "label": "For freelancers",
+        "href": "/#audience-freelancer"
+      },
+      {
+        "label": "FAQ",
+        "href": "/#faq"
+      },
+      {
+        "label": "Privacy",
+        "href": "/privacy"
+      },
+      {
+        "label": "Terms",
+        "href": "/terms"
+      }
+    ],
+    "smallPrint": "© 2026 Tezera. Built by a five-person team for the SDGP Agile Team Project."
+  }
+}
