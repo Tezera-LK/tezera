@@ -6,21 +6,27 @@ import "./Navigation.css"
 
 export default function Navigation() {
   return (
-    <nav>
+    <nav className="site-nav">
       <Link href={navLinks.home} className="nav-logo" aria-label="Tezera home">
         <img src={navLinks.img} alt="" className="nav-icon" />
       </Link>
       <ul className="nav">
-        {navLinks.links.map((link) => (
-          <li key={link.name}>
-            {link.href.includes('#') ? (
-              <a href={link.href}>{link.name}</a>
-            ) : (
-              <Link href={link.href}>{link.name}</Link>
-            )}
-          </li>
-        ))}
+        <ul className="nav">
+          {navLinks.links.map((link) => (
+            <li key={link.name}>
+              {link.href.includes('#') ? (
+                <a href={link.href}>{link.name}</a>
+              ) : (
+                <Link href={link.href}>{link.name}</Link>
+              )}
+            </li>
+          ))}
+        </ul>
       </ul>
+      <div className="nav-spacer" />
     </nav>
   )
 }
+
+
+

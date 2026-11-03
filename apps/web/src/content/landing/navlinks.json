@@ -23,8 +23,16 @@
       "href": "/#freelancer"
     },
     {
+      "name": "ATTENDEE",
+      "href": "/#attendee"
+    },
+    {
+      "name": "PURPOSE",
+      "href": "/#purpose"
+    },
+    {
       "name": "TEAM",
-      "href": "/team"
+      "href": "/#team"
     },
     {
       "name": "CONTACT",

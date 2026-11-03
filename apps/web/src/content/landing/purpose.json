@@ -1,0 +1,12 @@
+{
+  "vision": {
+    "heading": "Our Vision",
+    "text": "Every event in Sri Lanka, easy to find, easy to run and easy to trust.",
+    "img": "/images/marketing/purpose/vision.svg"
+  },
+  "mission": {
+    "heading": "Our Mission",
+    "text": "To bring organisers, vendors, freelancers and attendees into one place, so organisers can hire verified people with confidence, vendors and freelancers can win work on their record, and attendees can find what is on and who is going.",
+    "img": "/images/marketing/purpose/mission.svg"
+  }
+}

@@ -5,6 +5,10 @@ import Audience from "@/components/marketing/Audience";
 import Organiser from "@/components/marketing/Organiser";
 import Vendor from "@/components/marketing/Vendor";
 import Freelance from "@/components/marketing/Freelance";
+import Attendee from "@/components/marketing/Attendee";
+import Purpose from "@/components/marketing/Purpose";
+import Team from "@/components/marketing/Team";
+import Footer from "@/components/marketing/Footer";
 
 export default function Home() {
   return (
@@ -27,6 +31,19 @@ export default function Home() {
         <section id="freelance">
           <Freelance />
         </section>
+        <section id="attendee">
+          <Attendee />
+        </section>
+        <section id="purpose">
+          <Purpose />
+        </section>
+        <section id="team">
+          <Team />
+        </section>
+        <section id="contact">
+          <Footer />
+        </section>
+
       </main>
     </>
   )

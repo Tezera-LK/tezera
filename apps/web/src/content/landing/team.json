@@ -1,0 +1,36 @@
+{
+  "heading": "The Team",
+  "subheading": "Meet the crew",
+  "cards": [
+    {
+      "name": "Yevan Dewathanthriarachchi",
+      "title": "Group Leader",
+      "hobby": "His favorite pass time is to play games and hate on AI.",
+      "image": "/images/marketing/team/yevan.png"
+    },
+    {
+      "name": "Damian De Cruze",
+      "title": "Product Owner",
+      "hobby": "Loves to abuse his claude code tokens on a daily basis.",
+      "image": "/images/marketing/team/damian.png"
+    },
+    {
+      "name": "Danella De Cruze",
+      "title": "Scrum Master",
+      "hobby": "In day she panics about deadlines, in night she sings on big stages.",
+      "image": "/images/marketing/team/danella.png"
+    },
+    {
+      "name": "Reshan Tennekoon",
+      "title": "UI/UX Designer",
+      "hobby": "He knows half of the people in Colombo, despite being from Kandy.",
+      "image": "/images/marketing/team/reshan.png"
+    },
+    {
+      "name": "Navindu Ranwatte",
+      "title": "Software Engineer",
+      "hobby": "The talk of all the guys, either they want to be with him, or they want to be him.",
+      "image": "/images/marketing/team/navindu.png"
+    }
+  ]
+}

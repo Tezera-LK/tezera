@@ -13,7 +13,7 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: { default: "tezera", template: "%s | Tezera" },
   description: "Every event in Sri Lanka, in one place.",
-  icons: "./tezera-tab.svg"
+  icons: "./images/marketing/meta/tezera-tab.svg"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
