@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   gap: 48px;
-  padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
+  padding: var(--section-y) var(--pad-x);
   overflow-x: clip;
   /* cards start off screen; this stops a sideways scrollbar */
 }
@@ -24,11 +24,20 @@
 }
 
 .vendor-text h3 {
-  margin: 14px 0 0;
-  color: rgba(40, 40, 41, 0.72);
+  margin: var(--text-gap) 0 0;
+  color: var(--ink-soft);
+  font-size: var(--sub-size);
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
 }
 
 .vendor-text p {
+  margin: var(--text-gap) 0 0;
+  max-width: 60ch;
+  color: var(--ink-body);
+  font-size: var(--body-size);
+  line-height: 1.65;
   text-align: center;
 }
 
@@ -127,4 +136,23 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* phones: one card per row, so the photos stay readable */
+@media (max-width: 640px) {
+  .vendor-card {
+    flex-basis: 100%;
+  }
+}
+
+/* card finish: soft ink-tinted shadow + hairline edge (outline draws over the photo) */
+.vendor-card {
+  box-shadow: var(--card-shadow);
+  outline: var(--card-edge);
+  outline-offset: -1px;
+}
+
+.vendor-card:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
 }

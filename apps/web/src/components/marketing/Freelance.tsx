@@ -3,6 +3,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import freelance from "@/content/landing/freelance.json";
+import { useScrollFrame } from "./useScrollFrame";
 import "./Freelance.css";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -12,6 +13,9 @@ const DIM = 0.4; // how dark it gets (0 to 1)
 
 export default function Freelance() {
   const rootRef = useRef<HTMLElement>(null);
+  // the scroll-driven frame; set by the effect below, called by Lenis on scroll
+  const frameRef = useRef<(() => void) | null>(null);
+  useScrollFrame(frameRef);
 
   useEffect(() => {
     // the pinning is plain CSS and stays; reduced motion only skips the scale and dimming
@@ -42,16 +46,16 @@ export default function Freelance() {
       frame();
     };
     redo();
-    window.addEventListener("scroll", frame, { passive: true });
+    frameRef.current = frame; // runs on every Lenis scroll tick
     window.addEventListener("resize", redo);
     return () => {
-      window.removeEventListener("scroll", frame);
+      frameRef.current = null;
       window.removeEventListener("resize", redo);
     };
   }, []);
 
   return (
-    <section className="freelance" id="freelancer" ref={rootRef}>
+    <section className="freelance" ref={rootRef}>
       <div className="freelance-text">
         <h1>{freelance.heading}</h1>
         <h3>{freelance.subheading}</h3>

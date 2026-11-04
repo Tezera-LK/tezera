@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
-  gap: 100px;
+  padding: var(--section-y) var(--pad-x);
+  gap: clamp(56px, 8vw, 100px);
 }
 
 .purpose-vission {
@@ -22,9 +22,11 @@
 }
 
 .purpose-vission h3 {
-  margin: 14px 0 0;
-  color: rgba(40, 40, 41, 0.72);
-  font-size: 25px;
+  margin: var(--text-gap) 0 0;
+  color: var(--ink-soft);
+  font-size: var(--sub-size);
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .purpose-mission {
@@ -43,15 +45,17 @@
 }
 
 .purpose-mission h3 {
-  margin: 14px 0 0;
-  color: rgba(40, 40, 41, 0.72);
+  margin: var(--text-gap) 0 0;
+  color: var(--ink-soft);
   text-align: center;
-  font-size: 25px;
+  font-size: var(--sub-size);
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .purpose-img {
-  width: 100px;
-  height: 100px;
+  width: clamp(56px, 3rem + 3vw, 100px);
+  height: auto;
 }
 
 .purpose-header {
@@ -76,4 +80,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* body lines stay centred and readable under the centred headings */
+.purpose-vission h3,
+.purpose-mission h3 {
+  max-width: 48ch;
+  text-align: center;
+  text-wrap: balance;
 }
