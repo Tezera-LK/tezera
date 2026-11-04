@@ -3,6 +3,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import organiser from "@/content/landing/organiser.json";
+import { useScrollFrame } from "./useScrollFrame";
 import "./Organiser.css";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -11,6 +12,9 @@ const settle = (t: number) => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 
 
 export default function Organiser() {
   const rootRef = useRef<HTMLElement>(null);
+  // the scroll-driven frame; set by the effect below, called by Lenis on scroll
+  const frameRef = useRef<(() => void) | null>(null);
+  useScrollFrame(frameRef);
   const words = organiser.heading.split(" ");
 
   useEffect(() => {
@@ -30,6 +34,8 @@ export default function Organiser() {
       return clamp((vh * 0.9 - el.getBoundingClientRect().top) / (vh * 0.6));
     };
 
+    // phones (one card per row): each card gently rises and fades in on its own instead of the block drop
+    const phone = window.matchMedia("(max-width: 640px)");
     const rows = Math.ceil(cards.length / 2);
     const step = 0.45 / Math.max(1, cards.length - 1);
 
@@ -46,6 +52,15 @@ export default function Organiser() {
       paragraph.style.opacity = String(s);
       paragraph.style.transform = `translateY(${(1 - s) * 16}px)`;
 
+      if (phone.matches) {
+        cards.forEach((card) => {
+          const t = easeOut(clamp(progress(card) / 0.5));
+          card.style.opacity = String(t);
+          card.style.transform = `translateY(${(1 - t) * 40}px)`;
+        });
+        return;
+      }
+
       // cards: drop in like blocks, bottom row first
       const pc = progress(grid);
       cards.forEach((card, i) => {
@@ -57,16 +72,16 @@ export default function Organiser() {
     };
 
     frame();
-    window.addEventListener("scroll", frame, { passive: true });
+    frameRef.current = frame; // runs on every Lenis scroll tick
     window.addEventListener("resize", frame);
     return () => {
-      window.removeEventListener("scroll", frame);
+      frameRef.current = null;
       window.removeEventListener("resize", frame);
     };
   }, []);
 
   return (
-    <section className="organiser" id="organiser" ref={rootRef}>
+    <section className="organiser" ref={rootRef}>
       <div className="organiser-text">
         <h1>
           {words.map((word, i) => (

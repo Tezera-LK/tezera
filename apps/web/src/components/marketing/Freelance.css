@@ -3,7 +3,7 @@
   flex-direction: row-reverse;
   align-items: flex-start;
   gap: 48px;
-  padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
+  padding: var(--section-y) var(--pad-x);
   /* no overflow rule here: overflow hidden or auto on a parent breaks sticky */
 }
 
@@ -15,7 +15,7 @@
 
 .freelance-text {
   position: sticky;
-  top: 88px;
+  top: calc(var(--nav-h) + 24px);
   /* same as the first card's pin, so their tops line up */
   flex: 1;
   min-width: 0;
@@ -26,7 +26,7 @@
 
 
 .freelance-text h1 {
-  margin: 14px 0 0;
+  margin: 0;
   color: var(--page-ink);
   font-size: var(--header-size);
   font-weight: 800;
@@ -35,11 +35,19 @@
 }
 
 .freelance-text h3 {
-  margin: 14px 0 0;
-  color: rgba(40, 40, 41, 0.72);
+  margin: var(--text-gap) 0 0;
+  color: var(--ink-soft);
+  font-size: var(--sub-size);
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .freelance-text p {
+  margin: var(--text-gap) 0 0;
+  max-width: 60ch;
+  color: var(--ink-body);
+  font-size: var(--body-size);
+  line-height: 1.65;
   text-align: start;
 }
 
@@ -53,7 +61,7 @@
 
 .freelance-card {
   position: sticky;
-  top: calc(88px + var(--i) * 18px);
+  top: calc(var(--nav-h) + 24px + var(--i) * 18px);
   /* each card pins 18px lower than the one before */
   flex: none;
   width: 100%;
@@ -62,7 +70,10 @@
   overflow: hidden;
   background: var(--bg);
   transform-origin: top center;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.18);
+  /* upward shadow separates each card from the one it slides over; tinted to the ink colour */
+  box-shadow: 0 -10px 30px rgba(40, 40, 41, 0.18);
+  outline: var(--card-edge);
+  outline-offset: -1px;
 }
 
 /* inner shadow, tinted from each card's own colour */
@@ -187,4 +198,9 @@
     position: static;
     /* a sticky text block would cover the cards on a phone */
   }
+}
+
+.freelance-card:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
 }

@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { useLenis } from "lenis/react";
 import "@/components/marketing/Opening.css";
 import { site } from "@/content";
+import { markRevealed } from "@/components/marketing/reveal";
 
 // random number generator to keep a fixed scatter of tiles, on every reload
 const makeRng = (seed: number) => {
@@ -27,16 +28,24 @@ type Tile = {
 const WORD = site.wordmark;
 
 // timing (ms)
-const MIN_LOAD = 1400; // the blinking boxes show at least this long, so they never just flash
-const HOLD = 400; // after the boxes fade out, the wordmark sits still this long before the dissolve
-const PLAY = 2600; // how long the opening animation runs
+const MIN_LOAD = 1000; // the loader shows at least this long, so it never just flashes
+const HOLD = 250; // after the loader fades out, the wordmark sits still this long before the dissolve
+const PLAY = 2200; // how long the opening animation runs
+const REVEAL_AT = 0.42; // point in the animation (0 -> 1) where the nav and hero start coming in underneath
 
-// loading: wordmark + blinking boxes | playing: boxes fade out, then the opening animation | done: cover removed
+// mosaic: gap between tiles (px) and the tile width it aims for, so phones get fewer, bigger tiles
+const GAP = 5;
+const TARGET_TILE = 110;
+
+// loading: wordmark + loader | playing: loader fades out, then the opening animation | done: cover removed
 type Phase = "loading" | "playing" | "done";
 
 export default function Opening() {
   const [phase, setPhase] = useState<Phase>("loading");
   const lenis = useLenis();
+
+  // the loader bar; painted straight from the fill loop, not through React state
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   // grid container for inserting tiles
   const tilesRef = useRef<HTMLDivElement>(null);
@@ -56,17 +65,21 @@ export default function Opening() {
     if (!host) return;
     // fresh generator each build so result is identical every time
     const range = makeRng(7);
+    // tiles per row from the screen width; each tile spans 2 columns, plus 1 spare column for the brick offset
+    const perRow = Math.round(clamp(window.innerWidth / TARGET_TILE, 5, 12));
+    const cols = perRow * 2 + 1;
+    host.style.setProperty("--cols", String(cols));
     // one column's width
-    const colWidth = (window.innerWidth - 24 * 5) / 25;
+    const colWidth = (window.innerWidth - GAP * (cols - 1)) / cols;
     // a tile spans 2 columns
     const tileHeight = colWidth * 2 * 0.92;
     // number of rows that fill the screen height, + 1 spare
-    const rows = Math.ceil(window.innerHeight / (tileHeight + 5)) + 1;
+    const rows = Math.ceil(window.innerHeight / (tileHeight + GAP)) + 1;
     // wipes old tiles
     host.textContent = "";
     const list: Tile[] = [];
     for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < 12; x++) {
+      for (let x = 0; x < perRow; x++) {
         const el = document.createElement("i");
         el.style.background = range() < 0.2 ? "#e8e9ebb0" : "#ffffff47";
         if (y % 2 === 0 && x === 0) el.className = "off";
@@ -115,6 +128,17 @@ export default function Opening() {
       t.el.style.transform = k > 0 ? `rotate${t.axis}(${t.dir * e * 180}deg) scale(${1 - e * 0.1})` : "";
       t.el.style.opacity = k > 0 ? String(1 - e) : "";
     });
+
+    // start the nav + hero entrance while the tiles are still clearing
+    if (P >= REVEAL_AT) markRevealed();
+  }, []);
+
+  // paints the loader bar for v (0 -> 1)
+  const paintLoader = useCallback((v: number) => {
+    const el = loaderRef.current;
+    if (!el) return;
+    el.style.setProperty("--p", String(v));
+    el.setAttribute("aria-valuenow", String(Math.round(v * 100)));
   }, []);
 
   // lock scrolling (and hide the scrollbar) while the cover is up, release it when it's gone
@@ -133,24 +157,19 @@ export default function Opening() {
   // mount: build tiles, wait for the page to load, then play the animation
   useEffect(() => {
     reduce.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // coming back to this page in the same tab: hide the nav + hero again until the cover lifts
+    document.documentElement.classList.remove("is-revealed");
     window.scrollTo(0, 0);
     build();
 
     let raf = 0;
     let cancelled = false;
 
-    // all three must finish before the animation starts
-    const pageLoaded = new Promise<void>((res) => {
-      if (document.readyState === "complete") res();
-      else window.addEventListener("load", () => res(), { once: true });
-    });
-    const fontsReady: Promise<unknown> = document.fonts?.ready ?? Promise.resolve();
-    const minWait = new Promise<void>((res) => setTimeout(res, MIN_LOAD));
-
-    Promise.all([pageLoaded, fontsReady, minWait]).then(() => {
-      if (cancelled) return;
+    // after loading: play the opening animation
+    const play = () => {
       // reduced motion: skip the animation, just remove the cover
       if (reduce.current) {
+        markRevealed();
         setPhase("done");
         return;
       }
@@ -163,7 +182,33 @@ export default function Opening() {
         else setPhase("done");
       };
       raf = requestAnimationFrame(tick);
-    });
+    };
+
+    // the loader fills toward how much work is done (page load + fonts), never faster than MIN_LOAD
+    // for the whole bar, so it shows real progress but never just flashes
+    let done = 0;
+    let target = 0.08; // a sliver straight away, so it reads as a loader
+    const finish = () => {
+      if (cancelled) return;
+      done += 1;
+      target = Math.max(target, done / 2);
+    };
+    new Promise<void>((res) => {
+      if (document.readyState === "complete") res();
+      else window.addEventListener("load", () => res(), { once: true });
+    }).then(finish);
+    (document.fonts?.ready ?? Promise.resolve()).then(finish);
+
+    let shown = 0;
+    let last = performance.now();
+    const fill = (now: number) => {
+      shown = Math.min(target, shown + (now - last) / MIN_LOAD);
+      last = now;
+      paintLoader(shown);
+      if (shown < 1) raf = requestAnimationFrame(fill);
+      else play();
+    };
+    raf = requestAnimationFrame(fill);
 
     // on resize, rebuild the tiles and redraw the current frame
     const onResize = () => {
@@ -178,7 +223,7 @@ export default function Opening() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
     };
-  }, [build, render]);
+  }, [build, render, paintLoader]);
 
   // animation finished: remove the cover from the page
   if (phase === "done") return null;
@@ -200,12 +245,16 @@ export default function Opening() {
         </div>
       </div>
 
-      {/* four boxes that blink while the page loads, then fade out */}
-      <div className={`loader${phase === "loading" ? "" : " loader-out"}`} role="status" aria-label="Loading">
-        <span className="loader-box" />
-        <span className="loader-box" />
-        <span className="loader-box" />
-        <span className="loader-box" />
+      {/* loader under the wordmark; fades out once loading is done */}
+      <div
+        ref={loaderRef}
+        className={`loader${phase === "loading" ? "" : " loader-out"}`}
+        role="progressbar"
+        aria-label="Loading"
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <span className="loader-bar" />
       </div>
     </div>
   );

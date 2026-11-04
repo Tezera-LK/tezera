@@ -6,8 +6,41 @@
   --accent: #9bc1ae;
   --red: #e96b58;
   /* same green as your nav hover */
-  --header-size: 4.5rem;
+  /* section headings: ~40px on phones, 72px on desktop */
+  --header-size: clamp(2.5rem, 1.6rem + 3.8vw, 4.5rem);
   --font: var(--font-bricolage), "Segoe UI", system-ui, sans-serif;
+
+  /* layout */
+  --nav-h: 64px;
+  /* fixed nav height; sections that pin use it to clear the bar */
+  --gutter: clamp(20px, 3.7vw, 65px);
+  /* left/right page padding */
+  --content-max: 1320px;
+  /* widest the content gets; on wider screens the side padding grows instead */
+  --pad-x: max(var(--gutter), calc((100% - var(--content-max)) / 2));
+  /* side padding for every full-width block (nav, hero, sections, footer), so their edges line up */
+  --section-y: clamp(40px, 5.5vw, 80px);
+  /* top/bottom section padding; two of these make the gap between sections */
+
+  /* section text: one scale for every section's heading block */
+  --sub-size: clamp(18px, 1rem + 0.3vw, 21px);
+  /* subheading under a section heading */
+  --body-size: clamp(16px, 0.95rem + 0.15vw, 17.5px);
+  /* body paragraph */
+  --text-gap: 16px;
+  /* space between heading, subheading and body */
+  --ink-soft: rgba(40, 40, 41, 0.72);
+  /* subheadings */
+  --ink-body: rgba(40, 40, 41, 0.85);
+  /* body copy */
+
+  /* cards: soft shadow tinted to the ink colour, and a hairline edge */
+  --card-shadow: 0 1px 2px rgba(40, 40, 41, 0.05), 0 18px 36px -24px rgba(40, 40, 41, 0.4);
+  --card-edge: 1px solid rgba(40, 40, 41, 0.07);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 html.lenis,
@@ -33,9 +66,17 @@ body {
   font-family: var(--font);
   font-size: 16px;
   line-height: 1.5;
-  display: flex;
-  flex-direction: column;
-  gap: 30vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* sections own their spacing; no sideways scroll from off-screen animations */
+main {
+  overflow-x: clip;
+}
+
+section[id] {
+  scroll-margin-top: var(--nav-h);
 }
 
 /* ---------- scrollbar ---------- */
