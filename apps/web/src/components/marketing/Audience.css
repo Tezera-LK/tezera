@@ -1,5 +1,5 @@
 .audience {
-  padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
+  padding: var(--section-y) var(--pad-x);
 }
 
 .audience-top {
@@ -16,9 +16,11 @@
 }
 
 .audience-subheading {
-  margin: 14px 0 0;
-  color: rgba(40, 40, 41, 0.72);
-  font-size: clamp(16px, 1.1vw, 19px);
+  margin: var(--text-gap) 0 0;
+  color: var(--ink-soft);
+  font-size: var(--sub-size);
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .audience-cards {
@@ -96,7 +98,8 @@
 .audience-chips {
   position: absolute;
   top: 20px;
-  right: 0;
+  /* inset from the edge so every chip sits fully inside the card */
+  right: 20px;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -109,8 +112,9 @@
   gap: 4px;
 }
 
-.audience-chip-row:first-child {
-  margin-right: -13px;
+/* brick offset: the second row shifts in, instead of the first row hanging off the edge */
+.audience-chip-row:last-child {
+  margin-right: 13px;
 }
 
 .audience-chip {
@@ -129,19 +133,10 @@
   display: none;
 }
 
-.audience-card:nth-child(1) {
+/* every card starts together; the order is: card rises in flat, then its tiles flip away
+   in a diagonal wave, then the text and chips come in. Nothing rotates at the same time. */
+.audience-card {
   --card-delay: 0.1s;
-  --tilt: 24deg;
-}
-
-.audience-card:nth-child(2) {
-  --card-delay: 0.1s;
-  --tilt: -24deg;
-}
-
-.audience-card:nth-child(3) {
-  --card-delay: 0.1s;
-  --tilt: 24deg;
 }
 
 /* ----- starting state: hidden. These transitions run when going BACK to hidden: quick, no delay ----- */
@@ -153,8 +148,9 @@
 
 .audience.is-armed .audience-card {
   opacity: 0;
-  transform: perspective(1200px) rotateY(var(--tilt)) translateY(30px);
-  transition: opacity 0.2s ease, transform 0.1s ease;
+  transform: translateY(28px);
+  box-shadow: 0 0 0 -20px transparent;
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .audience.is-armed .audience-tiles {
@@ -164,20 +160,32 @@
   display: grid;
   grid-template: repeat(4, 1fr) / repeat(3, 1fr);
   gap: 6px;
+  /* same 6px all round as between tiles, so the grid sits evenly inside the card */
+  padding: 6px;
+  box-sizing: border-box;
   perspective: 1400px;
   pointer-events: none;
 }
 
 .audience-tiles i {
-  --t: calc(var(--card-delay) + 0.5s + var(--d));
-  border-radius: 24%;
+  /* starts once the card has settled (its rise takes 0.7s); --d = place in the diagonal wave */
+  --t: calc(var(--card-delay) + 0.55s + var(--d));
+  backface-visibility: visible;
+  /* card radius (30px) minus the 6px inset: the outer tiles' corners follow the card's corners */
+  border-radius: 24px;
+  /* a faint sheen + hairline so tiles the same colour as the card still read as tiles */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   transition: transform 0.2s ease, opacity 0.2s ease, visibility 0s;
   /* mosaic closes again quickly */
 }
 
-.audience.is-armed .audience-body {
+/* body lines start hidden; each one rises in on its own (see the open state below) */
+.audience.is-armed .audience-body h3,
+.audience.is-armed .audience-user-line,
+.audience.is-armed .audience-card li {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(12px);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -195,33 +203,39 @@
 
 .audience.is-armed .audience-card.is-in {
   opacity: 1;
-  transform: perspective(1200px) rotateY(0deg) translateY(0);
+  transform: none;
+  /* the shadow grows once the tiles have cleared */
+  box-shadow: 0 28px 50px -30px color-mix(in srgb, var(--card-bg) 60%, #282829);
   transition:
-    opacity 0.3s ease var(--card-delay),
-    transform 1s cubic-bezier(0.2, 0.7, 0.2, 1) var(--card-delay);
+    opacity 0.5s ease var(--card-delay),
+    transform 0.7s var(--ease-out) var(--card-delay),
+    box-shadow 0.8s ease calc(var(--card-delay) + 1.2s);
 }
 
 .audience.is-armed .audience-card.is-in .audience-tiles i {
   transform: var(--flip) scale(0.9);
   opacity: 0;
   visibility: hidden;
+  /* a 0.5s flip you can see turn; it only fades in the second half */
   transition:
-    transform 0.2s ease-in-out var(--t),
-    opacity 0.2s ease-in-out var(--t),
-    visibility 0s linear calc(var(--t) + 0.2s);
+    transform 0.5s cubic-bezier(0.45, 0, 0.25, 1) var(--t),
+    opacity 0.25s ease calc(var(--t) + 0.25s),
+    visibility 0s linear calc(var(--t) + 0.5s);
 }
 
-.audience.is-armed .audience-card.is-in .audience-body {
+.audience.is-armed .audience-card.is-in .audience-body h3,
+.audience.is-armed .audience-card.is-in .audience-user-line,
+.audience.is-armed .audience-card.is-in li {
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.2s ease calc(var(--card-delay) + 1s),
-    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--card-delay) + 1s);
+    opacity 0.35s ease calc(var(--card-delay) + 1.4s + var(--n) * 0.06s),
+    transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--card-delay) + 1.4s + var(--n) * 0.06s);
 }
 
 .audience.is-armed .audience-card.is-in .audience-chip {
   transform: scale(1);
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--card-delay) + 1.2s + var(--i) * 0.04s);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--card-delay) + 1.6s + var(--i) * 0.04s);
 }
 
 @media (max-width: 900px) {
@@ -230,10 +244,10 @@
   }
 }
 
-/* wide screens: the generous gaps from the design */
+/* wide screens: roomier gaps, capped so the cards keep enough width for their titles */
 @media (min-width: 1200px) {
   .audience-cards {
-    gap: clamp(40px, 8.8vw, 155px);
+    gap: clamp(32px, 3.3vw, 64px);
   }
 }
 

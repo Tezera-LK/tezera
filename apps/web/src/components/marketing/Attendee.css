@@ -12,8 +12,8 @@
   display: flex;
   align-items: center;
   gap: 48px;
-  padding: 88px clamp(20px, 3.7vw, 65px) 40px;
-  /* 88px clears the fixed nav */
+  padding: calc(var(--nav-h) + 24px) var(--pad-x) 40px;
+  /* the top padding clears the fixed nav */
   /* no overflow rule here: overflow hidden or auto on a parent breaks sticky */
 }
 
@@ -36,11 +36,19 @@
 }
 
 .attendee-text h3 {
-  margin: 14px 0 0;
-  color: rgba(40, 40, 41, 0.72);
+  margin: var(--text-gap) 0 0;
+  color: var(--ink-soft);
+  font-size: var(--sub-size);
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .attendee-text p {
+  margin: var(--text-gap) 0 0;
+  max-width: 60ch;
+  color: var(--ink-body);
+  font-size: var(--body-size);
+  line-height: 1.65;
   text-align: start;
 }
 
@@ -225,7 +233,7 @@
     height: auto;
     flex-direction: column;
     align-items: stretch;
-    padding: clamp(48px, 8vw, 120px) clamp(20px, 3.7vw, 65px);
+    padding: var(--section-y) var(--pad-x);
   }
 
   .attendee-text {
@@ -245,4 +253,16 @@
   .attendee-rail {
     display: none;
   }
+}
+
+/* card finish: soft ink-tinted shadow + hairline edge (outline draws over the photo) */
+.attendee-card {
+  box-shadow: var(--card-shadow);
+  outline: var(--card-edge);
+  outline-offset: -1px;
+}
+
+.attendee-card:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
 }

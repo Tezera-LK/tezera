@@ -8,7 +8,11 @@ import "./Audience.css";
 type Variant = "organiser" | "vendor" | "attendee";
 
 const variants = audience.variants as Variant[];
-const { chipColours, tileColours, tileDelays, tileFlips } = audience;
+const { chipColours, tileColours, tileFlips } = audience;
+
+// the mosaic is 3 tiles across, 4 down; tiles clear in a diagonal wave from the top-left corner
+const TILE_COLS = 3;
+const WAVE_STEP = 0.08; // seconds between one diagonal and the next
 
 export default function Audience() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -72,7 +76,8 @@ export default function Audience() {
                     style={
                       {
                         background: colour,
-                        "--d": `${tileDelays[t]}s`,
+                        // diagonal index (column + row) sets when this tile flips away
+                        "--d": `${((t % TILE_COLS) + Math.floor(t / TILE_COLS)) * WAVE_STEP}s`,
                         "--flip": tileFlips[t],
                       } as CSSProperties
                     }
@@ -97,12 +102,13 @@ export default function Audience() {
                 ))}
               </div>
 
+              {/* --n staggers each line of the body in, top to bottom */}
               <div className="audience-body">
-                <h3>{card.title}</h3>
-                <p className="audience-user-line">{card.userLine}</p>
+                <h3 style={{ "--n": 0 } as CSSProperties}>{card.title}</h3>
+                <p className="audience-user-line" style={{ "--n": 1 } as CSSProperties}>{card.userLine}</p>
                 <ul>
-                  {card.points.map((point) => (
-                    <li key={point}>{point}</li>
+                  {card.points.map((point, p) => (
+                    <li key={point} style={{ "--n": p + 2 } as CSSProperties}>{point}</li>
                   ))}
                 </ul>
               </div>
