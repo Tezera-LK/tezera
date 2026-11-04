@@ -1,0 +1,375 @@
+/* ─────────────────────────────────────────────────────────────
+   SHARED FORM STYLES (CSS Module)
+   File: src/components/auth/Form.module.css
+   Used by every auth form and its parts (TextField, Button ...).
+
+   Every colour is a var(--auth-...) variable, set per role in
+   AuthLayout.module.css. That's why the same form looks coral for
+   attendees, slate for organisers and sage for vendors.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── PAGE HEADING ─────────────────────────────────────────── */
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 4px 0 24px;         /* 24px gap before the form */
+  font-size: 15px;
+  color: var(--auth-muted);
+}
+
+/* ── FORM LAYOUT ──────────────────────────────────────────── */
+/* Stacks everything in the form with an even 20px gap, so no
+   field needs its own margins. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Two fields side by side (e.g. Password + Confirm password). */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;         /* an error under one box doesn't stretch the other */
+}
+
+/* Grid items won't shrink below their content's natural width unless
+   told to, which pushed the second password box past the edge. */
+.row > * {
+  min-width: 0;
+}
+
+/* Two buttons side by side (Skip for now + Continue). */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .row,
+  .actions {
+    grid-template-columns: 1fr;   /* stack on narrow phones */
+  }
+}
+
+/* ── TEXT FIELD (label + input + message) ────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Text boxes, text areas and drop-down lists share this look. */
+.input {
+  height: 46px;
+  box-sizing: border-box;     /* padding + border count inside the 46px */
+  padding: 0 14px;
+  border: 1px solid var(--auth-line);
+  border-radius: 12px;
+  background: var(--auth-surface);
+  color: var(--auth-text);
+  font: inherit;              /* inputs don't inherit the page font by default */
+  font-size: 15px;
+}
+
+/* A text area grows taller and needs padding on all sides. */
+textarea.input {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;           /* people can drag it taller, not wider */
+}
+
+.input::placeholder {
+  color: var(--auth-muted);
+}
+
+/* :focus-visible = focused with the keyboard or while typing. */
+.input:focus-visible {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 1px;
+  border-color: var(--auth-primary);
+}
+
+/* An ATTRIBUTE SELECTOR: inputs TextField marks as wrong turn red. */
+.input[aria-invalid="true"] {
+  border-color: var(--auth-error);
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--auth-muted);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--auth-error);
+}
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;       /* fully rounded "pill" ends */
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;      /* in case a Link is styled as a button */
+}
+
+/* Solid button: the main action on a screen. */
+.primary {
+  background: var(--auth-primary);
+  color: var(--auth-on-primary);
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--auth-primary) 88%, #000); /* a bit darker */
+}
+
+/* Button with a border: secondary actions (Google, Skip for now). */
+.outline {
+  background: var(--auth-surface);
+  border-color: var(--auth-line);
+  color: var(--auth-text);
+}
+
+.outline:hover {
+  border-color: var(--auth-primary);
+}
+
+.block {
+  width: 100%;                /* full width of the form */
+}
+
+/* Smaller buttons inside rows (Follow, Remove, Add). */
+.small {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+/* Not full width: stop a flex column stretching it. */
+.button:not(.block) {
+  align-self: flex-start;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 3px;
+}
+
+/* ── "or" DIVIDER ─────────────────────────────────────────── */
+/* line, "or", line. The lines are ::before and ::after. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--auth-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;                    /* each line fills the spare space */
+  height: 1px;
+  background: var(--auth-line);
+}
+
+/* ── LINKS, SMALL TEXT, MESSAGES ──────────────────────────── */
+/* A <button> that looks like a link (for actions on the same page). */
+.linkButton {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--auth-link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* A real link, e.g. "Forgot password?" or "Back to log in". */
+.link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--auth-link);
+}
+
+/* "New to Tezera? Create an account" */
+.footer {
+  margin: 0;
+  font-size: 14px;
+}
+
+.footer a {
+  color: var(--auth-link);
+  font-weight: 600;
+}
+
+/* Grey small print, e.g. the terms line. */
+.smallPrint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--auth-muted);
+}
+
+/* A row of small text and links, e.g. "Resend code in 0:24 · Change email". */
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--auth-muted);
+}
+
+.metaRow a {
+  color: var(--auth-link);
+}
+
+/* Success or info message after submitting. Soft accent colour. */
+.status {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--auth-accent) 40%, var(--auth-bg));
+  font-size: 14px;
+}
+
+/* A grey-bordered box with a short explanation. */
+.note {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--auth-surface);
+  border: 1px solid var(--auth-line);
+  font-size: 14px;
+}
+
+/* A section box inside a form (e.g. "Then set a new password"). */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--auth-surface);
+  border: 1px solid var(--auth-line);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* A section heading inside a form, e.g. "Interests". */
+.sectionTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* A group of radio buttons or tick boxes with a title (<fieldset>).
+   Browsers add a border and padding to fieldsets by default; remove them. */
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend {
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+/* ── TICK BOX ─────────────────────────────────────────────── */
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--auth-primary);  /* colours the browser's own tick box */
+  flex-shrink: 0;                     /* long text can't squash the box */
+}
+
+/* ── PASSWORD FIELD with a Show / Hide button ─────────────── */
+/* The box and the button share one row; the button sits inside the
+   right-hand end of the box. */
+.passwordWrap {
+  position: relative;         /* the button is positioned inside this */
+  display: flex;
+}
+
+.passwordInput {
+  flex: 1;
+  width: 100%;
+  min-width: 0;               /* lets the box shrink in narrow columns */
+  padding-right: 68px;        /* room for the button, so text never runs under it */
+}
+
+.showButton {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);   /* centre it vertically */
+  height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--auth-link);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.showButton:hover {
+  background: var(--auth-selected);
+}
+
+.showButton:focus-visible {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 1px;
+}

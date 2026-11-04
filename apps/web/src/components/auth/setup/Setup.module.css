@@ -1,0 +1,120 @@
+/* ─────────────────────────────────────────────────────────────
+   SETUP SCREEN STYLES: the parts only the setup screens use
+   File: src/components/auth/setup/Setup.module.css
+   ───────────────────────────────────────────────────────────── */
+
+/* A list of rows (organisers to follow, services). */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One row: picture or text on the left, button or price on the right. */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--auth-line);
+  border-radius: 14px;
+  background: var(--auth-surface);
+}
+
+/* flex: 1 = take all the spare width, pushing what follows to the right. */
+.itemText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;               /* lets long text shrink instead of overflowing */
+}
+
+.itemTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.itemSub {
+  font-size: 12.5px;
+  color: var(--auth-muted);
+}
+
+.price {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;        /* keep "from LKR 15,000" on one line */
+}
+
+/* Round placeholder picture for organisers. */
+.avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--auth-line);
+}
+
+/* Logo upload: square preview + button + help text in a row. */
+.logoRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.logoPreview {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--auth-selected);
+  object-fit: cover;          /* fill the square without stretching the image */
+}
+
+/* The real file input is hidden; a styled <label> opens it. */
+.hiddenInput {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* Chosen districts: chips with a remove ×. */
+.chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chosenChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--auth-selected);
+  color: var(--auth-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* "Add a service" mini-form. */
+.addService {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+@media (max-width: 520px) {
+  .addService {
+    grid-template-columns: 1fr;
+  }
+}

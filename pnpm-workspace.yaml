@@ -3,7 +3,9 @@ packages:
   - "packages/*"
   - "infra"
 allowBuilds:
+  '@aws-amplify/hosting': false
   '@parcel/watcher': true
-  unrs-resolver: false
+  core-js: false
   esbuild: true
+  unrs-resolver: false
 nodeLinker: hoisted
