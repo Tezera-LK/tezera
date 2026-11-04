@@ -1,150 +1,346 @@
-/* var(--att-...) are the attendee colours from src/app/globals.css.
-   They switch automatically between light and dark mode:
-     --att-b background   --att-t text   --att-p coral
-     --att-s pink         --att-a gold */
+/* ─────────────────────────────────────────────────────────────
+   AUTH LAYOUT STYLES (CSS Module)
+   File: src/components/auth/AuthLayout.module.css
+   Used by: app/(auth)/[role]/layout.tsx and BrandPanel.tsx
 
-.page{
-    min-height: 100vh;
-    box-sizing: border-box;
-    display: grid;
-    /* column 2: "1fr" = all the remaining space */
-    grid-template-columns: minmax(0,616px) 1fr; 
-    gap: 24px;
-    padding: 24px;
-    background: var(--att-b);
-    color: var(--att-t);
-    --auth-surface: #ffffff;    /* inputs and the outline button */
-    --auth-line: #e2c9c4;       /* borders */
-    --auth-muted: #6e6670;      /* secondary text (subtitles, hints) */
-    --auth-error: #b42318;      /* error messages and red borders */
+   HOW THE ROLE COLOURS WORK
+   The layout puts TWO classes on the page box: .page (the layout) and
+   one role class (.attendee, .organiser, .vendor or .freelancer).
+   Each role class sets the same list of CSS VARIABLES (--auth-...)
+   to that role's colours. Every component (fields, buttons, cards)
+   only ever uses the variables, never a colour code. So when the
+   role in the web address changes, the whole page re-colours, and no
+   component needs to know which role it's in.
+
+   Colours come from the brand manual v1.1 and the three wireframes.
+   Each role has a light set and a dark set (dark = computer in dark mode).
+   ───────────────────────────────────────────────────────────── */
+
+/* ── THE VARIABLES, explained once ───────────────────────────
+   --auth-bg          page background
+   --auth-text        main text
+   --auth-muted       secondary text: subtitles, hints
+   --auth-surface     inside of inputs, cards and outline buttons
+   --auth-line        borders
+   --auth-primary     main buttons, picked cards, focus rings
+   --auth-on-primary  text on a primary-coloured button
+   --auth-selected    background of a picked role card or chip
+   --auth-link        link colour
+   --auth-accent      small highlights (status messages)
+   --auth-error       error messages and red borders
+   --auth-panel       the big brand panel on the left
+   --auth-panel-text  text on the brand panel
+   --auth-logo-1/2    the two logo dots
+   --auth-logo-text   the "tezera" wordmark on the panel
+   --tile-accent, --tile-secondary, --tile-light, --tile-dark, --tile-pale
+                      the five colours of the decorative tiles on the panel,
+                      taken from the role's accent, secondary and primary
+   ───────────────────────────────────────────────────────────── */
+
+/* ── ATTENDEE: coral, warm and social ───────────────────── */
+.attendee {
+  --auth-bg: #f7f0ed;
+  --auth-text: #392f3d;
+  --auth-muted: #6e6670;
+  --auth-surface: #ffffff;
+  --auth-line: #e2c9c4;
+  --auth-primary: #d77e70;
+  --auth-on-primary: #ffffff;
+  --auth-selected: #f5c2c4;
+  --auth-link: #392f3d;
+  --auth-accent: #e5c76c;
+  --auth-error: #b42318;
+  --auth-panel: #d77e70;
+  --auth-panel-text: #ffffff;
+  --auth-logo-1: #ee6b6e;
+  --auth-logo-2: #f5c2c4;
+  --auth-logo-text: #392f3d;
+  --tile-accent: #e5c76c;       /* gold */
+  --tile-secondary: #e58e96;    /* pink */
+  --tile-light: #e8b9b4;        /* light coral */
+  --tile-dark: #ac645a;         /* deep coral */
+  --tile-pale: #f3e2df;
 }
 
-.formSide{
-    display: flex;
-    justify-content: center;
-    padding: 64px 24px;
+/* ── ORGANISER: slate, calm and dependable ───────────────── */
+.organiser {
+  --auth-bg: #f1f4f8;
+  --auth-text: #282829;
+  --auth-muted: #56616c;
+  --auth-surface: #ffffff;
+  --auth-line: #c7d1dc;
+  --auth-primary: #526c80;
+  --auth-on-primary: #ffffff;
+  --auth-selected: #cfe3d8;
+  --auth-link: #255a84;
+  --auth-accent: #f6e3b4;
+  --auth-error: #b3261e;
+  --auth-panel: #526c80;
+  --auth-panel-text: #ffffff;
+  --auth-logo-1: #70a98d;
+  --auth-logo-2: #d7dfea;
+  --auth-logo-text: #ffffff;
+  --tile-accent: #70a98d;       /* sage (organiser secondary) */
+  --tile-secondary: #6f908b;    /* grey-green (organiser accent) */
+  --tile-light: #95a6b3;        /* light slate */
+  --tile-dark: #3d5162;         /* deep slate */
+  --tile-pale: #d7dfea;         /* organiser background */
 }
 
-.formBox{
-    width: 100%;
-    max-width: 460px;
+/* ── VENDOR and FREELANCER: sage, fresh and collaborative ──
+   Freelancers share the vendor palette (brand manual: "Vendor +
+   Freelancer palette"). A comma applies one rule to both classes. */
+.vendor,
+.freelancer {
+  --auth-bg: #e9e7e2;
+  --auth-text: #050316;
+  --auth-muted: #5f5d68;
+  --auth-surface: #ffffff;
+  --auth-line: #d8d6d0;
+  --auth-primary: #70a992;
+  --auth-on-primary: #ffffff;
+  --auth-selected: #c8ded4;
+  --auth-link: #3d7a62;
+  --auth-accent: #b6c3a7;
+  --auth-error: #b42318;
+  --auth-panel: #70a992;
+  --auth-panel-text: #ffffff;
+  --auth-logo-1: #ffffff;
+  --auth-logo-2: #b6c3a7;
+  --auth-logo-text: #050316;
+  --tile-accent: #b6c3a7;       /* soft green (vendor accent) */
+  --tile-secondary: #658095;    /* slate (vendor secondary) */
+  --tile-light: #a9cbbd;        /* light sage */
+  --tile-dark: #4f7d6a;         /* deep sage */
+  --tile-pale: #e9e7e2;         /* vendor background */
 }
 
-.panel{
-    position: relative;
-    /* clip tiles that run past the rounded edge */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    padding: 48px;
-    border-radius: 32px;
-    background: var(--att-p);
-    color: #fff;
-}
-
-.logo{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: 26px;
-    color: var(--att-t);
-    text-decoration: none;
-}
-
-.dots{
-    position: relative;
-    width: 38px;
-    height: 24px;
-}
-
-.dots::before, .dots::after{
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-}
-
-.dots::before{
-    left: 0;
-    background: #ee6b6e;
-    z-index: 1;
-}
-
-.dots::after{
-    left: 14px;
-    background: #f5c2c4;
-}
-
-.headline{
-    margin: 72px 0 0;
-    /* "ch" = width of one character */
-    max-width: 14ch;
-    font-size: 34px;
-    line-height: 1.24;
-    font-weight: 700;
-}
-
-.sub{
-    margin: 24px 0 0;
-    max-width: 44ch;
-    font-size: 15px;
-}
-
-.tiles{
-    /* top auto pushes the tiles to the BOTTOM of the panel
-                 (in a flex column, an auto margin takes all spare space).
-                 The negative right and bottom margins cancel the panel's
-                 padding, so the tiles run off the edge, as in the design. */
-    margin: auto -48px -48px -24px;
-    padding-top: 48px;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr); /* 6 equal columns */
-    gap: 8px;
-}
-
-.tile{
-    aspect-ratio: 92/84;
-    border-radius: 22px;
-}
-
-.g{background: var(--att-a);}
-.p{background: color-mix(in srgb, var(--att-s) 70%, var(--att-p));}
-.l { background: color-mix(in srgb, #fff 45%, var(--att-p)); }
-.d { background: color-mix(in srgb, var(--att-p) 80%, #000); }
-.w { background: color-mix(in srgb, #fff 80%, var(--att-p)); }
-
+/* ── DARK MODE versions ──────────────────────────────────────
+   prefers-color-scheme: dark = the computer is set to dark mode.
+   Same variable names, darker values, so nothing else changes.
+   (The vendor dark set is still "proposed" in the brand manual.) */
 @media (prefers-color-scheme: dark) {
-  .page {
+  .attendee {
+    --auth-bg: #120b08;
+    --auth-text: #ccc2d0;
+    --auth-muted: #a096a4;
     --auth-surface: #1f1512;
     --auth-line: #3e2c26;
-    --auth-muted: #a096a4;
+    --auth-primary: #8f3628;
+    --auth-on-primary: #f2eef4;
+    --auth-selected: #610f25;
+    --auth-link: #ccc2d0;
+    --auth-accent: #93751a;
     --auth-error: #ff8a80;
+    --auth-panel: #8f3628;
+    --auth-logo-text: #ccc2d0;
+    --tile-accent: #93751a;
+    --tile-secondary: #610f25;
+    --tile-light: #c08f88;
+    --tile-dark: #6e2a20;
+    --tile-pale: #e9d7d4;
+  }
+
+  .organiser {
+    --auth-bg: #151d28;
+    --auth-text: #d6d6d7;
+    --auth-muted: #9aa6b2;
+    --auth-surface: #1c2632;
+    --auth-line: #3a4958;
+    --auth-primary: #7f9aad;
+    --auth-on-primary: #151d28;
+    --auth-selected: #1e3a33;
+    --auth-link: #9cc4e4;
+    --auth-accent: #4a3b12;
+    --auth-error: #f08a80;
+    --auth-panel: #2b3d4e;
+    --auth-panel-text: #d6d6d7;
+    --auth-logo-1: #7f9aad;
+    --auth-logo-2: #568f76;
+    --auth-logo-text: #d6d6d7;
+    --tile-accent: #568f76;
+    --tile-secondary: #6f908b;
+    --tile-light: #7f9aad;
+    --tile-dark: #1f2c39;
+    --tile-pale: #c5cfda;
+  }
+
+  .vendor,
+  .freelancer {
+    --auth-bg: #1d1b16;
+    --auth-text: #dcdbe4;
+    --auth-muted: #9c9aa5;
+    --auth-surface: #2b2922;
+    --auth-line: #3a372f;
+    --auth-primary: #5a9179;
+    --auth-on-primary: #ffffff;
+    --auth-selected: #28372f;
+    --auth-link: #8cc6ac;
+    --auth-accent: #4b583c;
+    --auth-error: #ff8a80;
+    --auth-panel: #5a9179;
+    --auth-logo-2: #4b583c;
+    --auth-logo-text: #dcdbe4;
+    --tile-accent: #4b583c;
+    --tile-secondary: #7d97ab;
+    --tile-light: #8fb5a4;
+    --tile-dark: #3e6654;
+    --tile-pale: #dcdbe4;
   }
 }
 
-@media (max-width: 900px){
+/* ── PAGE: two-column grid ───────────────────────────────── */
+.page {
+  min-height: 100vh;          /* at least the full window height */
+  box-sizing: border-box;     /* padding counts inside the 100vh */
+  display: grid;
+  grid-template-columns: minmax(0, 616px) 1fr; /* panel up to 616px, form gets the rest */
+  gap: 24px;
+  padding: 24px;
+  background: var(--auth-bg);
+  color: var(--auth-text);
+  /* Fade between role colours when switching role cards.
+     Custom properties can't animate, but the properties that use them can. */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-    .page{
-        grid-template-columns: 1fr;
-        padding: 16px;
-    }
+/* ── FORM SIDE: right column ─────────────────────────────── */
+.formSide {
+  display: flex;
+  justify-content: center;    /* centre the form box left-to-right */
+  padding: 64px 24px;
+}
 
-    .formSide{
-        padding: 32px 0;
-    }
+.formBox {
+  width: 100%;
+  max-width: 460px;           /* the design's form width */
+}
 
-    .panel{
-        padding: 28px;
-    }
+/* Setup and verification screens have more side-by-side fields, so
+   they're wider. A page asks for this by wrapping itself in an element
+   with the data-wide attribute; :has() checks for it. */
+.formBox:has([data-wide]) {
+  max-width: 620px;
+}
 
-    .headline{
-        margin-top: 32px;
-        font-size: 26px;
-    }
-    .tiles{
-        display: none;
-    }
+/* ── BRAND PANEL: the coloured card on the left ──────────── */
+.panel {
+  position: relative;
+  overflow: hidden;           /* clip tiles that run past the rounded edge */
+  display: flex;
+  flex-direction: column;     /* stack logo, headline, text, tiles */
+  padding: 48px;
+  border-radius: 32px;
+  background: var(--auth-panel);
+  color: var(--auth-panel-text);
+  transition: background-color 0.3s ease;
+}
+
+/* Logo: two overlapping dots + "tezera" */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--auth-logo-text);
+  text-decoration: none;
+}
+
+.dots {
+  position: relative;         /* the circles are placed inside this box */
+  width: 38px;
+  height: 24px;
+}
+
+/* ::before and ::after are PSEUDO-ELEMENTS: two extra boxes drawn by CSS. */
+.dots::before,
+.dots::after {
+  content: "";                /* required, or they don't appear */
+  position: absolute;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;         /* a circle */
+}
+
+.dots::before {
+  left: 0;
+  background: var(--auth-logo-1);
+  z-index: 1;                 /* on top of the second circle */
+}
+
+.dots::after {
+  left: 14px;                 /* overlaps the first by 10px */
+  background: var(--auth-logo-2);
+}
+
+.headline {
+  margin: 72px 0 0;
+  max-width: 16ch;            /* "ch" = width of one character */
+  font-size: 34px;
+  line-height: 1.24;
+  font-weight: 700;
+}
+
+.sub {
+  margin: 24px 0 0;
+  max-width: 44ch;
+  font-size: 15px;
+}
+
+/* ── TILES: the brand manual's tile system, in the role's colours ── */
+.tiles {
+  /* top: auto pushes the tiles to the BOTTOM of the panel.
+     The negative margins cancel the panel padding so they run off the edge. */
+  margin: auto -48px -48px -24px;
+  padding-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.tile {
+  aspect-ratio: 92 / 84;
+  border-radius: 22px;
+}
+
+/* One class per letter in BrandPanel's ROWS pattern. */
+.a { background: var(--tile-accent); }
+.s { background: var(--tile-secondary); }
+.l { background: var(--tile-light); }
+.d { background: var(--tile-dark); }
+.w { background: var(--tile-pale); }
+
+/* ── SMALL SCREENS (900px or narrower) ───────────────────── */
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;   /* panel above the form */
+    padding: 16px;
+  }
+
+  .formSide {
+    padding: 32px 0;
+  }
+
+  .panel {
+    padding: 28px;
+  }
+
+  .headline {
+    margin-top: 32px;
+    font-size: 26px;
+  }
+
+  .tiles {
+    display: none;
+  }
+}
+
+/* People who turn off animations in their settings get no fades. */
+@media (prefers-reduced-motion: reduce) {
+  .page,
+  .panel {
+    transition: none;
+  }
 }

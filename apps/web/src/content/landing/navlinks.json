@@ -1,0 +1,42 @@
+{
+  "img": "./tezera.svg",
+  "home": "/#home",
+  "links": [
+    {
+      "name": "HOME",
+      "href": "/#home"
+    },
+    {
+      "name": "PEOPLE",
+      "href": "/#audience"
+    },
+    {
+      "name": "ORGANISER",
+      "href": "/#organiser"
+    },
+    {
+      "name": "VENDOR",
+      "href": "/#vendor"
+    },
+    {
+      "name": "FREELANCER",
+      "href": "/#freelancer"
+    },
+    {
+      "name": "ATTENDEE",
+      "href": "/#attendee"
+    },
+    {
+      "name": "PURPOSE",
+      "href": "/#purpose"
+    },
+    {
+      "name": "TEAM",
+      "href": "/#team"
+    },
+    {
+      "name": "CONTACT",
+      "href": "/#contact"
+    }
+  ]
+}

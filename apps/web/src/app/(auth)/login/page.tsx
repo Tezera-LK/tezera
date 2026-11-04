@@ -1,7 +1,14 @@
-import LoginForm from "@/components/auth/LoginForm";
+// ─────────────────────────────────────────────────────────────
+// OLD ADDRESS: /login -> /attendee/login
+// File: src/app/(auth)/login/page.tsx
+//
+// Log in now lives at /<role>/login (e.g. /vendor/login). This page
+// keeps old links working by sending people to the attendee version.
+// redirect() stops this page and tells the browser to go elsewhere.
+// ─────────────────────────────────────────────────────────────
 
-export const metadata = {title: "Log in"};
+import { redirect } from "next/navigation";
 
-export default function LoginPage(){
-    return <LoginForm/>;
+export default function OldLoginPage() {
+  redirect("/attendee/login");
 }

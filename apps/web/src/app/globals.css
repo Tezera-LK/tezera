@@ -1,532 +1,81 @@
 :root {
-  --slate: #7999b1;
-  /* brand slate – cover background */
-
-  /* Page chrome (light theme) */
-  --page-bg: #d7dfea;
-  /* background of the account page */
+  --slate: #f7f0ed;
+  --page-bg: #f7f0ed;
   --page-ink: #282829;
-  /* main text colour */
-  --page-muted: #4c5866;
-  /* secondary text colour */
-  --page-line: #b9c4d2;
-  /* hairlines / borders */
   --focus: #6f908b;
-  /* keyboard focus ring colour */
-
-  /* Attendee palette: t = text, b = background, p = primary, s = secondary, a = accent */
-  --att-t: #392f3d;
-  --att-b: #f7f0ed;
-  --att-p: #d77e70;
-  --att-s: #f09eb4;
-  --att-a: #e5c76c;
-  /* Organiser palette */
-  --org-t: #282829;
-  --org-b: #ffffff;
-  --org-p: #526c80;
-  --org-s: #70a98d;
-  --org-a: #6f908b;
-  /* Vendor + Freelancer palette (they share one) */
-  --ven-t: #050316;
-  --ven-b: #e9e7e2;
-  --ven-p: #70a992;
-  --ven-s: #658095;
-  --ven-a: #b6c3a7;
-
-  --btn-ink: #ffffff;
-  /* text colour on coloured buttons */
-
-  /* --font-bricolage is injected by next/font in app/layout.tsx */
+  --accent: #9bc1ae;
+  --red: #e96b58;
+  /* same green as your nav hover */
+  --header-size: 4.5rem;
   --font: var(--font-bricolage), "Segoe UI", system-ui, sans-serif;
 }
 
-/* ---------- Dark theme, automatic (follows the OS unless forced to light) ---------- */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --page-bg: #151d28;
-    --page-ink: #d6d6d7;
-    --page-muted: #a7b0bc;
-    --page-line: #2c3a4b;
-    --focus: #7f9aad;
-    --att-t: #ccc2d0;
-    --att-b: #120b08;
-    --att-p: #8f3628;
-    --att-s: #610f25;
-    --att-a: #93751a;
-    --org-t: #d6d6d7;
-    --org-b: #1b2533;
-    --org-p: #7f9aad;
-    --org-s: #568f76;
-    --org-a: #6f908b;
-    --ven-t: #dcdbe4;
-    --ven-b: #1d1b16;
-    --ven-p: #5a9179;
-    --ven-s: #7d97ab;
-    --ven-a: #4b583c;
-    --btn-ink: #f2eef4;
-    color-scheme: dark;
-  }
-}
-
-/* ---------- Dark theme, forced (set data-theme="dark" on <html>) ---------- */
-:root[data-theme="dark"] {
-  --page-bg: #151d28;
-  --page-ink: #d6d6d7;
-  --page-muted: #a7b0bc;
-  --page-line: #2c3a4b;
-  --focus: #7f9aad;
-  --att-t: #ccc2d0;
-  --att-b: #120b08;
-  --att-p: #8f3628;
-  --att-s: #610f25;
-  --att-a: #93751a;
-  --org-t: #d6d6d7;
-  --org-b: #1b2533;
-  --org-p: #7f9aad;
-  --org-s: #568f76;
-  --org-a: #6f908b;
-  --ven-t: #dcdbe4;
-  --ven-b: #1d1b16;
-  --ven-p: #5a9179;
-  --ven-s: #7d97ab;
-  --ven-a: #4b583c;
-  --btn-ink: #f2eef4;
-  color-scheme: dark;
-}
-
-/* ---------- Base reset + body ---------- */
-html,
-body {
+html.lenis,
+html.lenis body {
   margin: 0;
+  height: auto;
+}
+
+html {
+  scrollbar-gutter: stable;
+  /* stops the page shifting sideways when the bar appears */
+}
+
+/* loading screen: no scrolling, no scrollbar, no reserved gutter */
+html.is-loading {
+  overflow: hidden;
+  scrollbar-gutter: auto;
 }
 
 body {
   background: var(--slate);
-  /* matches the cover so there is never a white flash */
   color: var(--page-ink);
   font-family: var(--font);
   font-size: 16px;
   line-height: 1.5;
-}
-
-/* ---------- Top navigation (fixed, sits above everything) ---------- */
-.topnav {
-  position: fixed;
-  z-index: 20;
-  top: 0;
-  left: 0;
-  right: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  /* safe-area insets keep it clear of notches on phones */
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
-  padding-bottom: 16px;
-  padding-left: max(24px, env(safe-area-inset-left, 0px));
-  padding-right: max(24px, env(safe-area-inset-right, 0px));
-  color: #fff;
-  /* white while it floats over the slate cover */
-  transition: color .4s ease;
+  flex-direction: column;
+  gap: 30vh;
 }
 
-.topnav .wordmark,
-.topnav .links a {
-  transition: color .4s ease, background-color .4s ease;
+/* ---------- scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 12px;
 }
 
-/* "wm-on" / "links-on" are toggled by React once the cover has mostly gone: switch to dark ink */
-.topnav.wm-on .wordmark,
-.topnav.links-on .links a {
-  color: var(--page-ink);
+::-webkit-scrollbar-track {
+  background: var(--page-bg);
 }
 
-.wordmark {
-  font-weight: 800;
-  font-size: 24px;
-  letter-spacing: -.02em;
-  color: inherit;
-  text-decoration: none;
-}
-
-.links {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* pill-shaped links, translucent over the cover */
-.links a {
-  color: inherit;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 15px;
-  padding: 6px 14px;
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--red) 55%, transparent);
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, .35);
-  background: rgba(21, 29, 40, .25);
+  border: 3px solid var(--page-bg);
+  /* gap around the thumb makes it look slimmer */
 }
 
-.topnav.links-on .links a {
-  border-color: var(--page-line);
-  background: transparent;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
-.links a:hover {
-  background: rgba(21, 29, 40, .5);
+/* Firefox only: browsers that support ::-webkit-scrollbar skip this */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--page-ink) 55%, transparent) var(--page-bg);
+  }
 }
 
-.topnav.links-on .links a:hover {
-  background: color-mix(in srgb, var(--page-ink) 8%, transparent);
-}
-
-/* the "Sign up" call-to-action is a filled pill */
-.links a.cta {
-  background: #fff;
-  color: #282829;
-  border-color: #fff;
-}
-
-.topnav.links-on .links a.cta {
-  background: var(--page-ink);
-  color: var(--page-bg);
-  border-color: var(--page-ink);
-}
-
-/* visible keyboard focus for every interactive element */
 a:focus-visible,
 button:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
 
-/* The scroll intro (runway, stage, cover, blobs, tiles, hero) now lives in
-   components/marketing/Landing.css, imported by Landing.tsx. */
-
-/* ---------- "Scroll" cue at the bottom of the cover ---------- */
-.cue {
-  position: absolute;
-  left: 50%;
-  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  color: #fff;
-  font-weight: 600;
-  font-size: 14px;
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  opacity: .9;
+.lenis-smooth {
+  scroll-behavior: initial !important;
 }
 
-.cue svg {
-  width: 22px;
-  height: 22px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cue svg {
-    animation: nudge 1.6s cubic-bezier(.65, 0, .25, 1) infinite;
-  }
-}
-
-/* bobbing arrow */
-@keyframes nudge {
-  50% {
-    transform: translateY(5px);
-  }
-}
-
-/* ---------- Account-type page (the layer revealed under the cover) ---------- */
-.roles {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: var(--page-bg);
-  color: var(--page-ink);
-  overflow-y: auto;
-  padding-top: calc(96px + env(safe-area-inset-top, 0px));
-  /* leaves room for the fixed nav */
-  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
-  padding-left: max(24px, env(safe-area-inset-left, 0px));
-  padding-right: max(24px, env(safe-area-inset-right, 0px));
-}
-
-.roles-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  gap: 28px;
-}
-
-.roles h2 {
-  margin: 0;
-  font-weight: 800;
-  font-size: clamp(36px, 5.4vw, 72px);
-  line-height: .95;
-  letter-spacing: -.02em;
-  text-wrap: balance;
-}
-
-.roles .lede {
-  margin: 10px 0 0;
-  color: var(--page-muted);
-  font-size: 18px;
-  max-width: 56ch;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 18px;
-}
-
-/* responsive card grid */
-
-/* ---------- Role cards ---------- */
-/* Each card re-maps the generic --t/--b/--p/--s/--a variables to its own palette (organiser is the default) */
-.role {
-  --t: var(--org-t);
-  --b: var(--org-b);
-  --p: var(--org-p);
-  --s: var(--org-s);
-  --a: var(--org-a);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  background: var(--b);
-  color: var(--t);
-  border: 1.5px solid color-mix(in srgb, var(--p) 55%, transparent);
-  border-radius: 22px 22px 5px 22px;
-  /* brand shape: one small corner bottom-right */
-  padding: 18px;
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  position: relative;
-  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
-}
-
-.role:hover {
-  border-color: var(--p);
-  transform: translateY(-2px);
-}
-
-.role[aria-checked="true"] {
-  border-color: var(--p);
-  box-shadow: 0 0 0 3px var(--p);
-}
-
-/* selected state */
-.role.att {
-  --t: var(--att-t);
-  --b: var(--att-b);
-  --p: var(--att-p);
-  --s: var(--att-s);
-  --a: var(--att-a);
-}
-
-.role.ven,
-.role.fre {
-  --t: var(--ven-t);
-  --b: var(--ven-b);
-  --p: var(--ven-p);
-  --s: var(--ven-s);
-  --a: var(--ven-a);
-}
-
-/* tiny mosaic at the top of each card */
-.mosaic {
-  margin-right: 34px;
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  gap: 4px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.mosaic i {
-  display: block;
-  aspect-ratio: 1 / .92;
-  border-radius: 24%;
-  grid-column: span 2;
-}
-
-.mosaic i.off {
-  grid-column: 2 / span 2;
-}
-
-.mosaic i.gh {
-  background: var(--t) !important;
-  opacity: .12;
-}
-
-/* "ghost" tiles: faint, in text colour */
-
-.role h3 {
-  margin: 0;
-  font-weight: 800;
-  font-size: 28px;
-  letter-spacing: -.02em;
-  line-height: 1;
-}
-
-.role .who {
-  margin: 0;
-  font-weight: 600;
-  font-size: 15px;
-  opacity: .85;
-}
-
-.role ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 6px;
-  font-size: 15px;
-}
-
-.role li {
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-}
-
-.role li::before {
-  content: "";
-  flex: none;
-  width: 10px;
-  height: 9px;
-  border-radius: 3px 3px 1px 3px;
-  background: var(--p);
-  transform: translateY(1px);
-}
-
-/* mini tile as bullet */
-
-/* radio "dot" in the card's top-right corner */
-.pick {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid var(--p);
-  display: grid;
-  place-items: center;
-}
-
-.role[aria-checked="true"] .pick::after {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--p);
-}
-
-/* filled when selected */
-
-/* ---------- Actions row (continue button + alternative links) ---------- */
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 22px;
-  align-items: center;
-}
-
-.go {
-  font: 600 17px var(--font);
-  border: 0;
-  cursor: pointer;
-  padding: 14px 24px;
-  border-radius: 14px 14px 3px 14px;
-  background: var(--page-ink);
-  color: var(--page-bg);
-}
-
-.go:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-/* the button takes the colour of the chosen role */
-.go.att {
-  background: var(--att-p);
-  color: var(--btn-ink);
-}
-
-.go.org {
-  background: var(--org-p);
-  color: var(--btn-ink);
-}
-
-.go.ven,
-.go.fre {
-  background: var(--ven-p);
-  color: var(--btn-ink);
-}
-
-.alt {
-  color: var(--page-muted);
-  font-size: 15px;
-}
-
-.alt a {
-  color: var(--page-ink);
-  font-weight: 700;
-}
-
-.note {
-  font-size: 13px;
-  color: var(--page-muted);
-}
-
-/* ---------- Toast (small pop-up message used by the prototype links) ---------- */
-.toast {
-  position: fixed;
-  z-index: 30;
-  left: 50%;
-  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  background: var(--page-ink);
-  color: var(--page-bg);
-  padding: 12px 18px;
-  border-radius: 14px 14px 3px 14px;
-  font-weight: 600;
-}
-
-/* ---------- Small screens: compact two-column cards, hide perks + mosaic ---------- */
-@media (max-width: 640px) {
-  .role ul {
-    display: none;
-  }
-
-  .role h3 {
-    font-size: 24px;
-  }
-
-  .cards {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .mosaic {
-    display: none;
-  }
-}
-
-/* ---------- Reduced motion: no scroll animation (the intro's own rules are in Landing.css) ---------- */
-@media (prefers-reduced-motion: reduce) {
-  .roles {
-    position: relative;
-    inset: auto;
-    min-height: 100vh;
-    overflow: visible;
-  }
-
-  .cue {
-    display: none;
-  }
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }

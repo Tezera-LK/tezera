@@ -1,25 +1,34 @@
-//labels, input boxes and optional messages
+// ─────────────────────────────────────────────────────────────
+// TEXT FIELD: a label, an input box and an optional message
+// File: src/components/auth/TextField.tsx
+//
+// Used for every one-line box in the auth forms. Writing it once means
+// every field looks and behaves the same, and fixes happen in one place.
+//   <TextField id="password" label="Password" type="password" error="..." />
+// ─────────────────────────────────────────────────────────────
 
 import styles from "./Form.module.css";
-//every prop a normal <input> accepts (type, value, onChange, placeholder, autoComplete...).
 
+// React.ComponentProps<"input"> = every prop a normal <input> accepts
+// (type, value, onChange, placeholder, autoComplete...).
+// "&" adds our own props on top. "?" = optional.
 type TextFieldProps = React.ComponentProps<"input"> & {
   id: string;        // required: links the <label> to the <input>
-  label: string;     
-  error?: string;    
-  hint?: string;  
+  label: string;     // the text above the box
+  error?: string;    // shown in red when there's a problem
+  hint?: string;     // grey help text, shown when there's no error
 };
 
+// DESTRUCTURING: take our own props out by name; "...inputProps" (the
+// REST) collects everything else to pass straight on to the <input>.
 export default function TextField({ id, label, error, hint, ...inputProps }: TextFieldProps) {
-  // An id for the message, so the input can point to it (below).
-  const messageId = `${id}-message`;
-
-  // Which message to show: an error wins over a hint.
-  // "??" means "use the left side unless it's empty (undefined/null)".
-  const message = error ?? hint;
+  const messageId = `${id}-message`;   // so the input can point at its message
+  const message = error ?? hint;       // ?? = use error, or hint if there's no error
 
   return (
     <div className={styles.field}>
+      {/* htmlFor = the input's id: clicking the label focuses the box, and
+          screen readers read them together. ("for" is a JavaScript word.) */}
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>
@@ -27,16 +36,12 @@ export default function TextField({ id, label, error, hint, ...inputProps }: Tex
       <input
         id={id}
         className={styles.input}
-        // aria-invalid: tells screen readers the value is wrong.
-        // !!error turns the error text into true/false.
-        aria-invalid={!!error}
-        // aria-describedby: screen readers also read the message under the box.
-        // Only set when there is a message.
-        aria-describedby={message ? messageId : undefined}
-        {...inputProps}
+        aria-invalid={!!error}                                  // !! turns text into true/false
+        aria-describedby={message ? messageId : undefined}      // screen readers read the message too
+        {...inputProps}                                         // SPREAD: type, value, onChange...
       />
 
-      {/* && means "only show this if the left side is true".
+      {/* && = only show this if the left side is true.
           role="alert" makes screen readers announce new errors at once. */}
       {error && (
         <p id={messageId} className={styles.error} role="alert">

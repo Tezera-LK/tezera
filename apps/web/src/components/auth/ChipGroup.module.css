@@ -1,0 +1,79 @@
+/* ─────────────────────────────────────────────────────────────
+   CHIP GROUP: a set of pill-shaped choices (interests, categories ...)
+   File: src/components/auth/ChipGroup.module.css
+   ───────────────────────────────────────────────────────────── */
+
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* flex-wrap: chips flow onto the next line when the row is full. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* One chip: a <label> around a hidden checkbox or radio. */
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--auth-line);
+  border-radius: 999px;
+  background: var(--auth-surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--auth-primary);
+}
+
+/* Picked: filled with the role's primary colour. */
+.chip:has(input:checked) {
+  background: var(--auth-primary);
+  border-color: var(--auth-primary);
+  color: var(--auth-on-primary);
+}
+
+.chip:has(input:focus-visible) {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 2px;
+}
+
+/* The real input, hidden but still usable by keyboards and screen readers. */
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* The tick shown on a picked chip (multi-select only). */
+.tick {
+  display: none;
+}
+
+.chip:has(input:checked) .tick {
+  display: inline;
+}
+
+.error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--auth-error);
+}

@@ -1,30 +1,19 @@
-/*only what's special to the login page
+/* ─────────────────────────────────────────────────────────────
+   LOGIN FORM STYLES: only what's special to the login page
+   File: src/components/auth/LoginForm.module.css
+   Everything shared is in Form.module.css.
+   ───────────────────────────────────────────────────────────── */
 
-/* Stacks the login form and the Forgot password panel. */
-.stack {
+/* "Keep me logged in" on the left, "Forgot password?" on the right. */
+.options {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  justify-content: space-between;   /* push the two items to opposite ends */
+  flex-wrap: wrap;                  /* wrap on very narrow screens */
+  gap: 8px;
 }
 
-/* The pink "Forgot password" box. */
-.forgotPanel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 20px;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--att-s) 45%, var(--att-b));
-}
-
-.forgotTitle {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.forgotText {
-  margin: 0;
-  font-size: 14px;
-  color: var(--auth-muted);
+/* "Your account is verified" message above the form. */
+.notice {
+  margin-bottom: 20px;
 }

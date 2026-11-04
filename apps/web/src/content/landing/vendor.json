@@ -1,0 +1,35 @@
+{
+  "heading": "Open for business.",
+  "subheading": "Show what you sell, land the right stalls and get booked by organisers who need you.",
+  "details": "Become one of our vendors and let your work speak for itself. Build a profile, answer booking requests, quote on jobs and apply for stall slots at events across Sri Lanka. Every finished job leaves a review, so the next organiser can see your record before they hire you.",
+  "cards": [
+    {
+      "title": "Business profiles",
+      "point": "Showcase your services, products, prices and business details.",
+      "img": "/images/marketing/vendor/vendor-1.png",
+      "bg": "#70a992",
+      "ink": "#ffff"
+    },
+    {
+      "title": "Stall applications",
+      "point": "Discover and apply for available event stalls.",
+      "img": "/images/marketing/vendor/vendor-2.png",
+      "bg": "#658095",
+      "ink": "#ffff"
+    },
+    {
+      "title": "Job opportunities",
+      "point": "Find relevant opportunities and connect with event organisers.",
+      "img": "/images/marketing/vendor/vendor-3.png",
+      "bg": "#b6c3a7",
+      "ink": "#1b1b28"
+    },
+    {
+      "title": "Reviews & ratings",
+      "point": "Build credibility through reviews from completed jobs.",
+      "img": "/images/marketing/vendor/vendor-4.png",
+      "bg": "#ffff",
+      "ink": "0000"
+    }
+  ]
+}

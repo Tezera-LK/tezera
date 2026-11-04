@@ -1,0 +1,100 @@
+/* ─────────────────────────────────────────────────────────────
+   ROLE CARDS: the four "I am joining as" choices
+   File: src/components/auth/RoleCards.module.css
+   ───────────────────────────────────────────────────────────── */
+
+/* <fieldset> groups related inputs. Remove the browser's default border. */
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* <legend> is the fieldset's title ("I am joining as"). */
+.legend {
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* two cards per row */
+  gap: 12px;
+}
+
+/* One card. It's a <label>, so clicking anywhere on it picks the radio. */
+.card {
+  position: relative;               /* the dot is positioned inside it */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 72px;
+  box-sizing: border-box;
+  padding: 14px 40px 14px 16px;     /* room on the right for the dot */
+  border: 1px solid var(--auth-line);
+  border-radius: 14px;
+  background: var(--auth-surface);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--auth-primary);
+}
+
+/* The picked card. :has() = "a card that HAS a checked input inside". */
+.card:has(input:checked) {
+  border-color: var(--auth-primary);
+  background: var(--auth-selected);
+}
+
+/* Keyboard focus ring on the card when its hidden radio has focus. */
+.card:has(input:focus-visible) {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 2px;
+}
+
+/* The real radio button: invisible but still there for keyboards and
+   screen readers (display: none would remove it for them too). */
+.radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* Our own round dot, top right. */
+.dot {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--auth-line);
+  border-radius: 50%;
+}
+
+/* "+" = the element straight after a checked radio (the dot): fill it. */
+.radio:checked + .dot {
+  border-color: var(--auth-primary);
+  background: var(--auth-primary);
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.description {
+  font-size: 12.5px;
+  color: var(--auth-muted);
+}
+
+@media (max-width: 380px) {
+  .grid {
+    grid-template-columns: 1fr;     /* one card per row on very narrow phones */
+  }
+}

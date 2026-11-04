@@ -1,0 +1,42 @@
+/* ─────────────────────────────────────────────────────────────
+   STEPPER: the progress bars above the setup screens
+   File: src/components/auth/Stepper.module.css
+   ───────────────────────────────────────────────────────────── */
+
+/* An ordered list with its numbers and spacing removed,
+   laid out as equal columns (one per step). */
+.steps {
+  display: grid;
+  grid-auto-flow: column;       /* each step becomes a new column */
+  grid-auto-columns: 1fr;       /* all the same width */
+  gap: 8px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--auth-muted);
+}
+
+/* The bar, drawn with ::before. Grey until the step is reached. */
+.step::before {
+  content: "";
+  height: 6px;
+  border-radius: 3px;
+  background: var(--auth-line);
+}
+
+.done::before,
+.current::before {
+  background: var(--auth-primary);
+}
+
+.current {
+  color: var(--auth-text);
+}
