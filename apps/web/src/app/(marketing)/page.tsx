@@ -28,7 +28,7 @@ export default function Home() {
         <section id="vendor">
           <Vendor />
         </section>
-        <section id="freelance">
+        <section id="freelancer">
           <Freelance />
         </section>
         <section id="attendee">

@@ -1,0 +1,105 @@
+/* ─────────────────────────────────────────────────────────────
+   FILE DROP: a dashed box to drop or choose files, and the chosen list
+   File: src/components/auth/FileDrop.module.css
+   ───────────────────────────────────────────────────────────── */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* The drop area. It's a <label>, so clicking anywhere opens the file picker. */
+.zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 16px;
+  border: 2px dashed var(--auth-line);
+  border-radius: 16px;
+  background: var(--auth-surface);
+  text-align: center;
+  cursor: pointer;
+}
+
+/* While a file is dragged over the box (set by FileDrop.tsx). */
+.dragging {
+  border-color: var(--auth-primary);
+  background: var(--auth-selected);
+}
+
+.zone:has(input:focus-visible) {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 2px;
+}
+
+.zoneTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.zoneHint {
+  font-size: 12px;
+  color: var(--auth-muted);
+}
+
+/* The real file input: hidden but still usable with the keyboard. */
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* The chosen files. */
+.files {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--auth-line);
+  border-radius: 12px;
+  background: var(--auth-surface);
+}
+
+.fileText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;           /* long names end in "..." instead of overflowing */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: var(--auth-muted);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--auth-error);
+}

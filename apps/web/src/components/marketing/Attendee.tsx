@@ -3,6 +3,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import attendee from "@/content/landing/attendee.json";
+import { useScrollFrame } from "./useScrollFrame";
 import "./Attendee.css";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -10,6 +11,9 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 export default function Attendee() {
   const rootRef = useRef<HTMLElement>(null);
+  // the scroll-driven frame; set by the effect below, called by Lenis on scroll
+  const frameRef = useRef<(() => void) | null>(null);
+  useScrollFrame(frameRef);
   const last = attendee.cards.length - 1;
 
   useEffect(() => {
@@ -78,18 +82,18 @@ export default function Attendee() {
     };
 
     redo();
-    window.addEventListener("scroll", frame, { passive: true });
+    frameRef.current = frame; // runs on every Lenis scroll tick
     window.addEventListener("resize", redo);
     plain.addEventListener("change", redo);
     return () => {
-      window.removeEventListener("scroll", frame);
+      frameRef.current = null;
       window.removeEventListener("resize", redo);
       plain.removeEventListener("change", redo);
     };
   }, []);
 
   return (
-    <section className="attendee" id="attendee" ref={rootRef}>
+    <section className="attendee" ref={rootRef}>
       <div className="attendee-stage">
         <div className="attendee-text">
           <h1 data-fade>{attendee.heading}</h1>

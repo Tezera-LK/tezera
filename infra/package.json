@@ -1,0 +1,23 @@
+{
+  "name": "@tezera/infra",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "synth": "cdk synth",
+    "deploy:dev": "pnpm --filter @tezera/api build && cdk deploy -c stage=dev",
+    "deploy:main": "pnpm --filter @tezera/api build && cdk deploy -c stage=main",
+    "deploy:github": "cdk deploy -c github=true",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.275.0",
+    "constructs": "^10.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "aws-cdk": "^2.1147.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
+  }
+}

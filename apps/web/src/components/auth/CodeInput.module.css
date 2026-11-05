@@ -1,0 +1,47 @@
+/* ─────────────────────────────────────────────────────────────
+   CODE INPUT: the six one-digit boxes (verify and reset password)
+   File: src/components/auth/CodeInput.module.css
+   ───────────────────────────────────────────────────────────── */
+
+.boxes {
+  display: flex;
+  gap: 10px;
+}
+
+.box {
+  width: 56px;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 1px solid var(--auth-line);
+  border-radius: 12px;
+  background: var(--auth-surface);
+  color: var(--auth-text);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;         /* the digit sits in the middle */
+}
+
+/* The box you're typing in gets the role's colour, as in the designs. */
+.box:focus-visible {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 1px;
+  border-color: var(--auth-primary);
+}
+
+/* Wrong code: every box turns red. */
+.box[aria-invalid="true"] {
+  border-color: var(--auth-error);
+}
+
+/* Smaller boxes on narrow phones so all six fit. */
+@media (max-width: 420px) {
+  .boxes {
+    gap: 6px;
+  }
+  .box {
+    width: 44px;
+    height: 52px;
+  }
+}

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+// Bundled instead of next/font/google so builds don't download from Google Fonts,
+// which made CI fail intermittently. One variable file covers weights 400-800 (latin).
+const bricolage = localFont({
+  src: "./fonts/BricolageGrotesque-Latin.woff2",
+  weight: "400 800",
   variable: "--font-bricolage",
   display: "swap",
 })

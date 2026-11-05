@@ -1,0 +1,19 @@
+/* ─────────────────────────────────────────────────────────────
+   LOGIN FORM STYLES: only what's special to the login page
+   File: src/components/auth/LoginForm.module.css
+   Everything shared is in Form.module.css.
+   ───────────────────────────────────────────────────────────── */
+
+/* "Keep me logged in" on the left, "Forgot password?" on the right. */
+.options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* push the two items to opposite ends */
+  flex-wrap: wrap;                  /* wrap on very narrow screens */
+  gap: 8px;
+}
+
+/* "Your account is verified" message above the form. */
+.notice {
+  margin-bottom: 20px;
+}

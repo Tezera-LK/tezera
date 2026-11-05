@@ -1,0 +1,52 @@
+name: Deploy API
+
+# A push to dev deploys stack TezeraApi-dev. A push to main deploys TezeraApi-main.
+# Amplify builds the website on its own; this workflow only deploys the API (Lambda).
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - 'apps/api/**'
+      - 'infra/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # lets the job ask GitHub for the OIDC token AWS checks
+
+# One deploy per branch at a time. A newer push waits instead of cancelling a running deploy.
+concurrency:
+  group: deploy-api-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Skipped until the repository variable AWS_DEPLOY_ROLE_ARN is set (one-time AWS setup).
+    if: vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: pnpm/action-setup@v6.1.0
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # Swaps the GitHub OIDC token for temporary AWS credentials for tezera-github-deploy.
+      - uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      # Runs `nest build`, bundles the API and deploys the stack for this branch.
+      - name: Deploy TezeraApi-${{ github.ref_name }}
+        working-directory: infra
+        run: pnpm run deploy:${{ github.ref_name }} --require-approval never
