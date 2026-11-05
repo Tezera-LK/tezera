@@ -22,9 +22,10 @@ if (app.node.tryGetContext('github') === 'true') {
 
   // The site each stage serves, for CORS. The browser normally reaches the API through
   // the site's own /api path (a Next.js rewrite), so CORS only matters for direct calls.
+  // main is www: Amplify redirects https://tezera.lk to https://www.tezera.lk.
   const webOrigins: Record<string, string> = {
     dev: 'https://dev.tezera.lk',
-    main: 'https://tezera.lk',
+    main: 'https://www.tezera.lk',
   };
   if (!(stage in webOrigins)) {
     throw new Error(`Unknown stage "${stage}". Use -c stage=dev or -c stage=main.`);
