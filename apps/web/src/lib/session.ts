@@ -3,18 +3,19 @@
 // File: src/lib/session.ts
 //
 // Used by the log in and verify forms (after a successful log in), and by
-// the pages that need someone logged in (setup, verification, home).
+// the pages that need someone logged in (setup, verification).
 // ─────────────────────────────────────────────────────────────
 
 import { fetchAuthSession, fetchUserAttributes, getCurrentUser, updateUserAttributes } from "aws-amplify/auth";
 import { ROLE_INFO, isRole, type Role } from "./roles";
+import { routes } from "./routes";
 
 // How far through setting up a user is (stored on their Cognito account
 // as "custom:setup", see amplify/auth/resource.ts):
 //   ""        not started: send them to /<role>/setup
 //   "profile" profile saved; organisers, vendors and freelancers still
 //             need to upload documents: send them to /<role>/verification
-//   "done"    finished (or skipped): send them to /<role>/home
+//   "done"    finished (or skipped): send them to the portal, /dashboard
 export type SetupStage = "" | "profile" | "done";
 
 // Everything the pages need to know about the logged-in user.
@@ -60,7 +61,8 @@ export async function saveSetupStage(stage: SetupStage): Promise<void> {
 
 // Where someone should go after logging in, given their setup stage.
 export function pathAfterLogin(role: Role, setup: SetupStage): string {
-  if (setup === "done") return `/${role}/home`;
+  // The portal's dashboard (EN-06): one address for every role.
+  if (setup === "done") return routes.dashboard;
   // Profile done but documents not sent yet (only roles that are verified).
   if (setup === "profile" && ROLE_INFO[role].verification) return `/${role}/verification`;
   return `/${role}/setup`;

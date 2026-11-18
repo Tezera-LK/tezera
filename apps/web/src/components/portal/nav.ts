@@ -1,4 +1,5 @@
 import type { PortalRole } from "@/lib/portal-roles";
+import { ROLE_INFO } from "@/lib/roles";
 import { routes } from "@/lib/routes";
 
 // What the portal's sidebar and top bar link to, for each role. Both follow the two wireframes in
@@ -51,8 +52,10 @@ function general(role: PortalRole | null): NavGroup {
   };
 }
 
-// vendors and freelancers share one tools area at /vendor; freelancers don't take stalls (PRD section 3)
-function vendorTools(withStalls: boolean): NavItem[] {
+// Vendors (/vendor) and freelancers (/freelancer) get the same tools from the vendor wireframe, except that
+// freelancers don't take stalls (PRD section 3). Verification is the auth screens' page (EN-04).
+function providerTools(role: "vendor" | "freelancer"): NavItem[] {
+  const withStalls = role === "vendor";
   return [
     { label: "Booking requests" },
     { label: "Job posts" },
@@ -60,7 +63,7 @@ function vendorTools(withStalls: boolean): NavItem[] {
     { label: "My bookings" },
     ...(withStalls ? [{ label: "My stall listing" }] : []),
     { label: "Payments" },
-    { label: "Verification" },
+    { label: "Verification", href: routes.verification(role) },
   ];
 }
 
@@ -72,8 +75,8 @@ const TOOLS: Record<PortalRole, NavGroup | null> = {
     title: "Organiser tools",
     items: [{ label: "My events" }, { label: "Hiring" }, { label: "Feed and promotion" }, { label: "Payments" }],
   },
-  vendor: { title: "Vendor tools", items: vendorTools(true) },
-  freelancer: { title: "Freelancer tools", items: vendorTools(false) },
+  vendor: { title: "Vendor tools", items: providerTools("vendor") },
+  freelancer: { title: "Freelancer tools", items: providerTools("freelancer") },
   // everything attendees do is a shared page; an attendee-only page would get its own gated folder
   attendee: null,
   // no wireframe yet
@@ -92,15 +95,39 @@ export function navFor(role: PortalRole | null): NavGroup[] {
 
 export const TOP_BAR_TEXT = {
   home: "Tezera home",
-  profile: "Your profile",
 } as const;
 
-export const TOP_BAR: Record<"search" | "messages" | "notifications" | "profile", NavItem> = {
+export const TOP_BAR: Record<"search" | "messages" | "notifications", NavItem> = {
   search: SHARED.search,
   messages: SHARED.messages,
   notifications: SHARED.notifications,
-  profile: SHARED.profile,
 };
+
+// ---------- Account menu (the avatar at the right of the top bar) ----------
+
+export const ACCOUNT_TEXT = {
+  button: "Your account",
+  // when the account has neither an email address nor a phone number to show
+  loggedIn: "Logged in",
+  logOut: "Log out",
+  loggingOut: "Logging out…",
+  logOutFailed: "Couldn't log you out. Check your connection and try again.",
+} as const;
+
+// Links to the account's set-up screens from the auth flow (EN-04): the same two links its stand-in
+// home page offered before the portal replaced it. Admins never sign up, so they have neither.
+export function accountLinks(role: PortalRole | null): { label: string; href: string }[] {
+  if (!role || role === "admin") return [];
+  const links = [{ label: role === "attendee" ? "Edit your feed" : "Edit your profile", href: routes.setUp(role) }];
+  // only organisers, vendors and freelancers are verified (lib/roles.ts)
+  if (ROLE_INFO[role].verification) links.push({ label: "Verification", href: routes.verification(role) });
+  return links;
+}
+
+// After logging out: the log-in screen for their role (as the stand-in home page did), else the default one.
+export function logOutDestination(role: PortalRole | null): string {
+  return role && role !== "admin" ? routes.logInAs(role) : routes.logIn;
+}
 
 // The search box's hint: what each role looks for (organiser and vendor wireframes; the rest proposed).
 export function searchHint(role: PortalRole | null): string {

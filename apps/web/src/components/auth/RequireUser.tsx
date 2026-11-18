@@ -3,7 +3,7 @@
 // File: src/components/auth/RequireUser.tsx
 //
 //   <RequireUser role="vendor"> ...the page... </RequireUser>
-// Wraps the setup, verification and home pages. While it checks, it
+// Wraps the setup and verification pages. While it checks, it
 // shows "Checking your account…"; if nobody (or another role) is logged
 // in, it sends them to /<role>/login. Also exports useSignedInUser() for
 // components that need the user's details.

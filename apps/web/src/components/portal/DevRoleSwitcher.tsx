@@ -5,8 +5,9 @@ import { DEV_ROLE_COOKIE, type DevRole } from "@/lib/auth/dev-role";
 import { PORTAL_ROLES, ROLE_LABEL } from "@/lib/portal-roles";
 import styles from "./PortalShell.module.css";
 
-// Development only (PortalShell renders it only under `next dev`): choose which role the stand-in
-// session in lib/auth/session.ts gives you. Deleted in Phase B, when real sign-in arrives.
+// Development only: PortalShell renders it only in `next dev` without a user pool (VIEW_AS in
+// lib/auth/cognito.ts), where nobody can sign in. It picks the role lib/auth/session.ts gives you.
+// With a real amplify_outputs.json (`pnpm sandbox`) you sign in for real and this box disappears.
 export default function DevRoleSwitcher({ current }: { current: DevRole }) {
   const router = useRouter();
 

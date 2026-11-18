@@ -23,6 +23,7 @@ import styles from "./Setup.module.css";
 import { checkFile, isEmail, parseIdentifier } from "@/lib/validation";
 import { ROLE_INFO } from "@/lib/roles";
 import { authErrorMessage } from "@/lib/authErrors";
+import { routes } from "@/lib/routes";
 import { saveSetupStage } from "@/lib/session";
 
 const LOGO_TYPES = ["image/png", "image/jpeg"];
@@ -184,7 +185,7 @@ export default function OrganiserSetupForm() {
 
         <div className={formStyles.actions}>
           {/* Skip: finish later from the home page. */}
-          <Button variant="outline" onClick={() => moveOn("done", "/organiser/home")} disabled={busy}>
+          <Button variant="outline" onClick={() => moveOn("done", routes.dashboard)} disabled={busy}>
             Skip for now
           </Button>
           <Button type="submit" disabled={busy}>

@@ -190,9 +190,110 @@ a.iconButton:hover {
   cursor: default;
 }
 
+/* the account menu's avatar is a <button>, not a link */
+button.iconButton {
+  padding: 0;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
 .avatar {
   margin-left: 4px;
   background: var(--tint);
+}
+
+button.avatar:hover,
+button.avatar[aria-expanded="true"] {
+  background: var(--tint-strong);
+}
+
+/* ---------- Account menu (AccountMenu.tsx): the panel under the avatar ---------- */
+.account {
+  position: relative;
+}
+
+.accountPanel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  gap: 14px;
+  box-sizing: border-box;
+  width: 264px;
+  max-width: calc(100vw - 2 * var(--gutter));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px 18px 5px 18px;
+  /* brand shape: one small corner bottom-right */
+  background: var(--b);
+  color: var(--t);
+  box-shadow: 0 16px 36px -14px color-mix(in srgb, var(--t) 38%, transparent);
+}
+
+.accountPanel[hidden] {
+  display: none;
+}
+
+.accountWho {
+  display: grid;
+  gap: 2px;
+}
+
+.accountName {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+  /* long email addresses wrap instead of widening the panel */
+  overflow-wrap: anywhere;
+}
+
+.accountRole {
+  margin: 0;
+  font-size: 14px;
+  opacity: .8;
+}
+
+.accountLinks {
+  margin: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.accountLinks a {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 10px 10px 3px 10px;
+  color: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.accountLinks a:hover {
+  background: var(--tint);
+}
+
+/* Log out: the outlined .button, as wide as the panel */
+.accountPanel .button {
+  justify-content: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.accountPanel .button:disabled {
+  cursor: progress;
+  opacity: .7;
+}
+
+.accountError {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .roleChip {

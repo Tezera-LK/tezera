@@ -1,23 +1,16 @@
 // ─────────────────────────────────────────────────────────────
-// HOME PAGE: /<role>/home, where people land after logging in
+// OLD ADDRESS: /<role>/home -> /dashboard
 // File: src/app/(auth)/[role]/home/page.tsx
 //
-// A stand-in until the real home pages exist (attendee feed, organiser
-// dashboard, vendor home). It shows who's logged in, links back to setup
-// and verification, and a Log out button, so the whole flow can be tested.
+// People used to land here after logging in, on a stand-in home page.
+// The portal's dashboard (EN-06) is the real one now: log in, setup and
+// verification all go there. This keeps old links working.
 // ─────────────────────────────────────────────────────────────
 
-import HomePanel from "@/components/auth/HomePanel";
-import { ROLE_INFO, type Role } from "@/lib/roles";
+import { redirect } from "next/navigation";
 
-type Props = { params: Promise<{ role: string }> };
+import { routes } from "@/lib/routes";
 
-export async function generateMetadata({ params }: Props) {
-  const role = (await params).role as Role;
-  return { title: `${ROLE_INFO[role].name} home` };
-}
-
-export default async function HomePage({ params }: Props) {
-  const role = (await params).role as Role;
-  return <HomePanel role={role} />;
+export default function OldHomePage() {
+  redirect(routes.dashboard);
 }

@@ -1,14 +1,27 @@
 import Link from "next/link";
-import { ROLE_LABEL, type PortalRole } from "@/lib/portal-roles";
+import type { Session } from "@/lib/auth/session";
+import { ROLE_LABEL } from "@/lib/portal-roles";
 import { routes } from "@/lib/routes";
-import { BellIcon, MessageIcon, PersonIcon, SearchIcon } from "./icons";
-import { NAV_TEXT, TOP_BAR, TOP_BAR_TEXT, searchHint, type NavItem } from "./nav";
+import AccountMenu from "./AccountMenu";
+import { BellIcon, MessageIcon, SearchIcon } from "./icons";
+import {
+  ACCOUNT_TEXT,
+  NAV_TEXT,
+  TOP_BAR,
+  TOP_BAR_TEXT,
+  accountLinks,
+  logOutDestination,
+  searchHint,
+  type NavItem,
+} from "./nav";
 import styles from "./PortalShell.module.css";
 
 // The bar across the top of every signed-in page (both wireframes): logo, search, messages,
-// notifications, the role and the profile. Their pages come from other tickets (search US-C01,
+// notifications, the role and the account. Their pages come from other tickets (search US-C01,
 // the bell EN-09-T4); until one is built, its control is shown but doesn't do anything.
-export default function TopBar({ role }: { role: PortalRole | null }) {
+// The wireframes' avatar opens the profile; until the profile page exists it opens the account menu.
+export default function TopBar({ session }: { session: Session }) {
+  const { role } = session;
   const searchReady = Boolean(TOP_BAR.search.href);
 
   return (
@@ -38,28 +51,29 @@ export default function TopBar({ role }: { role: PortalRole | null }) {
           <BellIcon />
         </Shortcut>
         {role && <span className={styles.roleChip}>{ROLE_LABEL[role]}</span>}
-        <Shortcut item={{ ...TOP_BAR.profile, label: TOP_BAR_TEXT.profile }} avatar>
-          <PersonIcon />
-        </Shortcut>
+        <AccountMenu
+          name={session.name || ACCOUNT_TEXT.loggedIn}
+          roleLabel={role ? ROLE_LABEL[role] : undefined}
+          links={accountLinks(role)}
+          logOutTo={logOutDestination(role)}
+        />
       </div>
     </header>
   );
 }
 
 // A round icon button: a link once its page exists, plain until then (the sidebar's "Soon" rule).
-function Shortcut({ item, avatar, children }: { item: NavItem; avatar?: boolean; children: React.ReactNode }) {
-  const className = avatar ? `${styles.iconButton} ${styles.avatar}` : styles.iconButton;
-
+function Shortcut({ item, children }: { item: NavItem; children: React.ReactNode }) {
   if (item.href) {
     return (
-      <Link href={item.href} className={className}>
+      <Link href={item.href} className={styles.iconButton}>
         {children}
         <span className={styles.srOnly}>{item.label}</span>
       </Link>
     );
   }
   return (
-    <span className={`${className} ${styles.iconSoon}`} title={`${item.label}: ${NAV_TEXT.soon}`}>
+    <span className={`${styles.iconButton} ${styles.iconSoon}`} title={`${item.label}: ${NAV_TEXT.soon}`}>
       {children}
       <span className={styles.srOnly}>{`${item.label}, ${NAV_TEXT.soon}`}</span>
     </span>

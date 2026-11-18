@@ -23,6 +23,7 @@ import { DISTRICTS } from "@/lib/districts";
 import { ROLE_INFO } from "@/lib/roles";
 import { SAMPLE_ORGANISERS } from "@/lib/temporary";
 import { authErrorMessage } from "@/lib/authErrors";
+import { routes } from "@/lib/routes";
 import { saveSetupStage } from "@/lib/session";
 
 const INTERESTS = [
@@ -51,7 +52,7 @@ export default function AttendeeSetupForm() {
     try {
       // TODO (API step): save interests, district and follows.
       await saveSetupStage("done"); // the next log in goes straight home
-      router.push("/attendee/home");
+      router.push(routes.dashboard);
     } catch (err) {
       setError(authErrorMessage(err));
       setBusy(false);

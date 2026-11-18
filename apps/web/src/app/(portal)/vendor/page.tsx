@@ -7,18 +7,13 @@ export const metadata: Metadata = { title: "Vendor tools" };
 
 export default async function VendorToolsPage() {
   // this page's own check: the layout's check doesn't re-run when you move between pages inside it
-  const { role } = await requireRole("vendor", "freelancer");
-  const isFreelancer = role === "freelancer";
+  await requireRole("vendor");
 
   return (
     <>
       <PageHeader
-        title={isFreelancer ? "Freelancer tools" : "Vendor tools"}
-        description={
-          isFreelancer
-            ? "Booking requests, job posts, your bookings and payments."
-            : "Booking requests, job posts, stalls, your bookings and payments."
-        }
+        title="Vendor tools"
+        description="Booking requests, job posts, stalls, your bookings and payments."
       />
       <EmptyState
         title="Nothing here yet"

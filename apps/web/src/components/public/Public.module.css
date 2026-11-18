@@ -1,4 +1,4 @@
-/* Public pages (events, organiser and vendor profiles): open to anyone, cached, same HTML for every visitor.
+/* Public teasers (events; organiser, vendor and freelancer profiles): open to anyone, cached, same HTML for every visitor.
    The page around them uses the page colours: background and text from globals.css, lines and muted
    text from here (PR #14 removed those two from globals.css; see docs/learning/web-portal-shell-colour-tokens.md).
    Each event or profile card picks a role palette with data-palette (see Palette.module.css). */
@@ -127,12 +127,6 @@
   letter-spacing: .04em;
 }
 
-.summary {
-  margin: 0;
-  max-width: 60ch;
-  font-size: 18px;
-}
-
 /* When / Where / Organiser rows */
 .facts {
   display: grid;
@@ -149,15 +143,20 @@
   margin: 0;
 }
 
-.facts a {
-  color: inherit;
-  font-weight: 600;
-}
-
-.section {
+/* "See more on Tezera" at the end of each teaser (SignInPrompt.tsx): a dashed box, like a locked area */
+.signIn {
   display: grid;
   gap: 10px;
   justify-items: start;
+  margin-top: 6px;
+  padding: 18px;
+  border: 1.5px dashed color-mix(in srgb, var(--p) 55%, transparent);
+  border-radius: 14px 14px 3px 14px;
+}
+
+.signIn p {
+  margin: 0;
+  max-width: 60ch;
 }
 
 .sectionTitle {
@@ -167,48 +166,11 @@
   letter-spacing: -.01em;
 }
 
-/* list of an organiser's events */
-.events {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 8px;
-  width: 100%;
-}
-
-.events a {
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  border: 1px solid color-mix(in srgb, var(--t) 18%, transparent);
-  border-radius: 14px 14px 3px 14px;
-  color: inherit;
-  text-decoration: none;
-}
-
-.events a:hover {
-  border-color: var(--p);
-}
-
-.eventTitle {
-  font-weight: 700;
-}
-
-.eventMeta {
-  font-size: 14px;
-  opacity: .8;
-}
-
-/* contact details: only for people who are logged in */
-.locked {
-  padding: 16px;
-  border: 1.5px dashed color-mix(in srgb, var(--p) 55%, transparent);
-  border-radius: 14px 14px 3px 14px;
-}
-
-.locked p {
-  margin: 0;
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 /* outlined, so the text keeps its contrast in every role palette */
@@ -223,6 +185,18 @@
 
 .button:hover {
   background: color-mix(in srgb, var(--p) 14%, transparent);
+}
+
+/* the main action: filled in the role's colour, with the text colour picked for it (--on-p, Palette.module.css) */
+.buttonPrimary,
+.buttonPrimary:hover {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* a ring rather than a paler fill, so the text keeps its contrast */
+.buttonPrimary:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
 }
 
 /* a page outside this layout, e.g. the app-wide "Page not found" */

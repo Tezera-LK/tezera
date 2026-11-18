@@ -50,7 +50,7 @@ const DASHBOARD: Record<PortalRole, Dashboard> = {
       title: "No bookings yet",
       description: "Booking requests and job posts that match you will show up here.",
     },
-    tools: { label: "Freelancer tools", href: routes.vendorTools },
+    tools: { label: "Freelancer tools", href: routes.freelancerTools },
     panels: [{ title: "Coming up", empty: "Events you're booked for will show up here." }, RECENT_MESSAGES],
   },
   attendee: {

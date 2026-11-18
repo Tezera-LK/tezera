@@ -24,6 +24,7 @@ import Stepper from "./Stepper";
 import formStyles from "./Form.module.css";
 import { ROLE_INFO, type Role } from "@/lib/roles";
 import { authErrorMessage } from "@/lib/authErrors";
+import { routes } from "@/lib/routes";
 import { saveSetupStage } from "@/lib/session";
 
 export default function VerificationForm({ role }: { role: Role }) {
@@ -92,7 +93,7 @@ export default function VerificationForm({ role }: { role: Role }) {
               ))}
             </ul>
           </div>
-          <Button onClick={() => router.push(`/${role}/home`)}>Continue</Button>
+          <Button onClick={() => router.push(routes.dashboard)}>Continue</Button>
         </div>
       </div>
     );

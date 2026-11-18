@@ -1,42 +1,38 @@
-// What the public pages may show. Written by hand for now; Phase B derives these from the
-// Amplify schema (EN-03) with SelectionSet, so a page can't use a field that was never fetched.
-// Public fields only: no drafts, no contact details, nothing a visitor must not see.
+// What the public pages may show: a teaser (decided 18 Nov), enough to recognise an event or a profile
+// from a shared link. Everything else needs an account. A page can't show more than these types carry,
+// because lib/data/public.ts only ever hands them these fields.
+// Written by hand for now; once the backend has a schema (EN-03), derive them from it with SelectionSet.
+// Public fields only: no drafts, no descriptions, no contact details, nothing personal.
 
 export type EventStatus = "published" | "postponed" | "cancelled";
 
 export type PublicEvent = {
   id: string;
   title: string;
-  summary: string;
   // ISO 8601 date and time with offset, e.g. 2026-12-12T18:00:00+05:30
   startsAt: string;
-  venueName: string;
+  // the district (city), not the venue
   district: string;
   // postponed and cancelled events stay visible (PRD EV-02)
   status: EventStatus;
-  organiser: { id: string; name: string };
+  organiserName: string;
 };
-
-export type EventSummary = Pick<PublicEvent, "id" | "title" | "startsAt" | "status">;
 
 export type PublicOrganiser = {
   id: string;
   name: string;
-  description: string;
   district: string;
   verified: boolean;
-  upcomingEvents: EventSummary[];
 };
 
 // vendors are businesses; freelancers are individuals and don't take stalls (PRD section 3)
-export type VendorKind = "vendor" | "freelancer";
+export type ProviderKind = "vendor" | "freelancer";
 
-export type PublicVendor = {
+export type PublicProvider = {
   id: string;
   name: string;
-  kind: VendorKind;
+  kind: ProviderKind;
+  // what they do, e.g. "Photographer"
   category: string;
-  description: string;
-  districtsServed: string[];
   verified: boolean;
 };

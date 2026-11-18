@@ -1,11 +1,34 @@
 // Made-up records for `next dev`, so the public pages have something to show before the backend exists.
 // Never used in production builds (see lib/data/public.ts). Real demo data comes from EN-03-T3's seed script.
-import type { PublicEvent, PublicOrganiser, PublicVendor } from "@/lib/data/types";
+// Like the real backend, a record holds more than a visitor may see (summaries, venues, descriptions):
+// lib/data/public.ts picks out the teaser fields.
+import type { EventStatus, ProviderKind } from "@/lib/data/types";
+
+type SampleOrganiser = { id: string; name: string; description: string; district: string; verified: boolean };
 
 // the backend also stores drafts; public reads must never return them
-export type SampleEvent = Omit<PublicEvent, "status"> & { status: PublicEvent["status"] | "draft" };
+type SampleEvent = {
+  id: string;
+  title: string;
+  summary: string;
+  startsAt: string;
+  venueName: string;
+  district: string;
+  status: EventStatus | "draft";
+  organiserId: string;
+};
 
-export const sampleOrganisers: Omit<PublicOrganiser, "upcomingEvents">[] = [
+type SampleProvider = {
+  id: string;
+  name: string;
+  kind: ProviderKind;
+  category: string;
+  description: string;
+  districtsServed: string[];
+  verified: boolean;
+};
+
+export const sampleOrganisers: SampleOrganiser[] = [
   {
     id: "org-sample-1",
     name: "Lotus Pond Events (sample)",
@@ -31,7 +54,7 @@ export const sampleEvents: SampleEvent[] = [
     venueName: "Galle Face Green",
     district: "Colombo",
     status: "published",
-    organiser: { id: "org-sample-1", name: "Lotus Pond Events (sample)" },
+    organiserId: "org-sample-1",
   },
   {
     id: "evt-sample-2",
@@ -41,7 +64,7 @@ export const sampleEvents: SampleEvent[] = [
     venueName: "Lakeside Pavilion",
     district: "Kandy",
     status: "postponed",
-    organiser: { id: "org-sample-2", name: "Hill Country Gatherings (sample)" },
+    organiserId: "org-sample-2",
   },
   {
     id: "evt-sample-3",
@@ -51,7 +74,7 @@ export const sampleEvents: SampleEvent[] = [
     venueName: "Fort ramparts",
     district: "Galle",
     status: "cancelled",
-    organiser: { id: "org-sample-1", name: "Lotus Pond Events (sample)" },
+    organiserId: "org-sample-1",
   },
   {
     // a draft: /events/evt-sample-draft must show "Event not found"
@@ -62,11 +85,11 @@ export const sampleEvents: SampleEvent[] = [
     venueName: "To be confirmed",
     district: "Colombo",
     status: "draft",
-    organiser: { id: "org-sample-1", name: "Lotus Pond Events (sample)" },
+    organiserId: "org-sample-1",
   },
 ];
 
-export const sampleVendors: PublicVendor[] = [
+export const sampleProviders: SampleProvider[] = [
   {
     id: "ven-sample-1",
     name: "Spice Route Kitchen (sample)",
@@ -77,7 +100,7 @@ export const sampleVendors: PublicVendor[] = [
     verified: true,
   },
   {
-    id: "ven-sample-2",
+    id: "fre-sample-1",
     name: "Studio Lumen Photography (sample)",
     kind: "freelancer",
     category: "Photographer",

@@ -26,6 +26,7 @@ import styles from "./Setup.module.css";
 import { DISTRICTS } from "@/lib/districts";
 import { ROLE_INFO } from "@/lib/roles";
 import { authErrorMessage } from "@/lib/authErrors";
+import { routes } from "@/lib/routes";
 import { saveSetupStage } from "@/lib/session";
 
 // Only vendors and freelancers use this form.
@@ -255,7 +256,7 @@ export default function ProviderSetupForm({ role }: { role: ProviderRole }) {
 
         <div className={formStyles.actions}>
           {/* Skip: finish later from the home page. */}
-          <Button variant="outline" onClick={() => moveOn("done", `/${role}/home`)} disabled={busy}>
+          <Button variant="outline" onClick={() => moveOn("done", routes.dashboard)} disabled={busy}>
             Skip for now
           </Button>
           <Button type="submit" disabled={busy}>
