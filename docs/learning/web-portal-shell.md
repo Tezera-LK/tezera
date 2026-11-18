@@ -7,7 +7,7 @@
 >
 > **Done when** (from the backlog): "Next.js portal with layouts for consumers, organisers, providers and admins" and "Event and profile pages render on the server and open without logging in". **Depends on:** EN-04 (authentication and role-based access).
 >
-> **Branch:** `feature/webportalshell` · **Started:** 2026-11-03 · **Status:** Phase A (the parts that need no backend) approved and being built on 3 Nov; see [Build order](#build-order). Checked against live Jira the same day (see [Live Jira](#live-jira-checked-2026-11-03)). Decisions 1, 3, 4 and 6 are *Accepted* for Phase A; the rest stay *Proposed* until the backend exists. On 4 Nov the shell was redrawn to follow the team's two portal wireframes (Decision 7, *Proposed*: its choices are waiting for Navindu's review).
+> **Branch:** `feature/webportalshell` · **Started:** 2026-11-03 · **Status (18 Nov):** Phase A (no backend needed) built 3 Nov and redrawn after the wireframes 4 Nov (Decision 7). On 18 Nov, after `dev` brought in Danella's Cognito log in, Navindu approved five recommendations and they're built: real sign-in on the server (Decision 1c, EN-04-T4), teaser-only public pages (Decision 4, *Changed*), a `/freelancer` area of its own (Decision 1, *Changed*), log in landing on `/dashboard` (new Decision 8) and a typed data layer over sample data until the backend has data (Decision 2). Checks: [18 Nov](#checks-18-nov). Still waiting: real data (EN-03) and a test with a real user pool. See [Build order](#build-order).
 >
 > **Related notes:** [the theory, explained](web-portal-shell-explained.md) · [public pages and the portal](web-portal-shell-public-vs-portal.md) · [colour tokens after PR #14](web-portal-shell-colour-tokens.md) · [demo script, 5 Nov](web-portal-shell-demo-script.md)
 
@@ -26,15 +26,16 @@ Each decision has a status: *Proposed* → *Accepted* (or *Changed*). If we chan
 
 | # | Question | Recommendation |
 | --- | --- | --- |
-| 1 | How does each role get its own area? | One signed-in shell, `(portal)`, whose navigation and colours follow the user's role. Pages every role uses (dashboard, feed, messages, settings…) exist **once**. Role-only tools sit in gated folders: `/organiser`, `/vendor` (vendors and freelancers) and `/admin`. *Revised: was one folder per role; `/provider` → `/vendor` on 3 Nov.* |
-| 2 | Where does a user's role come from? | **Cognito groups**: `attendee`, `organiser`, `vendor`, `freelancer`, `admin` (lowercase, as EN-04 created them in `amplify/auth/resource.ts`). **Exactly one per account**, added at sign-up by a small trigger. The backend ticket (EN-04) creates them; this ticket only reads them. *Revised: `ATTENDEE` → `CONSUMER` to match the backlog; then, on 18 Nov, to the lowercase names EN-04 actually built, with `attendee` instead of `CONSUMER`.* |
-| 3 | Where is the role checked? | Three layers: `proxy.ts` (are you signed in? It protects every page except the public ones), a server-only `requireRole()` helper (do you have this role?), and Amplify Data auth rules (the real lock). In the backlog, the first two belong to EN-04-T4. |
+| 1 | How does each role get its own area? | One signed-in shell, `(portal)`, whose navigation and colours follow the user's role. Pages every role uses (dashboard, feed, messages, settings…) exist **once**. Role-only tools sit in gated folders: `/organiser`, `/vendor`, `/freelancer` and `/admin`. *Revised: was one folder per role; `/provider` → `/vendor` on 3 Nov; freelancers moved from `/vendor` to `/freelancer` on 18 Nov, to match their log-in screen `/freelancer/login`.* |
+| 2 | Where does a user's role come from? | **Cognito groups**: `attendee`, `organiser`, `vendor`, `freelancer`, `admin` (lowercase, as EN-04 created them in `amplify/auth/resource.ts`), read from the access token. **Exactly one per account**, added at sign-up by a small trigger. One exception: **admin wins**, because admins are added to `admin` by hand on top of the group they signed up with. *Revised: `ATTENDEE` → `CONSUMER` to match the backlog; then, on 18 Nov, to the lowercase names EN-04 actually built, with `attendee` instead of `CONSUMER`; "admin wins" added 18 Nov.* |
+| 3 | Where is the role checked? | Three layers: `proxy.ts` (are you signed in? It protects every page except the public ones), a server-only `requireRole()` helper (do you have this role?), and backend auth rules (the real lock). The first two are EN-04-T4. **Built 18 Nov:** both read Danella's Cognito tokens from cookies (`ssr: true`), check their signature and refresh them when they expire. |
 | 4 | How do we read data with types? | Amplify Gen 2 `generateClient<Schema>()`. Types come straight from `amplify/data/resource.ts`, with no code generation. Three clients: browser, server-as-user, server-as-guest. |
 | 5 | Loading, error and empty states? | Next.js special files (`loading.tsx`, `error.tsx`, `not-found.tsx`) plus three small components: `<LoadingState>`, `<ErrorState>`, `<EmptyState>`. Their text comes in as props, so it can move into translation files. |
-| 6 | Public event and profile pages? | `/events/<id>`, `/organisers/<id>` and `/vendors/<id>`, server-rendered as a **guest** and cached for 60 seconds (`dynamic = 'force-static'` + `revalidate = 60`). Guests never see draft events or organiser contact details, and consumer profiles are **not** public. *Revised: was `/profiles/<id>`, then `/providers/<id>`.* |
+| 6 | Public event and profile pages? | **Teasers** (decided 18 Nov): `/events/<id>`, `/organisers/<id>`, `/vendors/<id>` and `/freelancers/<id>` show just enough to recognise the event or profile, then "See more on Tezera" with Log in and Create an account. Server-rendered and cached for 60 seconds (`dynamic = 'force-static'` + `revalidate = 60`), with Open Graph tags for WhatsApp previews. Drafts and attendee profiles are never public. *Revised: was `/profiles/<id>`, then `/providers/<id>`; full public pages → teasers on 18 Nov.* |
 | 7 | Use Next's new Cache Components (`'use cache'`)? | **Not yet.** It works (we tested it), but it switches caching rules for the whole app, and Amplify Hosting does not officially support Next 16 yet. Revisit before Next 17. |
-| 8 | How do we build before the backend exists? (Decision 6) | Pages only call a few small functions (`getSession()`, `getPublicEvent()`…) and build links through one `routes` file. Until EN-03 and EN-04 exist, those functions return sample data in `next dev`, where a "View as" box in the bottom-right corner picks your role. Production builds get no data and no session. *New, 3 Nov.* |
+| 8 | How do we build before the backend exists? (Decision 6) | Pages only call a few small functions (`getSession()`, `getPublicEvent()`…) and build links through one `routes` file. The data functions return sample data in `next dev` and nothing in production builds. *New, 3 Nov. Changed 18 Nov: `getSession()` is real now; the "View as" box only appears in `next dev` without a user pool (CI's placeholder `amplify_outputs.json`).* |
 | 9 | What should the shell look like? (Decision 7) | The layout both portal wireframes share: a top bar (logo, search, messages, notifications, role, profile), the sidebar as a rounded card in the role's colour, buttons beside each page title and an optional right-hand column of panels. Where the two wireframes disagree, each choice is written down. Text on the role colour is picked per palette, because white fails the contrast check on vendor green and consumer coral. *New, 4 Nov.* |
+| 10 | How do the log-in screens and the portal fit together? (Decision 8) | Log in, setup and verification all end on `/dashboard`; Danella's stand-in `/<role>/home` page redirects there. The avatar opens an account menu: who's logged in, the set-up and verification screens, and **Log out**. Signed-out visitors to `/vendor`, `/organiser` or `/freelancer` go to that role's log-in screen. *New, 18 Nov.* |
 
 ## Where we are starting from (2026-11-03)
 
@@ -125,7 +126,7 @@ PG-01 (sign-up and role choice) and the stories that build the real public pages
 
 ## Decision 1: Role-based layouts
 
-**Status:** Accepted for Phase A (3 Nov). Built with a stand-in session (Decision 6); the real sign-in check arrives with EN-04.
+**Status:** Accepted (3 Nov). Built with a stand-in session (Decision 6) on 3 Nov; the real Cognito session since 18 Nov (1c). *Changed 18 Nov:* freelancers have their own `/freelancer` area (see Naming below).
 
 ### The problem
 
@@ -157,44 +158,53 @@ Anyone who isn't signed in, or doesn't have the role, must not get into those to
 
 **Decision: F.**
 
-What Phase A built (3 Nov). BUILT = in the branch now; LATER = Phase B. Existing groups are untouched:
+What's built, as of 18 Nov (the 3 Nov tree is in git history). Folders from other tickets are only touched where noted:
 
 ```text
 apps/web/src/
-├── proxy.ts                          LATER signed-in check on every non-public URL (+ token refresh)  ← EN-04-T4
+├── proxy.ts                          18 Nov: signed-in check on every non-public URL + token refresh  (EN-04-T4)
 ├── lib/
 │   ├── roles.ts                      EN-04 the four sign-up roles and their auth-screen wording (Danella)
-│   ├── portal-roles.ts               BUILT portal roles = roles.ts + admin (= Cognito group names), labels, palettes
-│   ├── routes.ts                     BUILT every URL in one place (Decision 6)
-│   ├── format.ts                     BUILT dates in Sri Lanka time, "A, B and C" lists
-│   ├── auth/session.ts               BUILT getSession() stand-in, requireSession(), requireRole()
-│   ├── auth/dev-role.ts              BUILT the development-only "View as" cookie
-│   └── data/                         BUILT types.ts, samples.ts, public.ts (getPublicEvent() and friends)
+│   ├── session.ts                    EN-04 Danella's browser-side helpers; 18 Nov: pathAfterLogin → /dashboard
+│   ├── portal-roles.ts               portal roles = roles.ts + admin (= Cognito group names), labels, palettes
+│   ├── routes.ts                     every URL in one place (Decision 6); 18 Nov: /freelancer, auth screens
+│   ├── format.ts                     dates in Sri Lanka time, "A, B and C" lists
+│   ├── amplify/server.ts             18 Nov: Amplify's server runner (adapter-nextjs); is there a real user pool?
+│   ├── auth/cognito.ts               18 Nov: tokens → { userId, role, name }; "admin wins"; VIEW_AS
+│   ├── auth/paths.ts                 18 Nov: which URLs are public; which log-in screen a visitor gets
+│   ├── auth/session.ts               getSession() (real since 18 Nov), requireSession(), requireRole()
+│   ├── auth/dev-role.ts              the development-only "View as" cookie (only without a user pool)
+│   └── data/                         types.ts (teasers since 18 Nov), samples.ts, public.ts
 ├── components/
-│   ├── Palette.module.css            BUILT role palette → --t/--b/--p/--s/--a
-│   ├── states/                       BUILT LoadingState, ErrorState, EmptyState (+ text.ts)
-│   ├── portal/                       BUILT PortalShell, PortalNav, nav.ts, PageHeader, DevRoleSwitcher;
-│   │                                       4 Nov: TopBar, Columns, Panel, ButtonLink, icons (Decision 7)
-│   └── public/                       BUILT shared styles, labels, ContactDetails (locked for visitors)
+│   ├── ConfigureAmplify.tsx          EN-04 Danella's; 18 Nov: { ssr: true }
+│   ├── auth/LoginForm.tsx            EN-04 Danella's; 18 Nov: "Keep me logged in" uses cookies (Decision 2)
+│   ├── Palette.module.css            role palette → --t/--b/--p/--s/--a
+│   ├── states/                       LoadingState, ErrorState, EmptyState (+ text.ts)
+│   ├── portal/                       PortalShell, PortalNav, nav.ts, PageHeader, DevRoleSwitcher; 4 Nov: TopBar,
+│   │                                       Columns, Panel, ButtonLink, icons (Decision 7); 18 Nov: AccountMenu
+│   └── public/                       shared styles and words; 18 Nov: SignInPrompt, HeaderAction,
+│                                           ProviderTeaser, metadata.ts, useHasSession (ContactDetails removed)
 └── app/
-    ├── layout.tsx                         root (unchanged; Phase B adds the Amplify browser config)
-    ├── global-error.tsx              BUILT last-resort error page
-    ├── not-found.tsx                 BUILT "Page not found" for unknown URLs
+    ├── layout.tsx                         root (unchanged)
+    ├── global-error.tsx                   last-resort error page
+    ├── not-found.tsx                      "Page not found" for unknown URLs
     ├── (marketing)/ …                     landing page (unchanged)
-    ├── (auth)/ …                          login / sign-up (Danella's, unchanged)
-    ├── (public)/                     BUILT anyone can see; server-rendered and cached
-    │   ├── layout.tsx · error.tsx         header with "Log in"; no loading.tsx (see Decision 3)
+    ├── (auth)/ …                          log-in screens (Danella's). 18 Nov: [role]/home redirects to /dashboard
+    ├── (public)/                          teasers anyone can see; server-rendered and cached
+    │   ├── layout.tsx · error.tsx         header with "Log in" / "Your dashboard"; no loading.tsx (Decision 3)
     │   ├── events/[eventId]/              page · not-found
     │   ├── organisers/[organiserId]/      page · not-found
-    │   └── vendors/[vendorId]/            page · not-found   (vendors AND freelancers)
-    └── (portal)/                     BUILT signed-in area
+    │   ├── vendors/[vendorId]/            page · not-found
+    │   └── freelancers/[freelancerId]/    page · not-found   (18 Nov)
+    └── (portal)/                          signed-in area
         ├── layout.tsx · error.tsx         the shell: reads the role → that role's top bar, sidebar + palette
         ├── dashboard/                     page · loading; one URL for everyone, shows your role's dashboard
         │                                  (shared pages come later from their own tickets: feed, messages,
         │                                   community, notifications, leaderboards, reviews, profile,
         │                                   settings; the sidebar shows them as dashed "coming soon" pills)
         ├── organiser/                     layout + page call requireRole('organiser') · loading
-        ├── vendor/                        layout + page call requireRole('vendor', 'freelancer') · loading
+        ├── vendor/                        layout + page call requireRole('vendor') · loading
+        ├── freelancer/                    layout + page call requireRole('freelancer') · loading   (18 Nov)
         └── admin/                         layout + page call requireRole('admin') · loading
 ```
 
@@ -218,6 +228,19 @@ The shell sets a `data-palette` attribute (`Palette.module.css`) that maps the g
 
 A role's own tools use the singular (`/organiser/…`, "my organiser workspace"); public pages use the plural (`/organisers/<id>`, "organiser 45 of all organisers"), the same pattern as `/events/<id>`. Options considered: `provider` (Claude's recommendation: matches the PRD), `vendor` (chosen), and separate `vendor` and `freelancer` folders (rejected: almost every tool page would exist twice). Every URL is built in `lib/routes.ts`, so a later rename means that file plus the folder names, and a permanent redirect once real links are being shared.
 
+**Changed 18 Nov: freelancers get `/freelancer` and `/freelancers/<id>`.** Danella's log-in screens, which `dev` brought in, live at `/<role>/login` for each sign-up role, `/freelancer/login` included. Two things followed:
+
+- Sharing `/vendor` made freelancers log in at `/freelancer/login` and then work under `/vendor`. One word per role, in both places, is simpler to explain.
+- The portal's `/vendor` and `/organiser` pages had taken over Danella's `/vendor` → `/vendor/login` redirect (open question 20 on 18 Nov). Now `proxy.ts` sends a signed-out visitor at `/vendor`, `/organiser` or `/freelancer` to that role's log-in screen, so those addresses behave exactly as her redirect did for visitors, and as tools pages for signed-in users. `/attendee` has no tools, so her redirect still handles it.
+
+| Option | Good | Bad |
+| --- | --- | --- |
+| Keep `/vendor` for both (3 Nov) | Nothing to change | The log-in address and the tools address disagree for freelancers |
+| **`/freelancer` of its own (chosen)** | Matches `/freelancer/login`. The `/vendor` gate is simply "vendor" | The second rejection reason from 3 Nov comes back: each tools page exists twice. Acceptable for now: today each is one placeholder page, and shared parts can live in components |
+| Move every tool under `/<role>/tools/…` | No clash with the log-in screens at all | Longer addresses, and a bigger rename |
+
+The groups were always separate (`vendor`, `freelancer`), so only the folder, the gate (`requireRole('vendor')` and `requireRole('freelancer')`) and `routes.ts` changed. Freelancer profiles moved from `/vendors/<id>` to `/freelancers/<id>`. No real links existed yet, so no redirect was needed.
+
 ### 1b. Where the role comes from
 
 | Option | Good | Bad |
@@ -230,13 +253,14 @@ A role's own tools use the singular (`/organiser/…`, "my organiser workspace")
 
 - **Group names** (EN-04-T2): EN-04 created `attendee`, `organiser`, `vendor`, `freelancer` and `admin` (`amplify/auth/resource.ts`). Cognito group names are case-sensitive, so the portal uses exactly these words (`lib/portal-roles.ts`). Until 18 Nov this doc and the code used `ORGANISER`, `VENDOR`, `FREELANCER`, `CONSUMER` and `ADMIN`.
 - **How a user gets one** (PG-01-T1, EN-04-T1): the role picked at sign-up is sent with the sign-up, for example as an attribute that can't be changed later. The post-confirmation trigger then adds the matching group. The trigger must only accept the self-service roles: attendee, organiser, vendor and freelancer. **admin is assigned by hand, never from user input.**
-- **Exactly one group per account** (EN-04's "done when"). Our code still copes with zero groups (see `/dashboard` above). The session has one `role` field, not a list. In Phase B, exactly one known group becomes that role, and zero or several become "no role". That's safer than letting a two-group account into both areas.
+- **Exactly one group per account** (EN-04's "done when"). Our code still copes with zero groups (see `/dashboard` above). The session has one `role` field, not a list. Exactly one known group becomes that role, and zero or several become "no role". That's safer than letting a two-group account into both areas.
+- **Except admin (added 18 Nov): admin wins.** Everyone signs up as one of the four public roles: the pre-sign-up trigger refuses anything else. So an admin is someone who signed up (say, as an attendee) and was then added to `admin` by hand in the AWS console, and their account carries **two** groups. Under "several means no role", every admin would see "Finish setting up your account". Letting `admin` win is safe because only people with AWS console access can add anyone to that group. The rule lives in `roleFromGroups()` in `lib/auth/cognito.ts`, with a comment saying why.
 
 > **Nobody can pick a role in the UI yet.** `globals.css` has styles for an account-type screen, but no page renders it, and the backlog puts the web role-choice page in PG-01-T4. Agree the hand-off with whoever builds it (probably Danella, on `feature/auth`).
 
 ### 1c. Where the role is checked (defence in depth)
 
-> **Backlog note:** layers 1 and 2 below are EN-04-T4 ("protected routes and admin-only routes"). EN-06 depends on EN-04. So either EN-04-T4's owner builds them first, or we agree that this branch builds them as part of EN-04-T4.
+> **Backlog note:** layers 1 and 2 below are EN-04-T4 ("protected routes and admin-only routes", TES-337, unassigned). EN-06 depends on EN-04. **Built in this branch on 18 Nov**, with Navindu's go-ahead, on top of Danella's Cognito log in from `dev`. Tell Danella, and assign TES-337 in Jira (the connector here is read-only).
 
 The Next.js authentication guide is clear that **layouts are not a security boundary**:
 
@@ -246,82 +270,85 @@ So there are three layers, each with one job:
 
 | Layer | Question it answers | Why it is there |
 | --- | --- | --- |
-| 1. `src/proxy.ts`, running on **every URL except the public ones** (landing page, login and sign-up, `/events`, `/organisers`, `/vendors`, static files; also `/api`, which goes to the NestJS app) | Is anyone signed in? If not, go to `/login?next=…` | A fast bounce before any rendering. **It also refreshes expired tokens and saves them as cookies.** Server Components cannot write cookies; we read the Amplify adapter's source, and it silently ignores writes there. Shared pages (`/messages`, `/settings`…) will keep being added at the top level, so the proxy protects everything by default and lists only the public paths. A page someone forgets to list stays protected instead of open. Public paths return straight away, without reading cookies, so they stay cacheable (to confirm in the build check). |
+| 1. `src/proxy.ts`, running on **every URL except the public ones** (listed in `lib/auth/paths.ts`: the landing page, `/privacy` and `/terms`, Danella's log-in, sign-up, verify and reset screens, the teasers; the matcher also skips `/api`, which goes to the NestJS app, and static files) | Is anyone signed in? If not, go to a log-in screen: the role's own one for `/vendor/…` and the like, otherwise `/login` | A fast bounce before any rendering. **It also refreshes expired tokens and saves them as cookies.** Server Components cannot write cookies; we read the Amplify adapter's source, and it silently ignores writes there. Shared pages (`/messages`, `/settings`…) will keep being added at the top level, so the proxy protects everything by default and lists only the public paths. A page someone forgets to list stays protected instead of open. Public paths return straight away, without reading cookies, so they stay cacheable (confirmed 18 Nov: second visit is a cache `HIT`). |
 | 2. `requireRole('organiser')` in `lib/auth/` (server-only, wrapped in React `cache()`) | Does this user have the role? If not, send them to `/dashboard` | Called in each tools folder's `layout.tsx` **and** in every page or data loader inside it. Next treats that page-level call as the real check. Shared pages call `requireSession()` instead (signed in, any role). Thanks to `cache()`, calling these many times in one request costs one lookup. |
 | 3. Amplify Data authorisation rules | May this identity read or write this record? | The real lock. If a UI check is ever missed, the API still refuses. |
 
 **Wrong role → `redirect('/dashboard')`, not `forbidden()`.** `forbidden()` returns a proper 403 page, but it is still **experimental** in Next 16.4 (it needs `experimental.authInterrupts`). We avoid experimental flags in a shared team codebase and can revisit once it is stable.
 
-`requireSession()` and `requireRole()` are built (`lib/auth/session.ts`) and every portal layout and page already calls them. Only `getSession()` is a stand-in until EN-04 (Decision 6). In Phase B its body becomes this sketch, and nothing that calls it changes:
+`requireSession()` and `requireRole()` (`lib/auth/session.ts`) were built on 3 Nov, and every portal layout and page calls them. Until 18 Nov `getSession()` was a stand-in (Decision 6). Its body is now real, and nothing that calls it changed: the seam worked.
+
+#### How the real sign-in check works (built 18 Nov)
+
+1. **The browser keeps the login in cookies.** Danella's `ConfigureAmplify.tsx` now calls `Amplify.configure(outputs, { ssr: true })`. Without `ssr: true`, Amplify keeps the tokens in localStorage, which never reaches the server. With it, they're cookies, sent with every request. One more line had to change: her `LoginForm.tsx` swapped Amplify's storage for "Keep me logged in" (localStorage or sessionStorage), which would have hidden the login from the server again. It now picks between two cookie stores (Decision 2).
+2. **`lib/amplify/server.ts`** creates Amplify's server runner (`createServerRunner` from `@aws-amplify/adapter-nextjs` 1.8.1, which supports Next `<17`).
+3. **`readSession()` in `lib/auth/cognito.ts`** runs inside that runner. It asks for the tokens, which Amplify checks against the user pool's public keys (forged or edited tokens fail) and refreshes if they've expired. Then it returns `{ userId, role, name }`: the role from the access token's groups ("admin wins", 1b), the name from the ID token's email or phone.
+4. **`proxy.ts`** calls it with the request and response, so a refresh can write new cookies. Next.js hands cookies set in the proxy on to the page rendered for the same request (checked in Next's source, `mergeMiddlewareCookies`, and by test: one refresh per request, not two). If nobody is signed in, it redirects, and copies over any cookies Amplify cleared (for example a revoked refresh token), so the browser doesn't retry them on every page.
+5. **`getSession()`** calls it with Next's `cookies()`, wrapped in React `cache()`.
+
+**Tokens only, not the whole session.** The 3 Nov sketch used `fetchAuthSession()`. Reading Amplify's source showed that it also asks the Cognito **identity pool** for AWS credentials on every call, and the server creates a fresh Amplify context for every request, so nothing would be remembered between pages.
+
+| Option | Good | Bad |
+| --- | --- | --- |
+| `fetchAuthSession(ctx)` (the docs' example) | The documented pattern | One or two extra calls to Cognito Identity per request, in the proxy *and* the page. For signed-out visitors it would fetch **guest** credentials just to redirect them, so bots hitting `/dashboard` could use up Cognito's request quota. A failing identity-pool call would log out someone whose tokens are fine |
+| **`ctx.getTokens({ forceRefresh: false })` (chosen)** | Tokens only: signature check and refresh, no identity pool. It's on the public `AmplifyContext` type, and it's what Amplify's own server `getCurrentUser()` calls | Slightly less obvious than the docs' example, so the code comment says why |
+| `getCurrentUser(ctx)` | Documented, tokens only | Returns no groups, so the role would need a second read |
+
+**Where a signed-out visitor goes.** The sketch sent everyone to `/login?next=…`. Danella's `/login` sends everyone to `/attendee/login`, and her form doesn't read `?next=` yet. So `logInPathFor()` sends `/vendor/…` to `/vendor/login`, `/organiser/…` to `/organiser/login` and so on, and everything else to `/login`. After logging in, everyone lands on `/dashboard` (Decision 8). Coming back to the page they asked for is open question 23.
+
+**"View as" without a user pool.** `VIEW_AS` is true only in `next dev` with CI's placeholder `amplify_outputs.json` (client ID `placeholder`), where nobody can sign in. Then the proxy lets every page through and `getSession()` reads the "View as" cookie, as it always did. With a real `amplify_outputs.json`, or in any production build, it's false (Decision 6).
+
+What's built, for reference:
 
 ```ts
-// lib/auth/session.ts, Phase B version of getSession() (sketch)
-export const getSession = cache(async (): Promise<Session | null> =>
-  runWithAmplifyServerContext({
-    nextServerContext: { cookies },
-    operation: async (ctx) => {
-      const { tokens } = await fetchAuthSession(ctx);
-      if (!tokens) return null;
-      const groups = (tokens.accessToken.payload['cognito:groups'] as string[] | undefined) ?? [];
-      const known = groups.filter(isRole);
-      // exactly one group per account (EN-04); zero or several → no role, never "both"
-      return { userId: String(tokens.accessToken.payload.sub), role: known.length === 1 ? known[0] : null };
-    },
-  }),
-);
-```
-
-What's built today, for reference:
-
-```tsx
-// app/(portal)/layout.tsx: draws the sidebar and palette only; it is not the security check
-export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  const session = await requireSession();
-  return <PortalShell role={session.role}>{children}</PortalShell>;
-}
-
-// app/(portal)/vendor/layout.tsx: the gate for vendor tools (vendors AND freelancers)
-export default async function VendorToolsLayout({ children }: { children: React.ReactNode }) {
-  await requireRole('vendor', 'freelancer');
-  return <>{children}</>;
-}
-```
-
-```ts
-// src/proxy.ts (Phase B, simplified)
-const PUBLIC = [/^\/$/, /^\/(login|signup)(\/|$)/, /^\/(events|organisers|vendors)(\/|$)/]; // + whatever (auth) adds
-
-export default async function proxy(request: NextRequest) {
-  if (PUBLIC.some((path) => path.test(request.nextUrl.pathname))) return NextResponse.next();
+// src/proxy.ts (shortened)
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  if (VIEW_AS || isPublicPath(pathname)) return NextResponse.next();
 
   const response = NextResponse.next();
-  const signedIn = await runWithAmplifyServerContext({
+  const session = await runWithAmplifyServerContext({
     nextServerContext: { request, response }, // lets Amplify write refreshed tokens back as cookies
-    operation: async (ctx) => {
-      try {
-        return (await fetchAuthSession(ctx)).tokens !== undefined;
-      } catch {
-        return false;
-      }
-    },
+    operation: readSession,
   });
-  if (signedIn) return response;
-  const login = new URL('/login', request.url);
-  login.searchParams.set('next', request.nextUrl.pathname);
-  return NextResponse.redirect(login);
+  if (session) return response;
+
+  const logIn = NextResponse.redirect(new URL(logInPathFor(pathname), request.url));
+  for (const cookie of response.cookies.getAll()) logIn.cookies.set(cookie); // keep Amplify's cookie changes
+  return logIn;
 }
 
-export const config = {
-  // every path except /api, Next's own files and static images (the pattern from the Next.js docs)
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)'],
-};
+// lib/auth/cognito.ts (shortened)
+export async function readSession(ctx: AmplifyContext): Promise<Session | null> {
+  let tokens;
+  try {
+    tokens = await ctx.getTokens({ forceRefresh: false }); // checks the signature; refreshes if expired
+  } catch {
+    return null; // couldn't refresh (revoked, user deleted, Cognito unreachable): signed out
+  }
+  if (!tokens) return null;
+
+  const access = tokens.accessToken.payload;
+  const id = tokens.idToken?.payload;
+  return {
+    userId: String(access.sub),
+    role: roleFromGroups(access["cognito:groups"]),
+    name: typeof id?.email === "string" ? id.email : typeof id?.phone_number === "string" ? id.phone_number : "",
+  };
+}
+
+// app/(portal)/vendor/layout.tsx: the gate for vendor tools
+export default async function VendorToolsLayout({ children }: { children: React.ReactNode }) {
+  await requireRole("vendor");
+  return <>{children}</>;
+}
 ```
 
 ---
 
 ## Decision 2: Typed Amplify Data client
 
-**Status:** Proposed
+**Status:** Proposed, partly built. On 18 Nov the Amplify plumbing that sign-in needed was built: `{ ssr: true }` in the browser and the server runner (Decision 1c). The data clients themselves still wait. `dev` has no Amplify Data (`amplify/backend.ts` only has auth), and the NestJS API only answers `/` and `/health`, so there's nothing to read yet. Whether data comes from Amplify Data (PRD, Jira) or the NestJS API is open question 9; ask Damian. Until then, T2's "typed data" is the typed functions in `lib/data/public.ts` over sample data (approved 18 Nov). Option A below is still the plan if the answer is Amplify.
 
 ### The problem
 
@@ -350,26 +377,36 @@ The adapter package `@aws-amplify/adapter-nextjs` provides different clients for
 
 The `nextServerContext: null` → guest behaviour is barely documented. We confirmed it in the adapter's source (`createRunWithAmplifyServerContext.ts`): *"When `null` is passed as the value of `nextServerContext`, opt-in unauthenticated role (primarily for static rendering)."*
 
-Files (BUILT in Phase A, LATER in Phase B):
+Files (BUILT = in the branch, LATER = once there's a data backend):
 
 ```text
-apps/web/src/lib/
-├── amplify/                   LATER
-│   ├── outputs.ts             the only file that imports amplify_outputs.json
-│   ├── ConfigureAmplify.tsx   'use client': Amplify.configure(outputs, { ssr: true })
-│   └── server.ts              'server-only': createServerRunner + the two server clients
-├── data/
-│   ├── types.ts               BUILT hand-written public types → LATER derived from Schema with SelectionSet
-│   ├── samples.ts             BUILT sample records for `next dev` → LATER deleted
-│   ├── public.ts              BUILT getPublicEvent(), getPublicOrganiser(), getPublicVendor() → LATER guest-client reads
-│   └── result.ts              LATER unwrap(): { data, errors } → data, or throws DataError
-└── auth/
-    └── session.ts             BUILT requireSession(), requireRole(); getSession() is a stand-in until EN-04
+apps/web/src/
+├── components/ConfigureAmplify.tsx   Danella's (EN-04); 18 Nov: Amplify.configure(outputs, { ssr: true })
+└── lib/
+    ├── amplify/server.ts      BUILT 18 Nov: createServerRunner. LATER: the two server data clients
+    ├── data/
+    │   ├── types.ts           BUILT hand-written teaser types → LATER derived from the schema
+    │   ├── samples.ts         BUILT sample records for `next dev` → LATER deleted
+    │   ├── public.ts          BUILT getPublicEvent(), getPublicOrganiser(), getPublicProvider() → LATER guest reads
+    │   └── result.ts          LATER unwrap(): { data, errors } → data, or throws DataError
+    └── auth/session.ts        BUILT requireSession(), requireRole(); getSession() real since 18 Nov
 ```
+
+Two small departures from the 3 Nov plan:
+- **No `outputs.ts`.** `amplify_outputs.json` is imported in two places: Danella's `ConfigureAmplify.tsx` (already there) and `lib/amplify/server.ts`. Moving her import into a new file for the sake of one line wasn't worth touching her file again.
+- **`server.ts` has no `"server-only"` import**, because `proxy.ts` uses it and proxy code can't load that package. Nothing in it is secret: the browser bundle carries the same config.
 
 The `Schema` type comes from the backend's `amplify/data/resource.ts` (EN-03). Until that file exists, the functions in `public.ts` use the hand-written types in `types.ts` and return sample data in `next dev`. Pages only call the functions, so they won't change when the insides do. See [Decision 6](#decision-6-building-before-the-backend-exists) and the [build order](#build-order).
 
-`{ ssr: true }` tells the browser to keep tokens in **cookies** instead of localStorage, which is how the server finds out who is signed in. `ConfigureAmplify` is mounted once in the root layout. That is the simplest setup and avoids "Amplify has not been configured" errors, at the cost of a small extra download on the landing page.
+`{ ssr: true }` tells the browser to keep tokens in **cookies** instead of localStorage, which is how the server finds out who is signed in. *Changed from the plan:* `ConfigureAmplify` isn't in the root layout. Danella mounts it in `(auth)/[role]/layout.tsx`, and the portal shell mounts it for Log out. The landing page and the teasers don't load Amplify at all.
+
+**"Keep me logged in" (18 Nov).** Danella's log-in form chose between localStorage (ticked) and sessionStorage (unticked). Either would put the tokens back where the server can't see them, so both choices are now cookies:
+
+| Ticked | Unticked |
+| --- | --- |
+| The same cookies `ssr: true` uses by default: kept for a year | Session cookies (no expiry date): the browser deletes them when it closes |
+
+*Known gap:* when the server refreshes the tokens (after an hour), Amplify writes the new cookies with its default one-year lifetime, and so does the browser after a page reload. So "unticked" only holds until the first refresh. Making the choice stick needs a small follow-up (open question 22). It was already weaker before: with sessionStorage, reloading the page lost the login completely.
 
 ### Typing what a component receives
 
@@ -459,7 +496,7 @@ Component rules:
 
 ## Decision 4: Public, server-rendered event and profile pages (guest access)
 
-**Status:** Routes, caching and page skeletons built (3 Nov). Tested on a production build: found pages come back `200` with the content in the HTML, and the second visit is a cache `HIT`. Guest-access reads (4a) wait for the backend (EN-03, EN-04).
+**Status:** *Changed 18 Nov: teaser only* (see [4d](#4d-changed-18-nov-teasers-instead-of-full-pages)). Routes, caching and page skeletons built 3 Nov; tested on a production build, where found pages came back `200` with the content in the HTML and the second visit was a cache `HIT`. Guest-access reads (4a) wait for the data backend (EN-03). 4a to 4c still apply; 4d changes what the pages show.
 
 ### The problem
 
@@ -497,7 +534,7 @@ The backlog showed this is too wide for events. A model-level read rule lets tha
 | Data | Rule | Why |
 | --- | --- | --- |
 | **Events** | Guests and other users must never read drafts. Two ways for the backend to do it:<br>1. No read rule for other people on `Event`. They read through a **custom query**, such as `getPublicEvent(id)` with `allow.guest()`, that returns nothing for drafts.<br>2. Keep drafts in a separate owner-only model and copy them into a public `Event` model on publish, so `Event` keeps plain read rules. | 1 fits the backlog: US-C03-T1 already plans one event-page query, and custom queries accept `allow.guest()` (static rules only). The catch is that every other list of events (feed, search) also needs a query. 2 keeps lists simple, but publishing and taking an event down become copy and delete steps. **The choice is the backend's** (EN-03, EN-04-T2, PG-05). Our `getPublicEvent()` hides it, so pages don't change. PRD section 14 may also add private events and limits on unverified organisers, so one place that decides what's public helps. |
-| **Organiser and provider profiles** | `allow.guest().to(['read'])` on the two models, with a **field-level rule** on anything private | These are business listings meant to be found (US-P01 "Be found by organisers I don't know"; organisers carry a Verified badge, US-C05). The organiser profile includes contact details (AC-02). **Decided 3 Nov: hidden from visitors who aren't logged in; anyone logged in, whatever their role, can see them.** The cached public page can't contain them, so it shows a "Log in to see how to contact this organiser" box (`components/public/ContactDetails.tsx`). In Phase B that box loads the details in the browser for a logged-in viewer. Field-level rules **do not inherit** the model's rules (Amplify docs), so a locked field needs its own full list (owner, signed-in readers, admins). Our guest field lists leave such fields out, so guest reads never ask for them. |
+| **Organiser and provider profiles** | `allow.guest().to(['read'])` on the two models, with a **field-level rule** on anything private | These are business listings meant to be found (US-P01 "Be found by organisers I don't know"; organisers carry a Verified badge, US-C05). The organiser profile includes contact details (AC-02). **Decided 3 Nov: hidden from visitors who aren't logged in; anyone logged in, whatever their role, can see them.** The cached public page can't contain them, so it shows a "Log in to see how to contact this organiser" box (`components/public/ContactDetails.tsx`). In Phase B that box loads the details in the browser for a logged-in viewer. *(18 Nov: box removed with the teaser, 4d. Contact details now belong to the full profile page, for signed-in users only.)* Field-level rules **do not inherit** the model's rules (Amplify docs), so a locked field needs its own full list (owner, signed-in readers, admins). Our guest field lists leave such fields out, so guest reads never ask for them. |
 | **Consumer profiles** | No guest access, so no public page in this ticket | Consumers choose who can see their profile (AC-06), "enforced on every read" (PG-02-T1). A static guest rule can't respect a per-person setting. |
 
 These rules live in the backend (EN-04-T2, US-C03-T1, PG-05-T1), not in this branch. This ticket asks for them and calls them. A sketch of option 1 plus the profile rules:
@@ -597,6 +634,26 @@ export default async function EventPage({ params }: EventPageProps) {
 - **Taken-down and suspended accounts.** An admin can unpublish a fake event, and the report queue (PG-18) may suspend people. Whatever the backend does for those must also hide them from guests. That's one more reason to keep the "what is public" rule in one place.
 - **URLs** use IDs for now (`/events/<id>`). Keep them stable: the mobile app will open shared event links (US-C15-T3), and short links (US-C15-T4) will redirect to them. Friendly slugs (`/events/colombo-food-fest`) can come later, using a secondary index and a redirect to the main URL.
 
+### 4d. Changed 18 Nov: teasers instead of full pages
+
+On 4 Nov Navindu leaned towards sign-in for everything, then asked how shared WhatsApp links would keep working. The key fact: a link preview is fetched by WhatsApp's server, signed out, so whatever a preview shows is public by definition. The options and the reasoning are in [public pages and the portal](web-portal-shell-public-vs-portal.md). On 18 Nov Navindu approved **B, teaser only**:
+
+| Option | Verdict |
+| --- | --- |
+| A. Full public pages (built 3 Nov) | Replaced: more public than anyone wanted |
+| **B. Teaser only** | **Chosen**: shared links and preview cards keep working, and only a few fields per page are public |
+| C. Sign in for everything | Rejected: breaks US-C15 (a *Must*: "open a shared link") and EN-06's own "done when" |
+
+What each teaser shows: an event's title, date and time, district, organiser's name and status (Postponed, Cancelled); an organiser's name, district and Verified; a vendor's or freelancer's name, category and Verified. Each ends with "See more on Tezera" and Log in / Create an account.
+
+How it's enforced: the public types carry only those fields, and `lib/data/public.ts` copies them out by name, so a field added to the backend later can't leak by accident. A build with sample data confirmed no summary, venue or description appears anywhere in the HTML.
+
+Also on 18 Nov:
+- **Open Graph tags** (`og:title`, `og:description`, `og:site_name`) on every teaser, built from the teaser's own fields, so WhatsApp shows a sensible card. The preview image stays with US-C15-T4.
+- **Logged-in visitors** see the same cached page, but their browser swaps "Log in" for "Your dashboard". It looks for Amplify's login cookie; that's a hint for the label, never a decision about access.
+- **The contact-details box is gone**: contact details are simply not part of a teaser any more.
+- Still open: where signed-in users see an event's full details (the full-page stories decide), and rewording EN-06-T3's "done when" in Jira.
+
 ---
 
 ## Decision 5: Backend location, config file and deployment
@@ -634,7 +691,7 @@ Our app is on Next 16, but AWS's support page only lists versions up to 15. We s
 
 ## Decision 6: Building before the backend exists
 
-**Status:** Accepted and built (3 Nov).
+**Status:** Accepted and built (3 Nov). *Changed 18 Nov:* `getSession()` is real (Decision 1c). The "View as" box stays, but only for `next dev` without a user pool (see below). The data functions are still stand-ins.
 
 ### The problem
 
@@ -657,7 +714,7 @@ EN-06 depends on EN-04, which depends on EN-03, and neither has started (see [Li
   - In `next dev`, it's the role picked in the **"View as (development only)"** box, which floats in the bottom-right corner (it sat at the bottom of the sidebar until 4 Nov). That box sets a cookie; organiser is the default, and "No role yet" shows the dashboard's empty state.
   - In production builds it returns nobody, so every portal page redirects to `/login`.
   - It reads cookies in every mode, like the real one will, so portal pages stay rendered per request.
-- **`getPublicEvent()`, `getPublicOrganiser()` and `getPublicVendor()`** (`lib/data/public.ts`) return records from `lib/data/samples.ts` in `next dev`, and nothing (so "not found") in production builds. The samples include a draft, `/events/evt-sample-draft`, to show that drafts never come back.
+- **`getPublicEvent()`, `getPublicOrganiser()` and `getPublicVendor()`** (`getPublicProvider()` since 18 Nov; `lib/data/public.ts`) return records from `lib/data/samples.ts` in `next dev`, and nothing (so "not found") in production builds. The samples include a draft, `/events/evt-sample-draft`, to show that drafts never come back.
 - **`lib/routes.ts`** builds every URL, so renaming a URL word means changing one file plus the folder names.
 - The `NODE_ENV` checks are fixed when the app is built: `next build` sets `production`, so the development-only branches are dead code there.
 
@@ -666,9 +723,21 @@ EN-06 depends on EN-04, which depends on EN-03, and neither has started (see [Li
 - `/events/evt-sample-2` (postponed)
 - `/organisers/org-sample-1`
 - `/vendors/ven-sample-1` (a vendor)
-- `/vendors/ven-sample-2` (a freelancer)
+- `/freelancers/fre-sample-1` (a freelancer; it was `/vendors/ven-sample-2` until 18 Nov)
 
 **Phase B** deletes `samples.ts`, `dev-role.ts` and `DevRoleSwitcher.tsx`, and fills in the real `getSession()` and data reads.
+
+#### 18 Nov: "View as" only where nobody can sign in
+
+The 3 Nov plan deleted the "View as" box once real sign-in arrived. On 18 Nov real sign-in arrived, but the 3 Nov reason for the box still holds on any machine without its own Amplify backend: with CI's placeholder `amplify_outputs.json` there is no user pool, so the log-in screens can't work and the portal would be unreachable.
+
+| Option | Good | Bad |
+| --- | --- | --- |
+| Delete "View as" now (the 3 Nov plan) | No dev-only code left | Nobody can see the portal locally until they've set up AWS and a sandbox |
+| Keep it in every `next dev` | Easy demos | With a real sandbox, logging out would still show a portal: testing real sign-in in dev would be confusing |
+| **Keep it only when there's no user pool (chosen)** | Works out of the box with the placeholder; switches itself off once `pnpm sandbox` writes a real `amplify_outputs.json` | One more condition to understand: `VIEW_AS` in `lib/auth/cognito.ts` |
+
+`VIEW_AS = NODE_ENV === "development" && no user pool`, where "no user pool" means the client ID is CI's `placeholder` (or missing). Production builds never have it, whatever the config. When `VIEW_AS` is on, `proxy.ts` lets every page through and `getSession()` reads the "View as" cookie, exactly as before 18 Nov. `dev-role.ts` and `DevRoleSwitcher.tsx` can go once every developer has a sandbox.
 
 ## Decision 7: Following the wireframes
 
@@ -753,14 +822,75 @@ In dark mode `--p` is a light tint, so the card is drawn as a dark mix of it (30
 
 ---
 
+## Decision 8: Joining the log-in screens to the portal
+
+**Status:** Accepted and built (18 Nov). Navindu approved landing on `/dashboard`; the rest follows from it.
+
+### The problem
+
+`dev` brought in Danella's log-in flow (EN-04): `/<role>/signup` → `/<role>/verify` → `/<role>/setup` → `/<role>/verification`, ending on her stand-in home page `/<role>/home`. That page says who is logged in, links back to setup and verification, and has Log out; its own comment says to replace it "when the real home pages are built". The portal is that home. Four questions follow: where do people land, what happens to `/<role>/home` and its links, how do you log out of the portal, and what does a signed-out visitor at `/vendor` see now that the portal owns that address?
+
+### 8a. Where log in lands
+
+| Option | Good | Bad |
+| --- | --- | --- |
+| `/<role>/home` (as built) | No change | A placeholder that says "Your home page comes next" |
+| **`/dashboard` (chosen)** | The portal's one "after sign-in" address (Decision 1); one line in `pathAfterLogin` | Touches Danella's files |
+| The role's tools page (`/vendor` and so on) | Straight to the tools | Attendees have none, and the dashboard is the overview in both wireframes |
+
+People who haven't finished setting up still go to `/<role>/setup` or `/<role>/verification`, as before. "Skip for now" and "Continue" at the end of her three setup forms and the verification form now go to `/dashboard` too, through `routes.dashboard`.
+
+### 8b. `/<role>/home` and its links
+
+- **Kept as an old address** that redirects to `/dashboard`, the way Danella's `/login` redirects to `/attendee/login`. `HomePanel.tsx` is removed: only that page used it.
+- **Its two links moved into the account menu** (8c): "Edit your profile" ("Edit your feed" for attendees) → `/<role>/setup`, and "Verification" → `/<role>/verification` for organisers, vendors and freelancers. The vendor and freelancer sidebars' "Verification" items link there as well (open question 13 still asks whether one place suits every role).
+
+### 8c. The account menu and Log out
+
+The wireframes' avatar opens the profile, which no ticket has built yet. Until it exists, the avatar opens a small panel: the email or phone number they log in with, their role, the links from 8b, and **Log out**.
+
+| Option | Good | Bad |
+| --- | --- | --- |
+| **A disclosure: a button that shows and hides a panel (chosen)** | Plain links and a button, so Tab works as usual. Escape (focus returns to the avatar) or a click elsewhere closes it | Focus isn't trapped: tabbing past the last item leaves the panel open behind you until Escape or a click |
+| An ARIA menu (`role="menu"`, arrow keys) | Feels like a desktop menu | More code, and easy to get subtly wrong for screen readers |
+| A separate "Log out" button in the top bar | Always visible | No room on phones, where the role chip is already hidden |
+
+Log out calls Amplify's `signOut()`, which deletes the login cookies and tells Cognito to revoke the refresh token. Then it does a full page load to the role's log-in screen, so nothing from the portal stays in memory, and `replace()` keeps the portal out of the Back button. If `signOut()` fails, the menu says so instead of pretending: on a shared computer, believing you've logged out when you haven't is the worse mistake. Amplify has to be set up in the browser for this, so `PortalShell` renders Danella's `<ConfigureAmplify />`.
+
+### 8d. A signed-out visitor at `/vendor`
+
+Before 18 Nov, the portal's `/vendor` and `/organiser` pages took over Danella's `/vendor` → `/vendor/login` redirect. Now `proxy.ts` sends a signed-out visitor at `/vendor`, `/organiser` or `/freelancer` to that role's log-in screen (1c), the same place her redirect did.
+
+### Files touched outside the shell (for Danella's review)
+
+| File | Change |
+| --- | --- |
+| `components/ConfigureAmplify.tsx` | `{ ssr: true }`, so the server can see the login |
+| `components/auth/LoginForm.tsx` | "Keep me logged in" picks between two cookie stores instead of localStorage and sessionStorage (Decision 2) |
+| `lib/session.ts` | `pathAfterLogin`: "done" → `/dashboard` |
+| `components/auth/setup/AttendeeSetupForm.tsx`, `OrganiserSetupForm.tsx`, `ProviderSetupForm.tsx`; `components/auth/VerificationForm.tsx` | Finish on `/dashboard` |
+| `app/(auth)/[role]/home/page.tsx` | Now redirects to `/dashboard` |
+| `components/auth/HomePanel.tsx` | Removed |
+| `components/auth/RequireUser.tsx` | One comment |
+
+### Gotchas
+
+- **`ssr: true` alone wasn't enough.** The log-in form swapped Amplify's storage for "Keep me logged in", which would have put the tokens back in localStorage and left the server blind.
+- **Amplify re-applies its default storage on every `Amplify.configure()`**, which means on every page load. That's why "unticked" can't fully stick yet (Decision 2).
+- **The cookies are `Secure` by default.** Browsers accept that on `http://localhost`, so local log in works without HTTPS (checked in Edge on 18 Nov).
+- **Everyone is logged out once** when this reaches a deployed site: the tokens move from localStorage to cookies.
+- **There's no admin log-in screen.** An admin logs in on the screen of the role they signed up with; "admin wins" then takes them to the admin portal (open question 24).
+
+---
+
 ## Not part of this ticket
 
 The backlog gives the neighbouring work to other tickets. This branch uses their results but doesn't build them:
 
 - **The backend:** environments (EN-02), the data models (EN-03), Cognito groups and auth rules (EN-04-T1, T2), and the event-page query (US-C03-T1).
-- **Sign-in and sign-up pages**, including the role choice (PG-01-T4, probably `feature/auth`).
-- **The real sign-in check** (`proxy.ts` and the real `getSession()`) is EN-04-T4. `requireSession()` and `requireRole()` are already built here and called everywhere, so EN-04-T4 only fills in `getSession()` and adds `proxy.ts` (open question 7).
-- **The real page designs:** the event page (US-C03-T3), the vendor and freelancer profile (US-P01-T3), the organiser profile (US-P04-T3) and the consumer profile (PG-02-T3). This ticket ships the routes with plain placeholder content.
+- **Sign-in and sign-up pages**, including the role choice (PG-01-T4; Danella built them, and they're on `dev`).
+- ~~**The real sign-in check** (`proxy.ts` and the real `getSession()`) is EN-04-T4.~~ *Built in this branch on 18 Nov* (Decision 1c, open question 7).
+- **The real page designs:** the event page (US-C03-T3), the vendor and freelancer profile (US-P01-T3), the organiser profile (US-P04-T3) and the attendee profile (PG-02-T3). This ticket ships the routes with teasers.
 - **Sharing:** share buttons, short links and preview images (US-C15).
 - **Design tokens and translations** (EN-07). We use today's `globals.css` tokens and keep text out of the components.
 - Ticketing, payments, venue maps and chat.
@@ -782,16 +912,20 @@ Checks run: see the [experiment log](#phase-a-checks-3-nov). Nothing is committe
 
 ### Phase B: needs EN-03, EN-04 and the stack decision
 
-5. **Amplify wiring:** `outputs.ts`, `ConfigureAmplify`, the server runner, the three clients and `unwrap()`. Swap the hand-written types for `Schema`-based ones.
-6. **Real sign-in:** the real `getSession()` (sketch in 1c) and `proxy.ts`, by whoever owns EN-04-T4. Delete the "View as" switch.
-7. **Real public reads:** guest-client reads in `lib/data/public.ts`, delete the sample data, and load organiser contact details for logged-in viewers.
-8. **Check:** lint, type-check and build as in Phase A, then a sandbox, then an Amplify preview deployment (Next 16 on Amplify Hosting is unverified).
+5. **Amplify wiring:** *partly done 18 Nov*: `ssr: true` and the server runner. Still to come with a data backend: the data clients and `unwrap()`, and `Schema`-based types instead of the hand-written ones.
+6. **Real sign-in:** *done 18 Nov* (Decision 1c), in this branch as EN-04-T4. Plus Decision 8: log in lands on `/dashboard`, account menu, Log out. "View as" stays only where there's no user pool (Decision 6).
+7. **Real public reads:** guest reads in `lib/data/public.ts`, then delete the sample data. *Changed 18 Nov:* pages are teasers (4d), so there are no contact details to load.
+8. **Check:** *done 18 Nov* for lint, type-check, production build, a sign-in test with Cognito-shaped tokens, and browser checks ([18 Nov checks](#checks-18-nov)). Still to do: a real sandbox (`pnpm sandbox`), then dev.tezera.lk after the merge (Next 16 on Amplify Hosting is untested).
+
+**18 Nov, also built:** teasers (4d), `/freelancer` and `/freelancers/<id>` (Decision 1, Naming).
 
 ### Running it on Windows (3 Nov)
 
 - `pnpm install`. If `pnpm` isn't found, use `corepack pnpm install`.
 - `pnpm dev:web` works normally.
-- `pnpm build` currently fails on Windows (the Turbopack font error under [Where we are starting from](#where-we-are-starting-from-2026-11-03)). Use `pnpm exec next build --webpack` inside `apps/web`. On `main` it also fails everywhere until the empty `(auth)` files are filled in by `feature/auth`.
+- `pnpm build` currently fails on Windows (the Turbopack font error under [Where we are starting from](#where-we-are-starting-from-2026-11-03)). Use `pnpm exec next build --webpack` inside `apps/web`. On `main` it also fails everywhere until the empty `(auth)` files are filled in by `feature/auth`. **18 Nov:** both fixed on `dev`. The font is now bundled locally and the `(auth)` files are filled in, so a plain `next build` (Turbopack) works on Windows.
+- **18 Nov:** Next 16.4.2's `next build` and `next dev` sometimes stop after printing a security advisory ("Your version of Next.js is affected by a known security vulnerability"). Run the same command again and it carries on. The advisory is real: see open question 25.
+- **18 Nov:** only one `next dev` can run per project. A second one stops with "Another next dev server is already running" and names the first one's process.
 - `next dev` writes `apps/web/AGENTS.md` (notes for AI coding tools) every time it starts. The team should decide whether to commit it, as Next suggests, or switch it off with `agentRules: false` in `next.config.ts`. It isn't part of EN-06.
 
 ## Open questions
@@ -806,16 +940,16 @@ Checks run: see the [experiment log](#phase-a-checks-3-nov). Nothing is committe
 3. **Role names:** organisers, vendors (vendors and freelancers), consumers and admins. The Cognito groups are organiser, vendor, freelancer, consumer and admin, one per account.
 4. **Which profiles are public?** Organisers', vendors' and freelancers'. Consumer profiles follow each person's privacy settings (AC-05, AC-06, PG-02), so guests can't read them.
 5. **Organiser contact details:** hidden from visitors who aren't logged in; anyone logged in can see them (Decision 4).
-6. **URL words:** `/organiser/…`, `/vendor/…` and `/admin/…` for tools; `/events/<id>`, `/organisers/<id>` and `/vendors/<id>` for public pages (Decision 1).
+6. **URL words:** `/organiser/…`, `/vendor/…` and `/admin/…` for tools; `/events/<id>`, `/organisers/<id>` and `/vendors/<id>` for public pages (Decision 1). *Changed 18 Nov: freelancers got `/freelancer/…` and `/freelancers/<id>`.*
 
-**Still open:**
+**Still open** (as of 4 Nov; answers added 18 Nov):
 
-7. **EN-04-T4** (protected routes) has no assignee, but it sits under Danella's EN-04, so it's hers by default. `requireSession()` and `requireRole()` already exist in this branch. Agree with Danella who writes the real `getSession()` and `proxy.ts`.
+7. **EN-04-T4** (protected routes) has no assignee, but it sits under Danella's EN-04, so it's hers by default. `requireSession()` and `requireRole()` already exist in this branch. Agree with Danella who writes the real `getSession()` and `proxy.ts`. **Answered 18 Nov:** Navindu chose to build it in this branch (Decision 1c). Still to do: tell Danella, and assign TES-337 in Jira.
 8. **Hand-off with Danella:**
-   - after login, go to `/dashboard`, or to the page in `?next=` if there is one;
-   - how the sign-up form passes the chosen role to Cognito.
+   - after login, go to `/dashboard`, or to the page in `?next=` if there is one; **answered 18 Nov:** `/dashboard` (Decision 8). `?next=` is question 23.
+   - how the sign-up form passes the chosen role to Cognito. **Answered by `dev`:** as `custom:role`, which can't be changed later; the post-confirmation trigger checks it and adds the group (never `admin`).
 
-   PG-01-T4 (the sign-up and login pages) is unassigned, but `feature/auth` is building them.
+   PG-01-T4 (the sign-up and login pages) is unassigned, but `feature/auth` built them and they're on `dev`.
 9. **Stack:** NestJS or Amplify only? On the NestJS side: `apps/api`, the `/api` forwarding in `next.config.ts`, and the 15 Oct slide-deck stack. On the Amplify side: PRD v6 and the whole backlog. Phase A works either way; Phase B needs the answer.
 10. **Drafts:** will the backend hide them with a custom query or a separate draft model (4a)? Ask Yevan (EN-03) and Danella (EN-04).
 11. **"Other providers":** a third account type, or businesses the PRD already counts as vendors? Either way they'd use `/vendor`.
@@ -831,8 +965,19 @@ Checks run: see the [experiment log](#phase-a-checks-3-nov). Nothing is committe
 
 **New on 4 Nov (evening):**
 
-18. **How far should the public side go?** Full public pages (built), teaser only (proposed) or sign-in for everything. A link preview is fetched by a signed-out visitor, so whatever it shows is public. See [public pages and the portal](web-portal-shell-public-vs-portal.md). Decision 4 is unchanged until the team decides.
+18. **How far should the public side go?** Full public pages (built), teaser only (proposed) or sign-in for everything. A link preview is fetched by a signed-out visitor, so whatever it shows is public. See [public pages and the portal](web-portal-shell-public-vs-portal.md). Decision 4 is unchanged until the team decides. **Answered 18 Nov: teaser only** (Decision 4d). Still to do: reword EN-06-T3's "done when" and US-P01's "public view" in Jira.
 19. **Where do the brand colours live, and is there a dark mode?** PR #14 removed both from `globals.css`. The shell keeps its own copy of the colours for now, light only. EN-07 should give them one shared home. See [colour tokens after PR #14](web-portal-shell-colour-tokens.md).
+
+**New on 18 Nov:**
+
+20. **`/vendor` and `/organiser` vs Danella's `/<role>` redirect.** The portal's tools pages took over her `/vendor` → `/vendor/login` redirect. **Settled in code:** `proxy.ts` now sends signed-out visitors there to that role's log-in screen (Decision 8d). Confirm with Danella in the review.
+21. **Danella's review.** Decision 8 lists every file of hers that changed. Ask her to look before the pull request is merged.
+22. **"Keep me logged in", unticked,** only holds until the first token refresh (Decision 2). A follow-up could remember the choice in a cookie and apply it in `ConfigureAmplify` and `proxy.ts`. Low priority: before 18 Nov a page reload lost the login completely.
+23. **Coming back to the page you asked for after logging in** (`?next=`). Danella's form doesn't read it, so everyone lands on `/dashboard`. Worth adding once the full event pages exist, so "See more on Tezera" can bring people back to the event.
+24. **Admin log-in.** There's no admin log-in screen: `/admin/login` is a 404, and the four screens only accept their own role. An admin logs in on the screen of the role they signed up with; "admin wins" (1b) then gives them the admin portal. Fine for testing. Whether admins need their own entrance is for EN-04 and the admin stories.
+25. **Next.js 16.4.2 has a known security advisory**, which `next build` and `next dev` print. 16.4.4 is out. Upgrading changes the whole app, so it belongs in its own small pull request, not this one. Ask Damian, who owns the build.
+26. **dev.tezera.lk has no data to show.** Sample data only appears in `next dev`, so hosted teasers say "not found" and dashboards are empty. A "demo data" switch for dev.tezera.lk only (never www) was suggested on 18 Nov; not built, waiting for an answer.
+27. **Test with a real user pool before the pull request.** Run `corepack pnpm sandbox --outputs-out-dir apps/web` (needs the `tezera` AWS profile), sign up one account per role, and add one of them to `admin` in the Cognito console. Then try log in, each tools gate, Log out, and "Keep me logged in".
 
 ## Experiment log
 
@@ -890,13 +1035,31 @@ Same setup. The `(auth)` files were stubbed for the build and restored with `git
 | Screenshots (headless Edge, 16) | Every role's dashboard at 1440px (the wireframes' width); organiser tools; no role; 1280px and 1024px (the right-hand column moves under the main one); phone at 390px with the menu closed and open; dark mode for organiser, vendor and consumer; a vendor opening `/organiser` lands on `/dashboard`. Compared side by side with the wireframe screenshots; the "SOON" tags that wrapped were replaced with dashed pills, then shot again |
 | Not checked | Clicking through by hand, a screen reader, Safari |
 
+### Checks (18 Nov)
+
+In the repo, on top of `dev` (`e124948`), Next.js 16.4.2, Node 24.21.0, Windows 11. The check scripts were throwaway files outside the repo; the repo has no test framework yet (that's EN-16).
+
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit` | Passes |
+| `eslint` | 0 errors. One old warning in the landing page's `Roles.tsx`, not ours |
+| `next build` (Turbopack, on Windows) | Passes: 40 pages, the proxy compiled, portal routes `ƒ` (per request), teasers `○` (static, cached). Next drops the auth screens' `/[role]` static paths for `/organiser`, `/vendor` and `/freelancer` in favour of the portal's pages, with no error |
+| Logic checks (82) | Which URLs the proxy runs on (20, using Next's own matcher test), which are public (34), which log-in screen a visitor gets (9), groups → role (12), `readSession()` with a stand-in Amplify context (6), the two flags (2). All pass. This also proved the proxy's imports load without `"server-only"` |
+| Sign-in, end to end (49) | A production server with a throwaway signing key (below). Visitors go to the right log-in screen. Public pages, the auth screens and `/api` are left alone. Each role passes only its own gates. **Refused:** a token signed with another key, an organiser's token edited to say `admin`, another app's token, garbage. **Expiry:** an expired token with a good refresh token is refreshed **once** in the proxy and the page uses the new cookie; a revoked refresh token leads to log in, and the redirect clears all 7 login cookies. All pass, on the final build too |
+| Browser (23, headless Edge, screenshots) | The account menu shows the right name, role and links; Escape closes it and puts focus back on the avatar; a click elsewhere closes it. **Log out** (Amplify's real `signOut()`) clears every login cookie and lands on the role's log-in screen, and `/dashboard` then sends you to log in. Freelancer tools have no stalls. At 390px the menu stays on screen and nothing scrolls sideways. The public header says "Log in" or "Your dashboard". A `Secure` cookie written by JavaScript is kept on `http://localhost` |
+| Teasers (24) | On a build with sample data switched on temporarily (then switched back, and the file checked byte for byte). 200s and 404s as expected (a draft is a 404; a vendor's ID under `/freelancers/` is a 404). No summary, venue or description anywhere in the HTML. `og:title`, `og:description` and `og:site_name` correct; postponed events say so first. The second visit is a cache `HIT` |
+| `next dev` | Only the dev server another session had left running (started 20:52) could be used, because Next allows one `next dev` per project. On it, the "View as" dashboard and every tools gate behaved. Pages that build static paths returned 500, with "Jest worker encountered 2 child process exceptions" in its log, including the auth screens' `/[role]/login` (yet `/vendor/login` returned 200). The cause wasn't found. The same code's production builds ran the same static-path step without errors. Check a fresh `next dev` once that old server is stopped |
+| Not checked | A real user pool (no sandbox on this PC yet): real sign-up, codes and log in; dev.tezera.lk; Safari |
+
+**How the sign-in test worked without AWS.** A throwaway RSA key played the part of Cognito's signing key. A small preload in the server process answered two requests, and only for CI's placeholder pool's addresses: the pool's public keys (`/.well-known/jwks.json`, which `aws-jwt-verify` downloads), and `GetTokensFromRefreshToken` (Amplify's refresh call). Tokens carried Cognito's claims (`iss`, `token_use`, `client_id` or `aud`, `exp`, `cognito:groups`) and sat in the cookies Amplify uses. So the real code ran end to end, signature checks and refreshes included, and nothing was sent to AWS.
+
 ## Versions checked (npm, 2026-11-03)
 
 | Package | Latest | Notes |
 | --- | --- | --- |
 | `next` | 16.4.4 | The repo pins 16.4.2 |
 | `aws-amplify` | 6.22.2 | |
-| `@aws-amplify/adapter-nextjs` | 1.8.1 | Supports `next >=13.5.0 <17.0.0` |
+| `@aws-amplify/adapter-nextjs` | 1.8.1 | Supports `next >=13.5.0 <17.0.0`. **Installed 18 Nov** (`^1.8.1`; it brings `aws-jwt-verify` 4.0.1) |
 | `@aws-amplify/backend` | 1.25.1 | |
 | `@aws-amplify/backend-cli` | 1.10.0 | Needs Node `>=22`; we use 24 |
 
@@ -935,3 +1098,12 @@ Same setup. The `(auth)` files were stubbed for the build and restored with `git
 | 2026-11-04 | **Colours restored** (evening). PR #14, pulled at 16:05, removed the role colours, `--page-muted`, `--page-line`, dark mode and the `body` margin reset from `globals.css`, so the shell lost every colour. The colours now live in the shell's own CSS (`Palette.module.css`, `Public.module.css`), light theme only like the rest of the site. The margin is reset again, only while a shell page is on screen. Polish for the 5 Nov demo: "View as" floats in the bottom-right corner; public cards get a soft shadow. See [colour tokens after PR #14](web-portal-shell-colour-tokens.md). |
 | | **Public scope reopened.** Navindu leaned towards sign-in for everything, then asked how far the public side should go so that shared WhatsApp links keep working. Proposal: teaser-only public pages (open question 18). Decision 4 and the code are unchanged until the team decides. See [public pages and the portal](web-portal-shell-public-vs-portal.md). |
 | 2026-11-18 | **Committed and rebased onto `dev`** (`e124948`, PR #24), not pushed. `dev` now has EN-04's Amplify auth: Cognito groups `attendee`, `organiser`, `vendor`, `freelancer` and `admin`, and Danella's sign-up and log-in screens under `(auth)/[role]/`. The only git conflict was `lib/roles.ts`, which both branches added. Dev's file is kept as it is because about 20 auth files use it. The portal's roles move to the new `lib/portal-roles.ts` (dev's four roles plus `admin`), and every `requireRole()` call uses the lowercase group names. `CONSUMER` → `attendee`. **Not a git conflict but worth agreeing on:** dev's `(auth)/[role]/page.tsx` sends a bare `/vendor` or `/organiser` to that role's log-in page, but our static `/vendor` and `/organiser` tools pages take priority, so signed-out visitors there now go to `/login` (→ `/attendee/login`) instead. `/attendee` and `/freelancer` still redirect as before. |
+| 2026-11-18 | The two commits above were pushed to `origin/feature/webportalshell` the same evening, at Navindu's request. No pull request yet. |
+| 2026-11-18 | **Phase B, part 1, built** after Navindu's go-ahead ("start building… finish it asap"), on `feature/webportalshell` only: nothing merged into `dev`. Five recommendations approved: teaser public pages, a `/freelancer` area, log in landing on `/dashboard`, real sign-in on the server, and typed data functions over sample data until there's data. Checks in [18 Nov](#checks-18-nov). |
+| | **Decision 1c built** (EN-04-T4): `proxy.ts`, the real `getSession()`, and `readSession()` in `lib/auth/cognito.ts`, on `@aws-amplify/adapter-nextjs` 1.8.1. *Changed from the 3 Nov sketch:* `ctx.getTokens()` instead of `fetchAuthSession()`, because the latter also asks the identity pool for credentials on every request (including guest credentials for every signed-out visitor). And signed-out visitors go to their role's log-in screen, not `/login?next=…`, because Danella's form doesn't read `?next=` and her `/login` always means the attendee screen. |
+| | **Decision 1 changed:** freelancers moved from `/vendor` to `/freelancer`, and their profiles from `/vendors/<id>` to `/freelancers/<id>`, to match `/freelancer/login`. The `/vendor` gate is vendors only. This also settles the clash with Danella's `/<role>` redirect (open question 20). |
+| | **Decision 1b:** "admin wins". Admins sign up as one of the four roles and are added to `admin` by hand, so they carry two groups. |
+| | **Decision 2, partly built:** `{ ssr: true }` in Danella's `ConfigureAmplify.tsx` and the server runner. Her log-in form's "Keep me logged in" now chooses between two cookie stores, because localStorage or sessionStorage would hide the login from the server. Known gap: "unticked" holds only until the first token refresh (question 22). The data clients wait for a data backend. |
+| | **Decision 4 → Changed: teaser only** (4d, answering question 18). Types cut down to teaser fields, contact-details box removed, "See more on Tezera" box, Open Graph tags, and a browser-side "Your dashboard" hint for logged-in visitors. |
+| | **Decision 6 changed:** the "View as" box stays, but only in `next dev` without a user pool (CI's placeholder `amplify_outputs.json`). With a real one, or in production, sign-in is real. |
+| | **New Decision 8:** log in, setup and verification end on `/dashboard`; Danella's `/<role>/home` redirects there and `HomePanel.tsx` is gone; the avatar opens an account menu with her set-up links and Log out. Her files that changed are listed in Decision 8 for her review. |

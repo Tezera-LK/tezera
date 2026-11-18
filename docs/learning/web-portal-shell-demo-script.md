@@ -4,6 +4,13 @@
 > **Runs on:** your laptop, with `next dev` and sample data.
 >
 > **Background reading:** [web-portal-shell-explained.md](web-portal-shell-explained.md) (the theory behind each step) and [web-portal-shell-public-vs-portal.md](web-portal-shell-public-vs-portal.md) (the diagram for step 1 and the question for step 6).
+>
+> **Changed since this demo (18 Nov).** The script still works on a laptop **without** a user pool (CI's placeholder `amplify_outputs.json`), where "View as" stands in for signing in. Three things look different:
+> - public pages are **teasers** now, ending in "See more on Tezera" (step 6's question was answered: teaser only);
+> - freelancers have their own addresses: tools at `/freelancer`, profiles at `/freelancers/<id>` (sample: `/freelancers/fre-sample-1`);
+> - the avatar in the top bar opens an account menu with Log out.
+>
+> **With your own sandbox** (`corepack pnpm sandbox --outputs-out-dir apps/web`), "View as" disappears and you sign in for real: sign up once per role at `/<role>/signup`, and each log in lands on `/dashboard`. That also lets you show step 5's redirect live, which this script says can't be shown.
 
 ---
 
@@ -36,7 +43,7 @@
 | A postponed event | `/events/evt-sample-2` |
 | A draft event (should say "Event not found") | `/events/evt-sample-draft` |
 | An organiser's public profile | `/organisers/org-sample-1` |
-| A freelancer's public profile | `/vendors/ven-sample-2` |
+| A freelancer's public profile | `/freelancers/fre-sample-1` (was `/vendors/ven-sample-2` until 18 Nov) |
 | The dashboard | `/dashboard` |
 | Organiser tools | `/organiser` |
 | Admin tools (to try as a vendor) | `/admin` |
