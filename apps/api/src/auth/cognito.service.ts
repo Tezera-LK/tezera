@@ -5,7 +5,7 @@ import { CognitoIdentityProvider, CognitoIdentityProviderClient, GetUserCommand 
 
 export interface AccessTokenPayload {
   sub: string;
-  ' cognito: groups'?: string[];
+  'cognito:groups'?: string[];
 }
 
 @Injectable()
