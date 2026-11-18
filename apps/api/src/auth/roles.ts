@@ -1,5 +1,4 @@
 import { UserRole } from '@prisma/client';
-import { group } from 'console';
 
 const ROLE_ORDER: UserRole[] = ['admin', 'organiser', 'vendor', 'freelancer', 'attendee'];
 
