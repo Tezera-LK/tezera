@@ -1,3 +1,4 @@
+import localFont from "next/font/local";
 import palette from "@/components/Palette.module.css";
 import { ROLE_PALETTE, type PortalRole } from "@/lib/portal-roles";
 import DevRoleSwitcher from "./DevRoleSwitcher";
@@ -6,9 +7,20 @@ import TopBar from "./TopBar";
 import { NAV_TEXT, navFor } from "./nav";
 import styles from "./PortalShell.module.css";
 
+// The Figma files set body text in Instrument Sans and headings in Bricolage Grotesque (the site font).
+// Loaded here, not in the root layout, so only portal pages download it. Bundled like Bricolage
+// (app/layout.tsx), so builds don't depend on Google Fonts. One variable file, weights 400-700, latin.
+const instrumentSans = localFont({
+  src: "../../app/fonts/InstrumentSans-Latin.woff2",
+  weight: "400 700",
+  variable: "--font-instrument",
+  display: "swap",
+});
+
 type PortalShellProps = {
   // null = signed in without a role yet: shared pages only, organiser colours
   role: PortalRole | null;
+  // the page, from the (portal) layout
   children: React.ReactNode;
 };
 
@@ -18,7 +30,7 @@ type PortalShellProps = {
 export default function PortalShell({ role, children }: PortalShellProps) {
   return (
     <div
-      className={`${palette.root} ${styles.shell}`}
+      className={`${palette.root} ${instrumentSans.variable} ${styles.shell}`}
       data-palette={role ? ROLE_PALETTE[role] : "org"}
     >
       <a href="#portal-main" className={styles.skip}>

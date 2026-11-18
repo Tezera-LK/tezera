@@ -42,6 +42,22 @@
   --s: var(--org-s);
   --a: var(--org-a);
   --on-p: var(--org-b); /* white on slate, 5.5:1 */
+
+  /* The portal's surface colours, copied from the Figma high-fid files (organiser, 19 Nov 2026).
+     Figma has no styles or variables, so these are its literal values, not mixes of the brand palette.
+     page = page background · pill = sidebar items and right-hand panels · pill-ink = their text ·
+     current-ink = the current page's text on its white pill · field = search box and top-bar buttons ·
+     field-ink = search text · muted = secondary text · avatar = the empty profile circle ·
+     logo-2 = the logo's second dot */
+  --page: #d7dfea;
+  --pill: #cfe3d8;
+  --pill-ink: #1f3344;
+  --current-ink: #3b566b;
+  --field: #c5d3d1;
+  --field-ink: #2c4542;
+  --muted: #56616c;
+  --avatar: #cbd5e1;
+  --logo-2: var(--org-s);
 }
 
 .root[data-palette="att"] {
@@ -51,6 +67,17 @@
   --s: var(--att-s);
   --a: var(--att-a);
   --on-p: color-mix(in srgb, var(--att-t) 75%, #000); /* about 5:1; the plain text colour is 4.3:1 */
+
+  /* no Figma file for consumers yet: mixed from the brand palette as before */
+  --page: var(--att-b);
+  --pill: color-mix(in srgb, var(--att-s) 30%, var(--att-b));
+  --pill-ink: var(--att-t);
+  --current-ink: var(--att-t);
+  --field: color-mix(in srgb, var(--att-a) 45%, var(--att-b));
+  --field-ink: var(--att-t);
+  --muted: color-mix(in srgb, var(--att-t) 78%, var(--att-b));
+  --avatar: color-mix(in srgb, var(--att-s) 48%, var(--att-b));
+  --logo-2: var(--att-s);
 }
 
 .root[data-palette="ven"] {
@@ -60,4 +87,16 @@
   --s: var(--ven-s);
   --a: var(--ven-a);
   --on-p: var(--ven-t); /* 7.5:1 */
+
+  /* from the Figma vendor and freelancer files (19 Nov 2026). Figma puts white text on the green
+     (2.7:1); --on-p above stays dark, because white fails the 4.5:1 minimum. */
+  --page: #e9e7e2;
+  --pill: #c8ded4;
+  --pill-ink: #0f2a20;
+  --current-ink: #3d7a62;
+  --field: #b6c3a7;
+  --field-ink: #3f4d31;
+  --muted: #5f5d68;
+  --avatar: #d8d6d0;
+  --logo-2: var(--ven-a);
 }

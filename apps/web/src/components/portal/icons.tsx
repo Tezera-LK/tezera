@@ -3,6 +3,8 @@
 
 type IconProps = { className?: string };
 
+// The shared <svg> wrapper: a 24-unit grid drawn with 1.8-wide round strokes. It renders at 20px
+// unless CSS sets a size; the top bar's buttons and search box set 16px, as in Figma.
 function Icon({ className, children }: IconProps & { children: React.ReactNode }) {
   return (
     <svg
@@ -23,6 +25,7 @@ function Icon({ className, children }: IconProps & { children: React.ReactNode }
   );
 }
 
+// A magnifying glass, at the start of the search box.
 export function SearchIcon(props: IconProps) {
   return (
     <Icon {...props}>
@@ -32,6 +35,7 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
+// A speech bubble, for the messages button.
 export function MessageIcon(props: IconProps) {
   return (
     <Icon {...props}>
@@ -40,20 +44,12 @@ export function MessageIcon(props: IconProps) {
   );
 }
 
+// A bell, for the notifications button.
 export function BellIcon(props: IconProps) {
   return (
     <Icon {...props}>
       <path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 1.5h-15Z" />
       <path d="M10 20.5a2 2 0 0 0 4 0" />
-    </Icon>
-  );
-}
-
-export function PersonIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <circle cx="12" cy="8.5" r="3.8" />
-      <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
     </Icon>
   );
 }

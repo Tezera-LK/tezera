@@ -2,7 +2,9 @@ import Link from "next/link";
 import styles from "./PortalShell.module.css";
 
 type ButtonLinkProps = {
+  // where the button goes
   href: string;
+  // the button's text
   children: React.ReactNode;
   // filled in the role's colour; use it for the one main action on a page
   primary?: boolean;
