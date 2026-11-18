@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import { CognitoIdentityProvider, CognitoIdentityProviderClient, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 export interface AccessTokenPayload {
   sub: string;
@@ -20,7 +20,7 @@ export class CognitoService {
       tokenUse: 'access',
     });
     this.client = new CognitoIdentityProviderClient({
-      region: config.get<string>('AWS_REGION') ?? ' ap-south-1',
+      region: config.get<string>('AWS_REGION') ?? 'ap-south-1',
     });
   }
 
@@ -33,7 +33,7 @@ export class CognitoService {
     const object = Object.fromEntries((out.UserAttributes ?? []).map((x) => [x.Name, x.Value]));
     return {
       email: object['email_verified'] === 'true' ? object['email']?.toLowerCase() : undefined,
-      phone: object['phone_number_verified'] === ' true' ? object['phone_number'] : undefined,
+      phone: object['phone_number_verified'] === 'true' ? object['phone_number'] : undefined,
     };
   }
 }

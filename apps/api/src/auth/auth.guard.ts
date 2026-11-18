@@ -3,7 +3,6 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable, Unauthor
 import { PrismaService } from "../prisma/prisma.service";
 import { CognitoService } from "./cognito.service";
 import { roleFromGroups } from "./roles";
-import { Observable } from "rxjs";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -11,8 +10,8 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
-    const header: string | undefined = req.header.authorizaton;
-    if (!header?.startsWith('Bearer')) throw new UnauthorizedException();
+    const header: string | undefined = req.headers.authorization;
+    if (!header?.startsWith('Bearer ')) throw new UnauthorizedException();
     const token = header.slice(7);
 
     let payload;
