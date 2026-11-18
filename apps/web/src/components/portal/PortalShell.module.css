@@ -1,0 +1,546 @@
+/* The signed-in portal frame, laid out like the team's wireframes (the consumer-flow layout):
+   a top bar across the page, the sidebar card in the role's colour on the left, then the page.
+   Sizes are the wireframes' at 1440px: a 224px card, 36px gutters and, on pages that have one,
+   a 340px right-hand column, so the page area is 1112px wide.
+   Colours come from the generic palette variables that Palette.module.css sets from the role.
+   Below 900px the search moves to its own row and the card folds away behind a Menu button. */
+
+.shell {
+  /* The wireframes' colour roles: card = primary, pills and panels = secondary, search = accent. */
+  --side: var(--p);
+  --on-side: var(--on-p);
+  --tint: color-mix(in srgb, var(--s) 30%, var(--b));
+  --tint-strong: color-mix(in srgb, var(--s) 48%, var(--b));
+  --field: color-mix(in srgb, var(--a) 45%, var(--b));
+  --field-strong: color-mix(in srgb, var(--a) 65%, var(--b));
+  /* the current page's pill */
+  --current: #fff;
+  --on-current: var(--t);
+  --line: color-mix(in srgb, var(--t) 12%, transparent);
+  --gutter: 36px;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--b);
+  color: var(--t);
+}
+
+/* Light theme only for now, like the rest of the site (see Palette.module.css). The dark rules that
+   were here are in docs/learning/web-portal-shell-colour-tokens.md. */
+
+/* PR #14 moved globals.css's `body { margin: 0 }` onto the landing page only, which left an 8px
+   border round the portal. Put it back while the portal is on screen; delete this once globals.css
+   resets the margin for every page again. */
+:global(body):has(> .shell) {
+  margin: 0;
+}
+
+/* "Skip to content" link: hidden until it gets keyboard focus */
+.skip {
+  position: absolute;
+  z-index: 30;
+  left: 12px;
+  top: -60px;
+  padding: 8px 14px;
+  border-radius: 12px 12px 3px 12px;
+  background: var(--t);
+  color: var(--b);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip:focus {
+  top: 12px;
+}
+
+/* read by screen readers, invisible on screen */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Top bar ---------- */
+.topBar {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px 24px;
+  box-sizing: border-box;
+  min-height: 84px;
+  padding: 12px var(--gutter) 12px 28px;
+  background: var(--b);
+  border-bottom: 1px solid var(--line);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: -.02em;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* two overlapping dots, primary over secondary, as drawn in both wireframes */
+.logoMark {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 20px;
+}
+
+.logoMark::before,
+.logoMark::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.logoMark::before {
+  left: 12px;
+  background: var(--s);
+}
+
+.logoMark::after {
+  left: 0;
+  background: var(--p);
+}
+
+.search {
+  flex: 0 1 500px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--field);
+}
+
+/* the box shows focus for the input inside it */
+.search:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.searchIcon {
+  flex: none;
+  opacity: .75;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: 400 15px var(--font);
+}
+
+.searchInput::placeholder {
+  color: inherit;
+  opacity: .75;
+}
+
+.searchInput:disabled {
+  cursor: default;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconButton {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--field);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.iconButton:hover {
+  background: var(--field-strong);
+}
+
+.iconSoon {
+  cursor: default;
+}
+
+.avatar {
+  margin-left: 4px;
+  background: var(--tint);
+}
+
+.roleChip {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--p);
+  color: var(--on-p);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------- Below the top bar: sidebar card + page ---------- */
+.body {
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  column-gap: var(--gutter);
+  padding: 0 var(--gutter) 0 32px;
+}
+
+/* the card stays in view, 28px under the top bar, and scrolls inside if it's taller than the window */
+.sidebar {
+  position: sticky;
+  top: 112px;
+  align-self: start;
+  box-sizing: border-box;
+  height: calc(100vh - 140px);
+  height: calc(100dvh - 140px);
+  margin-top: 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 26px 20px 20px;
+  border-radius: 26px 26px 6px 26px;
+  /* brand shape: one small corner bottom-right */
+  background: var(--side);
+  color: var(--on-side);
+}
+
+/* the usual focus ring is too close to some card colours */
+.sidebar a:focus-visible,
+.sidebar button:focus-visible {
+  outline-color: var(--on-side);
+}
+
+/* only visible on narrow screens, where the links fold away behind it */
+.menuButton {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 700 17px var(--font);
+  cursor: pointer;
+}
+
+.menuButton::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-right: 2px solid;
+  border-bottom: 2px solid;
+  transform: translateY(-3px) rotate(45deg);
+}
+
+.menuButton[aria-expanded="true"]::after {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.nav {
+  display: grid;
+  gap: 26px;
+  align-content: start;
+}
+
+.groupTitle {
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+/* one pill in the card: a link, or a dashed placeholder for a page that isn't built yet */
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 7px 14px;
+  border-radius: 11px 11px 3px 11px;
+  background: var(--tint);
+  color: var(--t);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a.item:hover {
+  background: var(--tint-strong);
+}
+
+a.item[aria-current="page"] {
+  background: var(--current);
+  color: var(--on-current);
+  font-weight: 700;
+}
+
+/* no fill, so its text sits on the card itself and takes the card's text colour */
+.soon {
+  border: 1.5px dashed color-mix(in srgb, var(--on-side) 50%, transparent);
+  background: transparent;
+  color: color-mix(in srgb, var(--on-side) 85%, transparent);
+  cursor: default;
+}
+
+/* Development-only "View as" switch. It floats in the bottom-right corner, so it's always in reach
+   when showing the portal, and its dashed outline says it isn't part of the product.
+   Deleted in Phase B, together with DevRoleSwitcher.tsx. */
+.devSwitch {
+  position: fixed;
+  z-index: 40;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  box-sizing: border-box;
+  max-width: calc(100vw - 40px);
+  padding: 8px 8px 8px 14px;
+  border: 1.5px dashed color-mix(in srgb, var(--t) 45%, transparent);
+  border-radius: 14px 14px 4px 14px;
+  background: var(--b);
+  color: var(--t);
+  box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--t) 40%, transparent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.devSwitch select {
+  font: 500 14px var(--font);
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--b);
+  color: var(--t);
+}
+
+.devSwitch select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Page area ---------- */
+.main {
+  min-width: 0;
+  max-width: 1112px;
+  display: grid;
+  gap: 24px;
+  align-content: start;
+  padding: 28px 0 56px;
+}
+
+.main:focus {
+  outline: none;
+}
+
+.pageHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+
+.pageHeading {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pageTitle {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(26px, 2.4vw, 32px);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+}
+
+.lede {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 16px;
+  opacity: .8;
+}
+
+.pageActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* outlined by default; the primary one is filled in the role's colour with --on-p text */
+.button {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 7px 18px;
+  border: 2px solid var(--p);
+  border-radius: 12px 12px 3px 12px;
+  background: var(--b);
+  color: var(--t);
+  font: 600 15px var(--font);
+  text-decoration: none;
+}
+
+.buttonPrimary {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* a ring rather than a new fill, so the text keeps its contrast in every palette */
+.button:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
+}
+
+/* main column + right-hand column (Columns.tsx) */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 28px;
+  align-items: start;
+}
+
+.column {
+  min-width: 0;
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
+/* one card in the right-hand column (Panel.tsx) */
+.panel {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px 20px;
+  border-radius: 22px 22px 5px 22px;
+  background: var(--tint);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.panelEmpty {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px 12px 3px 12px;
+  background: var(--b);
+  font-size: 15px;
+}
+
+/* ---------- Narrower windows: the right-hand column moves under the main one ---------- */
+@media (max-width: 1199px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Phones and small tablets ---------- */
+@media (max-width: 899px) {
+  .shell {
+    --gutter: 16px;
+  }
+
+  .topBar {
+    position: static;
+    flex-wrap: wrap;
+    min-height: 0;
+    padding: 10px var(--gutter);
+  }
+
+  .topActions {
+    margin-left: auto;
+  }
+
+  .search {
+    order: 1;
+    flex: 1 1 100%;
+    margin: 0;
+  }
+
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 var(--gutter);
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    margin-top: 16px;
+    overflow: visible;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 20px 20px 5px 20px;
+  }
+
+  .menuButton {
+    display: flex;
+  }
+
+  .nav {
+    display: none;
+    padding-bottom: 10px;
+  }
+
+  .nav[data-open="true"] {
+    display: grid;
+  }
+
+  .main {
+    padding-top: 24px;
+  }
+}
+
+/* the role chip doesn't fit next to the icons on small phones; the card's tools heading still names the role */
+@media (max-width: 479px) {
+  .roleChip {
+    display: none;
+  }
+}
