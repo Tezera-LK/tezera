@@ -1,0 +1,63 @@
+/* Maps one role palette onto the generic variables --t, --b, --p, --s and --a
+   (text, background, primary, secondary, accent).
+   Usage: className={palette.root} plus data-palette="att" | "org" | "ven" on a wrapper.
+   Everything inside reads the generic variables, so it picks up the right colours by itself.
+
+   The brand colours themselves used to live in globals.css. The landing-page update (PR #14, pulled
+   on 4 Nov) removed them from there, so they are defined here until the design system (EN-07) gives
+   them a shared home. Values copied from globals.css at commit 077b258.
+   Light theme only: PR #14 also removed dark mode from the rest of the site, and a dark portal next
+   to a light site looks broken. The dark values are kept in
+   docs/learning/web-portal-shell-colour-tokens.md for when dark mode comes back.
+
+   --on-p is the text colour on a --p fill (the sidebar, the role chip, primary buttons). White only
+   works on the organiser slate: on the vendor green and the consumer coral it falls under the
+   4.5:1 contrast minimum, so those use dark text. Ratios checked 4 Nov. */
+
+.root {
+  /* the brand palettes: t = text, b = background, p = primary, s = secondary, a = accent */
+  /* consumers (the brand manual calls them attendees) */
+  --att-t: #392f3d;
+  --att-b: #f7f0ed;
+  --att-p: #d77e70;
+  --att-s: #f09eb4;
+  --att-a: #e5c76c;
+  /* organisers, and admins for now */
+  --org-t: #282829;
+  --org-b: #ffffff;
+  --org-p: #526c80;
+  --org-s: #70a98d;
+  --org-a: #6f908b;
+  /* vendors and freelancers share one */
+  --ven-t: #050316;
+  --ven-b: #e9e7e2;
+  --ven-p: #70a992;
+  --ven-s: #658095;
+  --ven-a: #b6c3a7;
+
+  /* organiser is the default (admins use it too) */
+  --t: var(--org-t);
+  --b: var(--org-b);
+  --p: var(--org-p);
+  --s: var(--org-s);
+  --a: var(--org-a);
+  --on-p: var(--org-b); /* white on slate, 5.5:1 */
+}
+
+.root[data-palette="att"] {
+  --t: var(--att-t);
+  --b: var(--att-b);
+  --p: var(--att-p);
+  --s: var(--att-s);
+  --a: var(--att-a);
+  --on-p: color-mix(in srgb, var(--att-t) 75%, #000); /* about 5:1; the plain text colour is 4.3:1 */
+}
+
+.root[data-palette="ven"] {
+  --t: var(--ven-t);
+  --b: var(--ven-b);
+  --p: var(--ven-p);
+  --s: var(--ven-s);
+  --a: var(--ven-a);
+  --on-p: var(--ven-t); /* 7.5:1 */
+}
