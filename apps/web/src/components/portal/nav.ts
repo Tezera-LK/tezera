@@ -27,13 +27,13 @@ const SHARED = {
   home: { label: "Home", href: routes.dashboard },
   messages: { label: "Messages" },
   community: { label: "Community" },
-  notifications: { label: "Notifications" },
+  notifications: { label: "Notifications", href: routes.notifications },
   leaderboards: { label: "Leaderboards" },
   reviews: { label: "Reviews" },
   reviewsAndRank: { label: "Reviews and rank" },
   profile: { label: "Profile" },
   settings: { label: "Settings" },
-  search: { label: "Search" },
+  search: { label: "Search", href: routes.search },
 } satisfies Record<string, NavItem>;
 
 // Figma lists Notifications in the sidebar as well as the bell in the top bar.
@@ -123,6 +123,25 @@ export const TOP_BAR: Record<"search" | "messages" | "notifications" | "profile"
   notifications: SHARED.notifications,
   profile: SHARED.profile,
 };
+
+// The bell's dropdown (O81).
+export const NOTIFICATIONS_TEXT = {
+  title: "Notifications",
+  markAllRead: "Mark all read",
+  seeAll: "See all notifications",
+  empty: "Nothing new. Bookings, quotes, stalls and messages will show up here.",
+  unread: "unread",
+} as const;
+
+// The avatar's menu (O82), in Figma's order. None of these pages exist yet; Log out becomes a
+// link to O98's confirmation when the Account slice is built.
+export const PROFILE_MENU: NavItem[] = [
+  { label: "My profile" },
+  { label: "Edit profile" },
+  { label: "Payments" },
+  { label: "Settings" },
+  { label: "Log out" },
+];
 
 // The search box's hint: what each role looks for. Organiser, vendor and freelancer wording is from
 // the Figma files; consumer and admin wording is ours until they have designs.

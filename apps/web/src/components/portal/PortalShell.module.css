@@ -228,6 +228,38 @@
   height: 16px;
 }
 
+/* the bell and the avatar are <button>s: drop the browser's button look */
+button.iconButton {
+  position: relative;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
+button.iconButton:hover {
+  background: color-mix(in srgb, var(--field) 80%, var(--t));
+}
+
+button.avatar:hover {
+  background: color-mix(in srgb, var(--avatar) 80%, var(--t));
+}
+
+/* the button whose panel is open */
+.iconButtonOpen {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 45%, transparent);
+}
+
+/* the bell's red dot while something is unread: 9px, over its top-right edge (O05) */
+.badge {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d9534f;
+}
+
 /* only real links react on hover; unbuilt ones stay still */
 a.iconButton:hover {
   background: color-mix(in srgb, var(--field) 80%, var(--t));
@@ -257,6 +289,135 @@ a.iconButton:hover {
   font-weight: 700;
   line-height: 26px;
   white-space: nowrap;
+}
+
+/* ---------- Top-bar panels: notifications dropdown (O81) and profile menu (O82) ---------- */
+/* Both hang 76px from the top of the window with their right edge 30px in, over the page, as
+   Figma draws them. Figma gives them no shadow; they're told apart from the page by their tint. */
+.popoverAnchor {
+  display: contents;
+}
+
+.popover {
+  position: fixed;
+  z-index: 20;
+  top: 76px;
+  right: 30px;
+  box-sizing: border-box;
+  max-height: calc(100dvh - 92px);
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--pill);
+  color: var(--t);
+}
+
+.popover[hidden] {
+  display: none;
+}
+
+.notificationsPopover {
+  width: 420px;
+}
+
+.profilePopover {
+  width: 310px;
+}
+
+/* "Notifications" and "Mark all read" on one line, 13px above the first row */
+.popoverHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 3px;
+}
+
+.popoverTitle {
+  margin: 0;
+  font: 700 16px/1.2 var(--title-font);
+}
+
+.popoverList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* one notification: 58px tall, a 32px picture, the time on the right in 11px */
+.popoverRow {
+  min-height: 58px;
+}
+
+.popoverTime {
+  flex: none;
+  align-self: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.popoverEmpty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* "See all notifications" sits on the panel's own tint in Figma, so it reads as text */
+.popover .popoverSeeAll {
+  margin-top: -1px;
+  background: transparent;
+}
+
+/* the profile menu's header: a 48px circle, the name and "email · role" */
+.profileHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profileWho {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.profileName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.profileMeta {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* one 56px white row of the profile menu */
+.profileItem {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.profileItem:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
 }
 
 /* ---------- Below the top bar: sidebar card + page ---------- */
@@ -532,8 +693,8 @@ a.item[aria-current="page"] {
   color: var(--on-p);
 }
 
-/* a ring rather than a new fill, so the text keeps its contrast in every palette */
-.button:hover {
+/* a ring rather than a new fill, so the text keeps its contrast in every palette; only real links */
+a.button:hover {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
 }
 
@@ -568,6 +729,18 @@ a.item[aria-current="page"] {
 }
 
 /* the panel's heading; the 5px margin plus the 10px gap makes Figma's 15px to the first row */
+/* the title row, when the panel has a link on the right ("Your rank … Leaderboards") */
+.panelHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panelHead .panelTitle {
+  margin-bottom: 0;
+}
+
 .panelTitle {
   margin: 0 0 5px;
   font: 700 16px/1.2 var(--title-font);
@@ -622,6 +795,14 @@ a.item[aria-current="page"] {
     order: 1;
     flex: 1 1 100%;
     margin: 0;
+  }
+
+  /* the panels span the window, 16px in from each side, under the first row of the top bar */
+  .popover {
+    top: 64px;
+    right: var(--gutter);
+    left: var(--gutter);
+    width: auto;
   }
 
   .body {

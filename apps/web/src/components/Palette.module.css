@@ -58,6 +58,9 @@
   --muted: #56616c;
   --avatar: #cbd5e1;
   --logo-2: var(--org-s);
+  /* soft = pale chips such as "Draft" and "Rising"; unread = the tint behind unread notifications (O06) */
+  --soft: #edf1f6;
+  --unread: #e2ebe9;
 }
 
 .root[data-palette="att"] {
@@ -78,6 +81,8 @@
   --muted: color-mix(in srgb, var(--att-t) 78%, var(--att-b));
   --avatar: color-mix(in srgb, var(--att-s) 48%, var(--att-b));
   --logo-2: var(--att-s);
+  --soft: color-mix(in srgb, var(--att-a) 18%, #fff);
+  --unread: color-mix(in srgb, var(--att-s) 18%, #fff);
 }
 
 .root[data-palette="ven"] {
@@ -99,4 +104,7 @@
   --muted: #5f5d68;
   --avatar: #d8d6d0;
   --logo-2: var(--ven-a);
+  /* not in the vendor file yet: mixed the way the organiser values relate to the organiser palette */
+  --soft: color-mix(in srgb, var(--ven-b) 60%, #fff);
+  --unread: color-mix(in srgb, var(--pill) 55%, #fff);
 }

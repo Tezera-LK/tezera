@@ -11,6 +11,11 @@ export const routes = {
 
   // signed in, any role
   dashboard: "/dashboard",
+  // ?type= picks a tab: bookings, stalls, messages or account
+  notifications: "/notifications",
+  // the top bar's search box submits here as ?q=; ?tab= picks providers, events or communities
+  search: "/search",
+  searchFor: (query: string) => `/search?q=${encodeURIComponent(query)}`,
 
   // signed in, one role each (vendor tools are for vendors and freelancers)
   organiserTools: "/organiser",

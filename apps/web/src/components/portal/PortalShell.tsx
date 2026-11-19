@@ -3,7 +3,7 @@ import palette from "@/components/Palette.module.css";
 import { ROLE_PALETTE, type PortalRole } from "@/lib/portal-roles";
 import DevRoleSwitcher from "./DevRoleSwitcher";
 import PortalNav from "./PortalNav";
-import TopBar from "./TopBar";
+import TopBar, { type TopBarProps } from "./TopBar";
 import { NAV_TEXT, navFor } from "./nav";
 import styles from "./PortalShell.module.css";
 
@@ -20,6 +20,9 @@ const instrumentSans = localFont({
 type PortalShellProps = {
   // null = signed in without a role yet: shared pages only, organiser colours
   role: PortalRole | null;
+  // what the top bar's bell and profile menu show (TopBar.tsx)
+  notifications: TopBarProps["notifications"];
+  account: TopBarProps["account"];
   // the page, from the (portal) layout
   children: React.ReactNode;
 };
@@ -27,7 +30,7 @@ type PortalShellProps = {
 // The frame around every signed-in page, laid out like the team's wireframes: a top bar, the sidebar
 // card in the role's colour, and the page. It only draws. The security checks are requireSession()
 // and requireRole() in lib/auth/session.ts.
-export default function PortalShell({ role, children }: PortalShellProps) {
+export default function PortalShell({ role, notifications, account, children }: PortalShellProps) {
   return (
     <div
       className={`${palette.root} ${instrumentSans.variable} ${styles.shell}`}
@@ -36,7 +39,7 @@ export default function PortalShell({ role, children }: PortalShellProps) {
       <a href="#portal-main" className={styles.skip}>
         {NAV_TEXT.skip}
       </a>
-      <TopBar role={role} />
+      <TopBar role={role} notifications={notifications} account={account} />
       {/* its own grid, so the sticky top bar above isn't held inside a grid cell */}
       <div className={styles.body}>
         <aside className={styles.sidebar}>
