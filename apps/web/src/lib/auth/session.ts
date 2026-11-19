@@ -3,6 +3,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { DEV_ROLE_COOKIE, DEV_ROLE_DEFAULT } from "@/lib/auth/dev-role";
+import { previewMode } from "@/lib/preview";
 import { isPortalRole, type PortalRole } from "@/lib/portal-roles";
 import { routes } from "@/lib/routes";
 
@@ -16,12 +17,13 @@ export type Session = {
 //
 // STAND-IN until EN-04 (Cognito) exists. Phase B replaces the body with a real read of the Amplify
 // session; the callers below don't change (docs/learning/web-portal-shell.md, Decisions 1c and 6).
-// - `next dev`: you are signed in as the role picked in the "View as" box, bottom-right (organiser by default).
-// - production builds: nobody is signed in, so every portal page sends you to the login page.
+// - preview mode (`next dev`, and dev.tezera.lk until sign-in is hosted: lib/preview.ts): you are signed
+//   in as the role picked in the "View as" box, bottom-right (organiser by default).
+// - other builds: nobody is signed in, so every portal page sends you to the login page.
 export const getSession = cache(async (): Promise<Session | null> => {
   // read cookies in every mode, like the real version will, so portal pages always render per request
   const cookieStore = await cookies();
-  if (process.env.NODE_ENV !== "development") return null;
+  if (!previewMode) return null;
 
   const picked = cookieStore.get(DEV_ROLE_COOKIE)?.value ?? DEV_ROLE_DEFAULT;
   return { userId: "dev-user", role: isPortalRole(picked) ? picked : null };

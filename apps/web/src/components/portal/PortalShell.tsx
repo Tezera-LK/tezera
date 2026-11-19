@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import palette from "@/components/Palette.module.css";
 import { ROLE_PALETTE, type PortalRole } from "@/lib/portal-roles";
+import { previewMode } from "@/lib/preview";
 import DevRoleSwitcher from "./DevRoleSwitcher";
 import PortalNav from "./PortalNav";
 import TopBar, { type TopBarProps } from "./TopBar";
@@ -50,7 +51,7 @@ export default function PortalShell({ role, notifications, account, children }: 
         </main>
       </div>
       {/* floats in the bottom-right corner, so it's always in reach during a demo */}
-      {process.env.NODE_ENV === "development" && <DevRoleSwitcher current={role ?? "none"} />}
+      {previewMode && <DevRoleSwitcher current={role ?? "none"} />}
     </div>
   );
 }

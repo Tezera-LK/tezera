@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/session";
 import { getVerification, saveVerification } from "@/lib/data/portal";
 import type { VerificationDocument } from "@/lib/data/portal-types";
+import { previewMode } from "@/lib/preview";
 import { routes } from "@/lib/routes";
 
 // Verification actions (O28, O38, O39). Files stay in the browser until storage is connected
@@ -49,10 +50,10 @@ export async function submitDocuments(form: FormData) {
 }
 
 // "Admin approves" and "Admin rejects" on O38: Figma's way of showing what happens next. The
-// real decision is the admin's (EN-08), so these only exist in `next dev`.
+// real decision is the admin's (EN-08), so these only exist in preview mode (lib/preview.ts).
 export async function devDecide(decision: "approve" | "reject") {
   const session = await requireRole("organiser");
-  if (process.env.NODE_ENV !== "development") redirect(routes.verification);
+  if (!previewMode) redirect(routes.verification);
   const current = await getVerification(session);
   if (!current || current.status !== "pending") redirect(routes.verification);
 
@@ -67,10 +68,10 @@ export async function devDecide(decision: "approve" | "reject") {
   redirect(routes.verification);
 }
 
-// "Start over" in `next dev`: back to no documents, so O28 can be seen again.
+// "Start over" in preview mode: back to no documents, so O28 can be seen again.
 export async function devReset() {
   const session = await requireRole("organiser");
-  if (process.env.NODE_ENV !== "development") redirect(routes.verification);
+  if (!previewMode) redirect(routes.verification);
   await saveVerification(session, { status: "not-started", documents: [], submittedAt: null, decidedAt: null, reason: "" });
   refresh();
   redirect(routes.verification);
