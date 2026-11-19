@@ -7,9 +7,13 @@ import { NAV_TEXT, type NavGroup } from "./nav";
 import styles from "./PortalShell.module.css";
 
 // The sidebar links. A Client Component because it marks the current page and opens and closes on phones.
+// groups comes from navFor() in nav.ts.
 export default function PortalNav({ groups }: { groups: NavGroup[] }) {
+  // the current URL, to mark the matching pill as the current page
   const pathname = usePathname();
+  // whether the links are unfolded on a phone; desktop ignores it
   const [open, setOpen] = useState(false);
+  // a unique id that ties the Menu button to the list it opens, and each heading to its list
   const navId = useId();
 
   return (
@@ -43,7 +47,7 @@ export default function PortalNav({ groups }: { groups: NavGroup[] }) {
                       {item.label}
                     </Link>
                   ) : (
-                    // a dashed outline instead of a "Soon" tag, which made longer names wrap in the 224px card
+                    // looks like the other pills (as in Figma) but isn't a link; screen readers hear "coming soon"
                     <span className={`${styles.item} ${styles.soon}`} title={`${item.label}: ${NAV_TEXT.soon}`}>
                       {item.label}
                       <span className={styles.srOnly}>{`, ${NAV_TEXT.soon}`}</span>

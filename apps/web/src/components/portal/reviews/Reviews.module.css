@@ -1,0 +1,289 @@
+/* Reviews (Figma O29, O49), reply and report (O46, O47), writing one (O30, O48) and
+   Leaderboards (O31). */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.notice {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--pill);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* "From providers (38) · From consumers (176)": a white track, the current one filled */
+.tabs {
+  display: flex;
+  justify-self: start;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 21px;
+  background: var(--card);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 17px;
+  color: var(--t);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tab[aria-current="page"] {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.card {
+  display: grid;
+  gap: 10px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+/* the averages: a big number over its label, in a row */
+.averages {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 8px 16px 12px;
+}
+
+.average {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.averageValue {
+  margin: 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.reviewHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reviewButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.scores {
+  margin: 0;
+  padding-left: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.reply {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+/* the review quoted at the top of the reply dialog (O46) */
+.quoted {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--pill);
+}
+
+textarea.textarea {
+  min-height: 90px;
+}
+
+/* plain radio rows in the report dialog (O47) */
+.reasons {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radio input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--p);
+}
+
+/* ---------- Review a provider (O30) ---------- */
+.goodNotice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #d4ebda;
+}
+
+.goodDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2b6b38;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* one score: its name on the left, five round choices on the right */
+.score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  min-height: 58px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.scoreLabel {
+  float: left;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.scoreChoices {
+  display: flex;
+  gap: 6px;
+}
+
+.scoreChoice {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scoreChoice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scoreChoice:has(input:checked) {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.scoreChoice:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Leaderboards (O31) ---------- */
+.filterForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pillSelect {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--t);
+  font: 700 12px/1 var(--font-instrument), var(--font);
+}
+
+.rankTable {
+  min-width: 560px;
+}
+
+.rankTable thead th:nth-child(1) { width: 62px; }
+.rankTable thead th:nth-child(2) { width: 312px; }
+.rankTable thead th:nth-child(3) { width: 188px; }
+
+/* the signed-in organiser's row: a pale band, as Figma draws it */
+.youRow > * {
+  background: var(--unread);
+}
+
+.youRow > :first-child {
+  padding-left: 8px;
+  border-radius: 12px 0 0 12px;
+}
+
+.youRow > :last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+a.rowLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.rowLink:hover {
+  text-decoration: underline;
+}
+
+.bigNumber {
+  margin: 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+@media (max-width: 900px) {
+  .tiles,
+  .averages {
+    grid-template-columns: 1fr 1fr;
+  }
+}

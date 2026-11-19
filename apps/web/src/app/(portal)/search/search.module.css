@@ -1,0 +1,23 @@
+/* The search page's own blocks (Figma O80). Shared pieces are in components/portal/ui.module.css. */
+
+/* provider rows are 60px with a 40px round picture */
+.providerRow {
+  min-height: 60px;
+}
+
+/* event and community rows are 58px with a 36px picture */
+.eventRow {
+  min-height: 58px;
+  padding-block: 11px;
+}
+
+/* "See all 18 in Find providers" sits 16px under the rows; the page's gap is 20px */
+.seeAll {
+  margin-top: -4px;
+}
+
+/* "Events" and its rows: the heading sits 19px above the first row */
+.section {
+  display: grid;
+  gap: 19px;
+}

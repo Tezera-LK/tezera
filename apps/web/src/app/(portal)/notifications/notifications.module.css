@@ -1,0 +1,42 @@
+/* The notifications page's own blocks (Figma O06). Shared pieces are in
+   components/portal/ui.module.css. */
+
+/* "Today" and its rows: the heading sits 19px above the first row */
+.group {
+  display: grid;
+  gap: 19px;
+}
+
+/* one notification: 77px tall, a 12px dot, three lines of text and a button on the right.
+   Unread ones are tinted (.unread); read ones are white. */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 77px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.unread {
+  background: var(--unread);
+}
+
+/* Figma puts the dot on every row, in the role colour */
+.dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--p);
+}
+
+/* the grey sentence in "Reminders and activity" */
+.panelText {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}

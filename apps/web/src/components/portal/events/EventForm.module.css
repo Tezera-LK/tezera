@@ -1,0 +1,90 @@
+/* The event form's own pieces (Figma O08, O54). Fields and buttons are in ../forms.module.css. */
+
+/* a 56px white row in the right-hand panels: label on the left, chip on the right */
+.asideRow {
+  justify-content: space-between;
+  min-height: 56px;
+}
+
+/* "How it looks": the photo, title, date line, organiser and price (O08) */
+.lookPhoto {
+  line-height: 0;
+}
+
+.lookPhoto > span {
+  width: 100% !important;
+}
+
+.lookTitle {
+  margin: 1px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.lookFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 3px 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* "Cover image": 12px label, the 240 x 140 photo with Replace and Remove beside it */
+.coverLabel {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cover {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.coverActions {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+/* O54's amber banner: "You changed the venue" */
+.changeBanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #f6e3b4;
+}
+
+.changeDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7a5200;
+}
+
+.bannerText {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* "Venue map · Will need a new map" (O54) */
+.mapCard {
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  font: 700 16px/1.2 var(--title-font);
+}
+
+@media (max-width: 640px) {
+  .cover {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,301 @@
+/* Small pieces the portal pages share: chips, image placeholders, tabs, white rows, link-style text
+   and buttons. Sizes and colours are the Figma organiser screens' (O05, O06, O80, O81, O82).
+   Colours come from the palette variables (Palette.module.css), so other roles recolour them. */
+
+/* ---------- Text ---------- */
+
+/* a heading above a block of the page, e.g. "Your events", "Today": Bricolage 15px */
+.sectionTitle {
+  margin: 0;
+  font: 700 15px/1.2 var(--title-font);
+}
+
+/* a heading with a link on its right, e.g. "Your events … Analytics" */
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* bold link text in the darker role colour, e.g. "Analytics", "Open ›", "Mark all read" */
+.textLink {
+  color: var(--current-ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.22;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.textLink:hover {
+  text-decoration: underline;
+}
+
+/* grey 12px text: dates, details, footnotes */
+.muted {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.22;
+}
+
+/* a page or panel note under a block, e.g. "Bookings: confirmed of requests sent…" */
+.note {
+  margin: -3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.22;
+}
+
+/* a link or button that isn't wired up yet: looks the same, but no hand cursor */
+.soon {
+  cursor: default;
+}
+
+/* ---------- Chips ---------- */
+
+/* a 22px status pill, e.g. "Published", "Draft", "Top Rated" */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* The status colours are the same for every role in Figma: green for published, amber for a
+   live problem. The rest come from the role's palette. */
+.chipGood {
+  background: #d4ebda;
+  color: #2b6b38;
+}
+
+.chipWarn {
+  background: #f6e3b4;
+  color: #7a5200;
+}
+
+/* taken down by an admin (O07, O55) */
+.chipDanger {
+  background: #f3d6d2;
+  color: #b3261e;
+}
+
+/* postponed, cancelled */
+.chipNeutral {
+  background: var(--page);
+  color: var(--muted);
+}
+
+/* draft, "Rising" */
+.chipSoft {
+  background: var(--soft);
+  color: var(--current-ink);
+}
+
+/* "Top Rated" */
+.chipStrong {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* ---------- Placeholders ---------- */
+
+/* a grey box where a photo or icon will go once the data has one */
+.thumb {
+  flex: none;
+  display: block;
+  background: var(--avatar);
+}
+
+/* the big event photo on the dashboard card: Figma's "image" mark, a box with two diagonals */
+.thumbImage {
+  border-radius: 12px;
+}
+
+.thumbImage svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.thumbRound {
+  border-radius: 50%;
+}
+
+/* ---------- Tabs ---------- */
+
+/* a white 42px pill holding the tabs, as on O06 and O80; the current tab is filled in the role
+   colour. Each tab is a link, so the choice lives in the URL and the back button works. */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-self: start;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 21px;
+  background: var(--card);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 17px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.tab:hover {
+  background: var(--page);
+}
+
+.tab[aria-current="page"] {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* ---------- Rows and buttons ---------- */
+
+/* a stack of white rows, 8px apart */
+.rows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* one white row with a picture on the left, two lines of text and something on the right */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.row:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+/* the row's text column: it takes the free space and lets long names wrap */
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.rowTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+/* a 32px button inside a row, e.g. "Open", "Compare" (O06) */
+.rowButton {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--page);
+  color: var(--t);
+  font: 700 12px/1 var(--font-instrument), var(--font);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* the same size filled in the role colour, e.g. "Manage event" */
+.rowButtonPrimary {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* white on the tinted dashboard card, e.g. "Update status" */
+.rowButtonWhite {
+  background: var(--card);
+}
+
+a.rowButton:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
+}
+
+/* a full-width 40px white button under a list, e.g. "See all notifications" */
+.wideButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* as a <button> (a submit, e.g. "Preview event page"): no browser border, the same font */
+button.wideButton {
+  width: 100%;
+  border: 0;
+  font-family: var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+a.wideButton:hover,
+button.wideButton:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
+}
+
+/* a 28px white chip that runs a search, e.g. "DJ" in "Recent searches" (O80) */
+.searchChip {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.searchChip:hover {
+  box-shadow: 0 0 0 2px var(--p);
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

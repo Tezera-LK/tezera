@@ -3,6 +3,7 @@ import styles from "./PortalShell.module.css";
 type ColumnsProps = {
   // the narrow right-hand column, usually a few <Panel>s
   aside: React.ReactNode;
+  // the page's main content, in the 744px left-hand column
   children: React.ReactNode;
 };
 
@@ -12,7 +13,7 @@ export default function Columns({ aside, children }: ColumnsProps) {
   return (
     <div className={styles.columns}>
       <div className={styles.column}>{children}</div>
-      <div className={styles.column}>{aside}</div>
+      <div className={`${styles.column} ${styles.aside}`}>{aside}</div>
     </div>
   );
 }

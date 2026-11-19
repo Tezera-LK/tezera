@@ -80,18 +80,19 @@ section[id] {
 }
 
 /* ---------- scrollbar ---------- */
+/* --scroll-track and --scroll-thumb let a page area recolour it (the portal sets them per role) */
 ::-webkit-scrollbar {
   width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--page-bg);
+  background: var(--scroll-track, var(--page-bg));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--red) 55%, transparent);
+  background: var(--scroll-thumb, color-mix(in srgb, var(--red) 55%, transparent));
   border-radius: 999px;
-  border: 3px solid var(--page-bg);
+  border: 3px solid var(--scroll-track, var(--page-bg));
   /* gap around the thumb makes it look slimmer */
 }
 
@@ -103,7 +104,8 @@ section[id] {
 @supports not selector(::-webkit-scrollbar) {
   html {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--page-ink) 55%, transparent) var(--page-bg);
+    scrollbar-color: var(--scroll-thumb, color-mix(in srgb, var(--page-ink) 55%, transparent))
+      var(--scroll-track, var(--page-bg));
   }
 }
 

@@ -1,0 +1,145 @@
+/* Pieces the event tabs share (Stalls O13, Hiring O14): a heading over a white table card,
+   tables with 57px rows, right-hand panel text and buttons, and the inside of a dialog form. */
+
+/* ---------- Sections ---------- */
+/* a heading (and buttons) over a white table card: 19px apart, 16px under the buttons */
+.section {
+  display: grid;
+  gap: 19px;
+}
+
+.sectionTight {
+  gap: 16px;
+}
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.headButtons {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- Tables ---------- */
+/* 57px rows split by thin lines; the header row is 29px of small grey labels */
+.tableCard {
+  overflow-x: auto;
+  padding: 16px 16px 6px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.22;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  box-sizing: border-box;
+  height: 57px;
+  padding: 0 8px 0 0;
+  vertical-align: middle;
+  font-weight: 400;
+}
+
+.table thead th {
+  height: 29px;
+  padding-top: 2px;
+  vertical-align: top;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table tbody tr + tr > * {
+  border-top: 1px solid var(--line);
+}
+
+/* a vendor's name, with "★ 4.4 · Verified" under it */
+.strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* the row headings (stall type, vendor) stay bold over the table's plain cells */
+.table th.strong,
+.table th .strong {
+  display: table-cell;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.table th .strong {
+  display: block;
+}
+
+.small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+td > .small:only-child {
+  margin-top: 0;
+}
+
+.end {
+  text-align: right;
+}
+
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Right-hand panels ---------- */
+.panelText {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.42;
+}
+
+/* "Payments", "Open map builder": a full-width 40px white button */
+.panel .panelLink,
+span.panelLink,
+a.panelLink,
+button.panelLink {
+  justify-content: center;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* ---------- Dialogs ---------- */
+.dialogForm {
+  display: grid;
+  gap: 17px;
+}
+
+/* "Cancel" 140px, the main button the rest */
+.dialogActions {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width: 640px) {
+  .dialogActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

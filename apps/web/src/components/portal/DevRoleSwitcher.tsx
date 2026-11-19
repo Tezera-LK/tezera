@@ -10,6 +10,7 @@ import styles from "./PortalShell.module.css";
 export default function DevRoleSwitcher({ current }: { current: DevRole }) {
   const router = useRouter();
 
+  // Saves the chosen role in the cookie that the stand-in session reads, then reloads the page's data.
   function viewAs(role: DevRole) {
     document.cookie = `${DEV_ROLE_COOKIE}=${role}; path=/; SameSite=Lax`;
     // re-render the server side with the new role; a tools page you can no longer use sends you to the dashboard

@@ -1,0 +1,433 @@
+/* A booking (Figma O22, O83–O88) and the payment pages (O60–O65). Shared hiring pieces are in
+   ./Hiring.module.css and ../tables.module.css. */
+
+/* ---------- Booking (O22) ---------- */
+/* "Confirmed", "Message" and "Change terms" on the right of the title */
+.headActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* a white card of label and value pairs ("What was agreed", the brief) */
+.factsCard {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.paymentsTable {
+  min-width: 640px;
+}
+
+.paymentsTable thead th:nth-child(1) { width: 153px; }
+.paymentsTable thead th:nth-child(2) { width: 139px; }
+.paymentsTable thead th:nth-child(3) { width: 140px; }
+.paymentsTable thead th:nth-child(4) { width: 140px; }
+
+.footnote {
+  margin: -7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* the pale green pill at the end of a history row */
+.historyDot {
+  flex: none;
+  width: 30px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--pill);
+}
+
+/* "Cancel booking" as red text under the report button */
+.dangerLink {
+  color: #b3261e;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dangerLink:hover {
+  text-decoration: underline;
+}
+
+/* a green line under the title after something was sent ("New terms sent…") */
+.notice {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--pill);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* an instalment with "was 15,000" at its right end (O83) */
+.withWas {
+  position: relative;
+}
+
+.withWas input {
+  width: 100%;
+  padding-right: 96px;
+}
+
+.was {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* ---------- Cancelled (O85) ---------- */
+.warnNotice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #f6e3b4;
+}
+
+.warnDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7a5200;
+}
+
+.noticeText {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.warnNotice .noticeText {
+  color: #4f3d1a;
+  font-size: 13px;
+}
+
+/* "Find a replacement fast": the green card with two wide buttons */
+.replaceCard {
+  display: grid;
+  gap: 12px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.twoButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* "Receipt" as plain text on a pale row */
+.plainRowButton {
+  background: transparent;
+}
+
+/* ---------- Dialogs (O84, O87, O88) ---------- */
+.choices {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+label.choice {
+  min-height: 56px;
+}
+
+textarea.textarea {
+  min-height: 70px;
+}
+
+/* "What happens, by the booking terms": a green card */
+.happens {
+  display: grid;
+  gap: 12px;
+  padding: 16px 14px;
+  border-radius: 16px;
+  background: var(--pill);
+}
+
+/* "Keep booking" 170px, "Cancel booking" the rest */
+.cancelActions {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 12px;
+}
+
+/* ---------- Payments (O60–O65) ---------- */
+/* "Test payment, no real money" along the top of every payment page */
+.testBanner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: #f6e3b4;
+  color: #7a5200;
+  font-size: 12px;
+}
+
+.testBanner strong {
+  font-size: 13px;
+}
+
+/* a white card with a title row: "Payment account", "History and receipts", "Summary" */
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+/* a pale 58px row inside a card: a square, a name and a line, then the amount and a chip */
+.ledgerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.ledgerRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.amount {
+  flex: none;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* the big total in the Stall fees panel and on a receipt */
+.bigAmount {
+  margin: 0;
+  font: 700 30px/1.2 var(--title-font);
+}
+
+/* "Card", "eZ Cash", "Bank transfer": choice pills */
+.methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.method {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--page);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.method input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.method:has(input:checked) {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.method:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* the history filters reuse the pill: pale, or filled when current */
+a.filterLink {
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.filterLink[aria-current="page"] {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* the card fields only show while "Card" is picked */
+.payForm:not(:has(input[value="card"]:checked)) .cardOnly,
+.payForm:has(input[value="card"]:checked) .notCard {
+  display: none;
+}
+
+/* the card fields sit straight on the checkout card */
+div.flatCard {
+  padding: 0;
+  background: transparent;
+}
+
+/* "Sandbox" in the checkout card's corner */
+.sandboxChip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* "Not run" on the test payment row (O61) */
+.smallState {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* "Open PayHere sign-up": a centred text button */
+a.centredLink {
+  justify-self: center;
+}
+
+.totalRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.totalRow .bigAmount {
+  font-size: 20px;
+}
+
+/* the main button wide, the second one 187px */
+.payActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 187px;
+  gap: 12px;
+}
+
+.payActions > :last-child {
+  background: var(--card);
+}
+
+/* ---------- Receipt (O64) ---------- */
+.receipt {
+  display: grid;
+  gap: 16px;
+  padding: 32px;
+  border-radius: 24px;
+  background: var(--card);
+}
+
+.receiptHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--line);
+}
+
+.receiptLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 700 26px/1 var(--title-font);
+}
+
+.receiptAmount {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 2px solid var(--line);
+  font-size: 14px;
+}
+
+.receiptSmall {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* the red "!" on O65 */
+.failDot {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #f3d6d2;
+  color: #b3261e;
+  font: 700 34px/1 var(--title-font);
+}
+
+button.printButton {
+  border: 0;
+  cursor: pointer;
+}
+
+@media print {
+  /* "Download PDF" prints the receipt alone */
+  .receipt {
+    padding: 0;
+  }
+
+  .printButton {
+    display: none;
+  }
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width: 640px) {
+  .twoButtons,
+  .cancelActions,
+  .payActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

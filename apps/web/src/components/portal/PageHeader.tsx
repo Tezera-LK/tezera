@@ -1,7 +1,9 @@
 import styles from "./PortalShell.module.css";
 
 type PageHeaderProps = {
+  // the h1: one per page
   title: string;
+  // the grey line under the title, e.g. "Agastra Events · 4 upcoming events"
   description?: string;
   // buttons on the right of the title, as in the wireframes (e.g. "Create event")
   actions?: React.ReactNode;
