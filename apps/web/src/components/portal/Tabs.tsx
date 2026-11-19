@@ -1,7 +1,9 @@
 import Link from "next/link";
+import MaybeLink from "./MaybeLink";
 import ui from "./ui.module.css";
 
-export type Tab = { key: string; label: string; href: string };
+// href is missing while that tab page belongs to a slice that is not built yet
+export type Tab = { key: string; label: string; href?: string };
 
 type TabsProps = {
   tabs: Tab[];
@@ -16,7 +18,12 @@ type TabsProps = {
 export default function Tabs({ tabs, current, label }: TabsProps) {
   return (
     <nav className={ui.tabs} aria-label={label}>
-      {tabs.map((tab) => (
+      {tabs.map((tab) =>
+        !tab.href ? (
+          <MaybeLink key={tab.key} className={ui.tab}>
+            {tab.label}
+          </MaybeLink>
+        ) : (
         <Link
           key={tab.key}
           href={tab.href}
@@ -26,7 +33,8 @@ export default function Tabs({ tabs, current, label }: TabsProps) {
         >
           {tab.label}
         </Link>
-      ))}
+        ),
+      )}
     </nav>
   );
 }

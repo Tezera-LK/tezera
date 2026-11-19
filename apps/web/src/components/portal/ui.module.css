@@ -81,6 +81,12 @@ a.textLink:hover {
   color: #7a5200;
 }
 
+/* taken down by an admin (O07, O55) */
+.chipDanger {
+  background: #f3d6d2;
+  color: #b3261e;
+}
+
 /* postponed, cancelled */
 .chipNeutral {
   background: var(--page);
@@ -253,7 +259,16 @@ a.rowButton:hover {
   text-decoration: none;
 }
 
-a.wideButton:hover {
+/* as a <button> (a submit, e.g. "Preview event page"): no browser border, the same font */
+button.wideButton {
+  width: 100%;
+  border: 0;
+  font-family: var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+a.wideButton:hover,
+button.wideButton:hover {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
 }
 

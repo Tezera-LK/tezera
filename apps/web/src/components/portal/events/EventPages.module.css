@@ -1,0 +1,727 @@
+/* The organiser's event pages (Figma O07, O09, O15, O16, O51, O52, O55, O57) and their dialogs
+   (O10, O53, O56). Shared pieces are in ../ui.module.css and ../forms.module.css. */
+
+/* ---------- Event header (O09) ---------- */
+/* a 110 x 76 photo, then the title, the when-and-where line, chips and three buttons */
+.eventHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.eventHeadText {
+  min-width: 0;
+  display: grid;
+}
+
+.eventTitle {
+  margin: -1px 0 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.eventMeta {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.22;
+}
+
+.eventChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.eventActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ---------- Number tiles (O09, O57) ---------- */
+/* white 85px tiles: a big number over a grey label */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.tiles2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tiles3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.tile {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  box-sizing: border-box;
+  min-height: 85px;
+  padding: 15px 16px;
+  border-radius: 18px;
+  background: var(--card);
+}
+
+.tileValue {
+  margin: 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+/* the label comes first in the HTML (<dt> before <dd>) but shows under the number */
+.tileLabel {
+  order: 1;
+}
+
+/* ---------- Overview blocks (O09) ---------- */
+/* two white cards side by side: "Venue map" and "Questions and board" */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  font: 700 16px/1.2 var(--title-font);
+}
+
+/* a 56px pale link row with a "›" at the end: "3 questions waiting for your answer" */
+.linkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--page);
+  color: var(--t);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.linkRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+/* a sent announcement: a 12px square, the text and "Today · 11:00 AM · to …" */
+.announcement {
+  min-height: 58px;
+  align-items: flex-start;
+}
+
+.square {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 13px;
+  border-radius: 4px;
+  background: var(--avatar);
+}
+
+/* the grey line at the top of a right-hand panel */
+.panelText {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* the announcement box in the right-hand panel */
+.panelTextarea {
+  background: var(--card);
+}
+
+/* ---------- My events (O07) ---------- */
+/* one event: a 104 x 72 photo, title, when and where, chips and turnout, and "Manage" */
+.eventCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+  min-height: 107px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.eventCardText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.eventCardTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+.eventCardMeta {
+  margin: 10px 0 0;
+}
+
+.eventCardFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* "Tonight": the amber card with a dot, then four small white buttons in two columns */
+.liveCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #f6e3b4;
+}
+
+.liveDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7a5200;
+}
+
+.liveDetail {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.buttonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 8px;
+}
+
+.buttonGrid > * {
+  justify-content: center;
+  background: var(--card);
+}
+
+/* ---------- Published (O51) ---------- */
+/* the big white card: a green tick, "… is live", the link and two buttons, all centred */
+.liveHero {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 48px 24px;
+  border-radius: 20px;
+  background: var(--card);
+  text-align: center;
+}
+
+.tick {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #d4ebda;
+  color: #2b6b38;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.heroTitle {
+  margin: 15px 0 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.heroText {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.linkLine {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 21px;
+}
+
+.linkChip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--page);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 13px;
+  margin-top: 16px;
+}
+
+/* the four "Next steps" in a two-by-two grid */
+.steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Preview (O52) ---------- */
+/* "Preview: what people see on the event page" */
+.previewBar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: var(--soft);
+}
+
+.previewDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--current-ink);
+}
+
+.previewPhoto {
+  line-height: 0;
+}
+
+.previewPhoto > span {
+  width: 100% !important;
+}
+
+.previewTitle {
+  margin: 15px 0 0;
+  font: 700 30px/1.2 var(--title-font);
+}
+
+/* "Going", "Interested", "Share": three equal 40px buttons */
+.previewButtons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.previewButtons > * {
+  justify-content: center;
+}
+
+/* "Know before you go": label and value in two columns */
+.facts {
+  display: grid;
+  grid-template-columns: 162px minmax(0, 1fr);
+  gap: 11px 0;
+  margin: 0;
+  font-size: 13px;
+}
+
+.facts dt {
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* ---------- Q&A (O15) and Board (O16) ---------- */
+/* "Questions and answers" on the left, the filter chips on the right */
+.listHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.listHeadText {
+  display: grid;
+  gap: 5px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* a small filter pill: white, or filled when it's the current one */
+.filter {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.filter[aria-current="page"],
+.filterPrimary {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* one question or thread: a round picture, the text, a button on the right */
+.post {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.postRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.answerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.answer {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  font-size: 14px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* ---------- Unpublished (O55) ---------- */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #f6e3b4;
+}
+
+/* a closed item: title, detail and a state on the right */
+.closedRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.closedState {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* the two big buttons under it */
+.bigActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+/* the pale panel on the right ("Your verified badge is not affected") */
+.quietPanel {
+  display: grid;
+  gap: 10px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
+  background: var(--soft);
+}
+
+/* ---------- Past event tables (O57) ---------- */
+.tableCard {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.table {
+  width: 100%;
+  min-width: 560px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  box-sizing: border-box;
+  padding: 11px 8px 11px 0;
+  vertical-align: middle;
+  font-weight: 400;
+}
+
+.table thead th {
+  padding-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table thead th:nth-child(1) { width: 237px; }
+.table thead th:nth-child(2) { width: 181px; }
+.table thead th:nth-child(3) { width: 153px; }
+
+.table tbody tr + tr > * {
+  border-top: 1px solid var(--line);
+}
+
+.table tbody th span {
+  display: block;
+}
+
+.table tbody th span + span {
+  margin-top: 3px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- Dialogs (O10, O53, O56) ---------- */
+/* the page dims behind a white 600px dialog with 28px corners */
+.overlay {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  overflow-y: auto;
+  padding: 90px 16px 40px;
+  background: rgb(31 51 68 / 0.55);
+}
+
+.dialog {
+  box-sizing: border-box;
+  width: min(600px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 28px;
+  background: var(--card);
+  color: var(--t);
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+.dialogHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dialogTitle {
+  margin: 0;
+  font: 700 22px/1.2 var(--title-font);
+}
+
+.dialogSubtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* the round × in the corner */
+.dialogClose {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--page);
+  color: var(--t);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* the green "who will be told" note inside a dialog */
+.tellNote {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--pill);
+}
+
+.tellDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--p);
+}
+
+/* "What happens": label and value in two columns, on a pale card */
+.happens {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--soft);
+}
+
+/* one audience switch row in O56 */
+.audienceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.quote {
+  margin: 0;
+  padding: 16px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  font-size: 13px;
+}
+
+/* ---------- Small helpers for the overview ---------- */
+/* a heading with its block under it, 19px apart */
+.events {
+  display: grid;
+  gap: 19px;
+}
+
+/* "Open map builder": a full-width button in its card */
+.centred {
+  justify-content: center;
+}
+
+/* the full-width button at the bottom of a right-hand panel */
+button.panelButton {
+  min-height: 40px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* the new start time only shows while "Running late" is picked */
+label:not(:has(input[type="radio"]:checked)) > .onlyWhenPicked {
+  display: none;
+}
+
+/* the picked choice in a dialog (O10, O53), drawn without a radio input */
+div.pickedChoice {
+  background: var(--pill);
+  cursor: default;
+}
+
+span.dotOn {
+  background: var(--p);
+}
+
+/* "Cancel" narrow, "Send to … people" wide (O56) */
+div.sendActions {
+  grid-template-columns: 140px minmax(0, 1fr);
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width: 900px) {
+  .pair,
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .eventHead {
+    flex-direction: column;
+  }
+
+  .tiles2,
+  .tiles3,
+  .previewButtons,
+  .bigActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .facts dd {
+    margin-bottom: 6px;
+  }
+
+  .dialog {
+    padding: 20px;
+  }
+}

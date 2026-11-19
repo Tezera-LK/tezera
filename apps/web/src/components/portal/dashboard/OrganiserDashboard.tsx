@@ -114,7 +114,9 @@ export default function OrganiserDashboard({ data, now }: { data: Data; now: Dat
         actions={
           <>
             <ButtonLink>{TEXT.postJob}</ButtonLink>
-            <ButtonLink primary>{TEXT.createEvent}</ButtonLink>
+            <ButtonLink href={routes.newEvent} primary>
+              {TEXT.createEvent}
+            </ButtonLink>
           </>
         }
       />
@@ -139,9 +141,13 @@ export default function OrganiserDashboard({ data, now }: { data: Data; now: Dat
               )}
             </div>
             <div className={styles.featuredActions}>
-              {/* the event's own page and its live status are slice 4 (O09) */}
-              <MaybeLink className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>{TEXT.manageEvent}</MaybeLink>
-              <MaybeLink className={`${ui.rowButton} ${ui.rowButtonWhite}`}>{TEXT.updateStatus}</MaybeLink>
+              <MaybeLink href={routes.manageEvent(featured.id)} className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>
+                {TEXT.manageEvent}
+              </MaybeLink>
+              {/* the Live status panel is on the event's overview */}
+              <MaybeLink href={routes.manageEvent(featured.id)} className={`${ui.rowButton} ${ui.rowButtonWhite}`}>
+                {TEXT.updateStatus}
+              </MaybeLink>
             </div>
           </div>
           <dl className={styles.stats}>
@@ -216,8 +222,9 @@ function EventRow({ event }: { event: OrganiserEventRow }) {
       <td>{ratio(event.bookings?.confirmed, event.bookings?.requested)}</td>
       <td>{ratio(event.stalls?.approved, event.stalls?.offered)}</td>
       <td>
-        {/* the event's own page is slice 4 (O09, O54) */}
-        <MaybeLink className={ui.textLink}>{draft ? TEXT.edit : TEXT.open}</MaybeLink>
+        <MaybeLink href={draft ? routes.editEvent(event.id) : routes.manageEvent(event.id)} className={ui.textLink}>
+          {draft ? TEXT.edit : TEXT.open}
+        </MaybeLink>
       </td>
     </tr>
   );

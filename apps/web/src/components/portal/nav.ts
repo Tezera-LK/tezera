@@ -81,7 +81,7 @@ const TOOLS: Record<PortalRole, NavGroup | null> = {
   organiser: {
     title: "Organiser tools",
     items: [
-      { label: "My events" },
+      { label: "My events", href: routes.myEvents },
       { label: "Hiring" },
       { label: "Feed and promotion" },
       { label: "Analytics" },

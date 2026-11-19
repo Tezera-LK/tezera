@@ -19,6 +19,18 @@ export const routes = {
 
   // signed in, one role each (vendor tools are for vendors and freelancers)
   organiserTools: "/organiser",
+  // an organiser's own events (Figma O07–O16, O51–O57); ?tab= on the list picks drafts or past
+  myEvents: "/organiser/events",
+  newEvent: "/organiser/events/new",
+  manageEvent: (eventId: string) => `/organiser/events/${segment(eventId)}`,
+  editEvent: (eventId: string) => `/organiser/events/${segment(eventId)}/edit`,
+  eventPublished: (eventId: string) => `/organiser/events/${segment(eventId)}/published`,
+  previewEvent: (eventId: string) => `/organiser/events/${segment(eventId)}/preview`,
+  eventQa: (eventId: string) => `/organiser/events/${segment(eventId)}/qa`,
+  eventBoard: (eventId: string) => `/organiser/events/${segment(eventId)}/board`,
+  // the overview with a dialog open over it: postpone or cancel (O10, O53), confirm an announcement (O56)
+  eventDialog: (eventId: string, dialog: "postpone" | "cancel" | "announce") =>
+    `/organiser/events/${segment(eventId)}?dialog=${dialog}`,
   vendorTools: "/vendor",
   adminTools: "/admin",
 

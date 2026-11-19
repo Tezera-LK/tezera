@@ -129,3 +129,115 @@ export type SearchResults = {
   events: EventResult[];
   communities: CommunityResult[];
 };
+
+// ---------- An organiser's own event: My events (O07), create and edit (O08, O54), its pages ----------
+
+// unpublished = taken down by an admin (O55); the organiser still sees it, the public doesn't
+export type ManagedEventStatus = OrganiserEventStatus | "unpublished";
+
+export type AgeRating = "all" | "18+" | "21+";
+
+// one row of "Line-up or schedule": "18:00" and what happens then
+export type LineupItem = { time: string; act: string };
+
+export type Entry =
+  | { kind: "free" }
+  | { kind: "paid"; priceLkr: number | null; ticketUrl: string };
+
+// "Know before you go": each field shows on the event page only when it's filled in
+export type KnowBeforeYouGo = {
+  dressCode: string;
+  bring: string;
+  parking: string;
+  rules: string;
+  foodPrices: string;
+  ifRains: string;
+};
+
+// What the create and edit forms send. Dates and times are as the inputs give them:
+// date "2026-12-12", times "18:00" (Sri Lanka time).
+export type EventDraft = {
+  title: string;
+  category: string;
+  ageRating: AgeRating;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venueName: string;
+  address: string;
+  description: string;
+  lineup: LineupItem[];
+  entry: Entry;
+  know: KnowBeforeYouGo;
+};
+
+export type ManagedEvent = EventDraft & {
+  id: string;
+  status: ManagedEventStatus;
+  // ISO 8601, built from date + time; null while a draft has no date
+  startsAt: string | null;
+  endsAt: string | null;
+  going: number;
+  interested: number;
+  bookings: { confirmed: number; requested: number } | null;
+  stalls: { approved: number; offered: number } | null;
+  liveStatus: { kind: "late"; newStartAt: string } | null;
+  publishedAt: string | null;
+  editedAt: string;
+  // when an admin unpublished it (O55): the reason they gave
+  unpublishedReason: string | null;
+  // the start it had before it was postponed (O10), shown as "New date: …"; null if never moved
+  postponedFrom: string | null;
+  // why it was cancelled (O53), shown on the event page
+  cancelReason: string | null;
+  // sent announcements, newest first (O09, O56)
+  announcements: Announcement[];
+  // questions people asked on the event page (O15)
+  questions: Question[];
+};
+
+// who an announcement goes to (O56)
+export type Audience = "going" | "interested" | "followers";
+
+export type Announcement = {
+  id: string;
+  text: string;
+  sentAt: string;
+  audience: Audience[];
+};
+
+export type Question = {
+  id: string;
+  text: string;
+  askedBy: string;
+  // "Consumer", "Vendor"…
+  askedByRole: string;
+  askedAt: string;
+  answer: string | null;
+  answeredAt: string | null;
+};
+
+// one thread on the event's discussion board (O16). Read-only until the People slice (O25, O93).
+export type BoardThread = {
+  id: string;
+  title: string;
+  author: string;
+  authorRole: string;
+  verified: boolean;
+  replies: number;
+  upvotes: number;
+  pinned: boolean;
+  postedAt: string;
+};
+
+// a booking on a finished event that still needs closing (O57)
+export type BookingToClose = {
+  id: string;
+  provider: string;
+  kind: "Vendor" | "Freelancer";
+  service: string;
+  status: "completed" | "not-marked";
+};
+
+// a stall vendor on a finished event (O57)
+export type StallToReview = { id: string; vendor: string; category: string; stall: string };
