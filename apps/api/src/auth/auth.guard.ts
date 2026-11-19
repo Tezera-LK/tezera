@@ -6,7 +6,7 @@ import { roleFromGroups } from "./roles";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private coginto: CognitoService, private prisma: PrismaService) { }
+  constructor(private cognito: CognitoService, private prisma: PrismaService) { }
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
 
     let payload;
     try {
-      payload = await this.coginto.verifyAccessToken(token);
+      payload = await this.cognito.verifyAccessToken(token);
     } catch {
       throw new UnauthorizedException();
     }
@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
 
     let user = await this.prisma.user.findUnique({ where: { cognitoSub: payload.sub } });
     if (!user) {
-      const { email, phone } = await this.coginto.getVerifiedContact(token);
+      const { email, phone } = await this.cognito.getVerifiedContact(token);
       if (!email && !phone) throw new ForbiddenException('CONTACT_NOT_VERIFIED');
       try {
         user = await this.prisma.user.create({
