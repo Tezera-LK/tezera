@@ -569,6 +569,10 @@ a.linkRow:hover {
   color: var(--t);
 }
 
+.dialogNarrow {
+  width: min(560px, 100%);
+}
+
 .dialog:focus {
   outline: none;
 }

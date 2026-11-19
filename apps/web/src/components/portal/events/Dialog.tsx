@@ -11,13 +11,15 @@ type DialogProps = {
   // where closing goes: the page under the dialog, without ?dialog=
   closeHref: string;
   closeLabel: string;
+  // 560px wide instead of 600, as the stall dialogs are (O72–O76)
+  narrow?: boolean;
   children: React.ReactNode;
 };
 
 // A dialog over the page (Figma O10, O53, O56). It's opened by a link with ?dialog=…, so it
 // works without JavaScript and the back button closes it. With JavaScript it also takes focus,
 // keeps Tab inside it, and closes on Escape or a click on the dimmed page.
-export default function Dialog({ title, subtitle, closeHref, closeLabel, children }: DialogProps) {
+export default function Dialog({ title, subtitle, closeHref, closeLabel, narrow, children }: DialogProps) {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
@@ -61,7 +63,7 @@ export default function Dialog({ title, subtitle, closeHref, closeLabel, childre
     <div className={styles.overlay} onClick={() => router.push(closeHref, { scroll: false })}>
       <div
         ref={panelRef}
-        className={styles.dialog}
+        className={`${styles.dialog} ${narrow ? styles.dialogNarrow : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

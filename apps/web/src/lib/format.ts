@@ -59,6 +59,11 @@ export function formatDayMonth(iso: string): string {
   return dayMonth.format(new Date(iso));
 }
 
+// "5 Dec"
+export function formatShortDate(iso: string): string {
+  return shortDate.format(new Date(iso));
+}
+
 // When something happened, as short as it can be: today "4:12 PM" (or "4:12" when compact),
 // in the last six days "Mon", before that "2 Oct".
 export function formatWhen(iso: string, now: Date, compact = false): string {

@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { sampleEvents } from "@/lib/data/samples";
 import { allStoredEvents, findStoredEvent, insertStoredEvent, updateStoredEvent } from "@/lib/data/event-store";
+import { findStoredStalls, saveStoredStalls } from "@/lib/data/stall-store";
 import {
   sampleAccounts,
   sampleCommunities,
@@ -16,10 +17,12 @@ import {
   sampleUnpublished,
   sampleProviders,
   sampleRecentSearches,
+  sampleStallVendors,
 } from "@/lib/data/portal-samples";
 import type {
   Account,
   EventDraft,
+  EventStalls,
   FeaturedEvent,
   ManagedEvent,
   NotificationType,
@@ -27,6 +30,7 @@ import type {
   OrganiserDashboard,
   PortalNotification,
   SearchResults,
+  StallVendor,
 } from "@/lib/data/portal-types";
 import type { Session } from "@/lib/auth/session";
 import { routes } from "@/lib/routes";
@@ -219,4 +223,33 @@ export async function getUnpublishedDetails(session: Session, eventId: string) {
 export async function getReviewsToWrite(session: Session) {
   if (!useSamples || session.role !== "organiser") return [];
   return sampleReviewsToWrite;
+}
+
+// ---------- One event's stalls (O13, O72–O76) ----------
+
+// The event's stall slots, applications and approved vendors. null in production.
+export const getEventStalls = cache(async (session: Session, eventId: string): Promise<EventStalls | null> => {
+  if (!useSamples || session.role !== "organiser" || !findStoredEvent(eventId)) return null;
+  return findStoredStalls(eventId);
+});
+
+// Saves the event's stalls, and keeps the event's own "stalls approved" count (O05, O09) in step.
+export async function saveEventStalls(
+  session: Session,
+  eventId: string,
+  stalls: EventStalls,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!useSamples || session.role !== "organiser") return { ok: false, error: NO_BACKEND };
+  const event = findStoredEvent(eventId);
+  if (!event) return { ok: false, error: "That event doesn't exist any more." };
+  saveStoredStalls(eventId, stalls);
+  const approved = stalls.slots.reduce((sum, slot) => sum + slot.approved, 0);
+  updateStoredEvent(eventId, { stalls: { approved, offered: event.stalls?.offered ?? approved } });
+  return { ok: true };
+}
+
+// Vendors the organiser can invite to a stall (O73). The real search is the backend's (US-C01).
+export async function getStallVendors(session: Session): Promise<StallVendor[]> {
+  if (!useSamples || session.role !== "organiser") return [];
+  return sampleStallVendors;
 }

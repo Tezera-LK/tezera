@@ -241,3 +241,72 @@ export type BookingToClose = {
 
 // a stall vendor on a finished event (O57)
 export type StallToReview = { id: string; vendor: string; category: string; stall: string };
+
+// ---------- One event's stalls (O13, O72–O76) ----------
+
+export type StallType = "Food" | "Drinks" | "Merchandise" | "Crafts" | "Other";
+
+// one row of "Stall slots": how many stalls of a type, what they cost and until when vendors can
+// apply. Dates are as the inputs give them ("2026-11-27"). `applied` counts every application
+// ever made for the type; `approved` every stall given out.
+export type StallSlot = {
+  type: StallType;
+  slots: number;
+  feeLkr: number;
+  closesOn: string;
+  feeDue: string;
+  rules: string;
+  applied: number;
+  approved: number;
+};
+
+// a vendor as the organiser sees them when inviting one or reading an application
+export type StallVendor = {
+  id: string;
+  name: string;
+  type: StallType;
+  rating: number;
+  verified: boolean;
+  city: string;
+};
+
+// a vendor who applied for a stall, or one the organiser invited (waiting for them to accept)
+export type StallApplication = {
+  id: string;
+  vendor: StallVendor;
+  type: StallType;
+  receivedAt: string;
+  status: "applied" | "invited";
+  message: string;
+  // the fee offered with an invitation; applications pay the slot's fee
+  feeLkr?: number;
+};
+
+// one thing on an approved vendor's menu or price list (O74). `note` says why the organiser
+// might hide it, e.g. it breaks one of the event's rules.
+export type ListingItem = { id: string; name: string; kind: string; priceLkr: number; hidden: boolean; note?: string };
+
+// a vendor with a stall. `number` is their place on the venue map ("B-14"); null until given one.
+export type ApprovedStall = {
+  id: string;
+  vendor: StallVendor;
+  type: StallType;
+  number: string | null;
+  fee: "paid" | "paid-outside" | "due";
+  feeDue: string;
+  listing: { blurb: string; items: ListingItem[] } | null;
+  // the organiser hid the whole listing from the event page
+  hidden: boolean;
+};
+
+// an area of the venue map and the stall numbers in it, e.g. "Food court": B-12 to B-16
+export type StallZone = { name: string; numbers: string[]; taken: string[] };
+
+export type EventStalls = {
+  slots: StallSlot[];
+  applications: StallApplication[];
+  approved: ApprovedStall[];
+  // stall fees paid so far, in the app or outside it
+  collected: { paid: number; amountLkr: number };
+  zones: Record<StallType, StallZone>;
+};

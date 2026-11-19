@@ -21,8 +21,8 @@ const TEXT = {
 } as const;
 
 // The top of every page for one event (Figma O09, O15, O16, O57): photo, title, when and where,
-// status chips, three buttons and the six tabs. Map, Stalls and Hiring belong to later slices, so
-// those tabs are drawn but aren't links yet.
+// status chips, three buttons and the six tabs. Map and Hiring belong to later slices, so those
+// tabs are drawn but aren't links yet.
 export default function EventHeader({ event, current }: { event: ManagedEvent; current: EventTab }) {
   const ended = hasEnded(event);
   const status = EVENT_STATUS[event.status];
@@ -67,9 +67,9 @@ export default function EventHeader({ event, current }: { event: ManagedEvent; c
         current={current}
         tabs={[
           { key: "overview", label: "Overview", href: routes.manageEvent(event.id) },
-          // the venue map (O11–O71), stalls (O13) and hiring (O14) are later slices
+          // the venue map (O11–O71) and hiring (O14) are later slices
           { key: "map", label: "Map" },
-          { key: "stalls", label: "Stalls" },
+          { key: "stalls", label: "Stalls", href: routes.eventStalls(event.id) },
           { key: "hiring", label: "Hiring" },
           { key: "qa", label: "Q&A", href: routes.eventQa(event.id) },
           { key: "board", label: "Board", href: routes.eventBoard(event.id) },

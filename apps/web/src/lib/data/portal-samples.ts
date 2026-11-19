@@ -14,6 +14,10 @@ import type {
   ManagedEvent,
   Question,
   StallToReview,
+  EventStalls,
+  StallType,
+  StallVendor,
+  StallZone,
   CommunityResult,
   EventResult,
   OrganiserDashboard,
@@ -420,3 +424,124 @@ export function sampleUnpublished(now: Date): Record<string, { at: string; detai
 export const sampleReviewsToWrite = [
   { id: "rv-1", name: "Pulse Sound & Light", eventId: "evt-rooftop-sessions-1", eventTitle: "Rooftop Sessions Vol. 1" },
 ];
+
+// ---------- Stalls (O13, O72–O76) ----------
+
+// The vendors an organiser can invite (O73) and who applied (O13).
+export const sampleStallVendors: StallVendor[] = [
+  { id: "ven-kottu-corner", name: "Kottu Corner", type: "Food", rating: 4.4, verified: true, city: "Colombo" },
+  { id: "ven-island-ice-cream", name: "Island Ice Cream", type: "Food", rating: 4.6, verified: true, city: "Negombo" },
+  { id: "ven-lanka-threads", name: "Lanka Threads", type: "Merchandise", rating: 4.2, verified: false, city: "Kandy" },
+  { id: "ven-thambili-bar", name: "Thambili Bar", type: "Drinks", rating: 4.5, verified: true, city: "Colombo" },
+  { id: "ven-thambili-hut", name: "Thambili Hut", type: "Drinks", rating: 4.1, verified: false, city: "Gampaha" },
+  { id: "ven-spice-route", name: "Spice Route Catering", type: "Food", rating: 4.7, verified: true, city: "Colombo" },
+  { id: "ven-brew-bros", name: "Brew Bros", type: "Drinks", rating: 4.3, verified: true, city: "Colombo" },
+  { id: "ven-hoppers-co", name: "Hoppers & Co", type: "Food", rating: 4.5, verified: false, city: "Dehiwala" },
+  { id: "ven-batik-lane", name: "Batik Lane", type: "Merchandise", rating: 4.4, verified: true, city: "Galle" },
+  { id: "ven-clay-kiln", name: "Clay & Kiln", type: "Crafts", rating: 4.6, verified: false, city: "Galle" },
+];
+
+const vendor = (id: string) => sampleStallVendors.find((v) => v.id === id)!;
+
+// The venue map's stall areas. Taken numbers belong to approved stalls that aren't in the
+// sample list below.
+export const sampleStallZones: Record<StallType, StallZone> = {
+  Food: { name: "Food court", numbers: ["B-12", "B-13", "B-14", "B-15", "B-16"], taken: ["B-12", "B-13"] },
+  Drinks: { name: "Drinks zone", numbers: ["C-01", "C-02", "C-03", "C-04", "C-05"], taken: ["C-01", "C-03", "C-04"] },
+  Merchandise: { name: "Market lane", numbers: ["A-01", "A-02", "A-03", "A-04", "A-05", "A-06"], taken: ["A-01"] },
+  Crafts: { name: "Craft corner", numbers: ["A-07", "A-08", "A-09"], taken: [] },
+  Other: { name: "Market lane", numbers: ["A-10", "A-11", "A-12"], taken: [] },
+};
+
+// Each event's stalls, by event id. Colombo Music Fest has Figma's O13. Its dates count back
+// from the event, which the samples hold tonight.
+export function sampleStalls(now: Date): Record<string, EventStalls> {
+  const day = (days: number) => dayAt(now, days, "10:00").slice(0, 10);
+  const rules = "No alcohol · gas cookers only · lights off by 11:30 PM";
+  return {
+    "evt-colombo-music-fest": {
+      slots: [
+        { type: "Food", slots: 10, feeLkr: 15000, closesOn: day(-3), feeDue: day(-1), rules, applied: 12, approved: 9 },
+        { type: "Drinks", slots: 5, feeLkr: 12000, closesOn: day(-3), feeDue: day(-1), rules, applied: 5, approved: 5 },
+        { type: "Merchandise", slots: 6, feeLkr: 8000, closesOn: day(-3), feeDue: day(-1), rules, applied: 3, approved: 2 },
+      ],
+      applications: [
+        { id: "app-1", vendor: vendor("ven-kottu-corner"), type: "Food", receivedAt: dayAt(now, -7, "09:20"), status: "applied", message: "" },
+        { id: "app-2", vendor: vendor("ven-island-ice-cream"), type: "Food", receivedAt: dayAt(now, -6, "14:05"), status: "applied", message: "" },
+        { id: "app-3", vendor: vendor("ven-lanka-threads"), type: "Merchandise", receivedAt: dayAt(now, -5, "11:40"), status: "applied", message: "" },
+        {
+          id: "app-4",
+          vendor: vendor("ven-thambili-bar"),
+          type: "Drinks",
+          receivedAt: dayAt(now, -4, "16:30"),
+          status: "invited",
+          message: "We would love your king coconuts in the drinks zone!",
+        },
+      ],
+      approved: [
+        {
+          id: "stall-1",
+          vendor: vendor("ven-spice-route"),
+          type: "Food",
+          number: "B-14",
+          fee: "paid",
+          feeDue: day(-1),
+          hidden: false,
+          listing: {
+            blurb: "Kottu, isso wade and cold drinks. Halal kitchen, fast queue.",
+            items: [
+              { id: "it-1", name: "Chicken kottu", kind: "Main", priceLkr: 1200, hidden: false },
+              { id: "it-2", name: "Isso wade", kind: "Short eat", priceLkr: 400, hidden: false },
+              { id: "it-3", name: "Arrack cocktail", kind: "Drink", priceLkr: 900, hidden: false, note: "breaks your “no alcohol” rule" },
+              { id: "it-4", name: "Water 500 ml", kind: "Drink", priceLkr: 150, hidden: false },
+              { id: "it-5", name: "Egg hopper", kind: "Main", priceLkr: 250, hidden: false },
+              { id: "it-6", name: "Vegetable roti", kind: "Short eat", priceLkr: 200, hidden: false },
+              { id: "it-7", name: "Lime juice", kind: "Drink", priceLkr: 350, hidden: false },
+              { id: "it-8", name: "Watalappan", kind: "Dessert", priceLkr: 450, hidden: false },
+            ],
+          },
+        },
+        {
+          id: "stall-2",
+          vendor: vendor("ven-brew-bros"),
+          type: "Drinks",
+          number: "C-02",
+          fee: "paid-outside",
+          feeDue: day(-1),
+          hidden: false,
+          listing: {
+            blurb: "Iced coffee, tea and fresh juice.",
+            items: [
+              { id: "it-1", name: "Iced coffee", kind: "Drink", priceLkr: 650, hidden: false },
+              { id: "it-2", name: "Ceylon tea", kind: "Drink", priceLkr: 300, hidden: false },
+              { id: "it-3", name: "Passion fruit juice", kind: "Drink", priceLkr: 500, hidden: false },
+              { id: "it-4", name: "Ginger beer", kind: "Drink", priceLkr: 400, hidden: false },
+              { id: "it-5", name: "Water 500 ml", kind: "Drink", priceLkr: 150, hidden: false },
+              { id: "it-6", name: "Cold brew", kind: "Drink", priceLkr: 750, hidden: false },
+            ],
+          },
+        },
+        {
+          id: "stall-3",
+          vendor: vendor("ven-hoppers-co"),
+          type: "Food",
+          number: "B-11",
+          fee: "due",
+          feeDue: day(-1),
+          hidden: true,
+          listing: {
+            blurb: "Hoppers made to order, with sambol and curries.",
+            items: [
+              { id: "it-1", name: "Plain hopper", kind: "Main", priceLkr: 150, hidden: false },
+              { id: "it-2", name: "Egg hopper", kind: "Main", priceLkr: 250, hidden: false },
+              { id: "it-3", name: "String hoppers", kind: "Main", priceLkr: 400, hidden: false },
+            ],
+          },
+        },
+        { id: "stall-4", vendor: vendor("ven-batik-lane"), type: "Merchandise", number: null, fee: "due", feeDue: day(-1), hidden: false, listing: null },
+      ],
+      collected: { paid: 12, amountLkr: 168000 },
+      zones: sampleStallZones,
+    },
+  };
+}

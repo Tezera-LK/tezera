@@ -28,6 +28,8 @@ export const routes = {
   previewEvent: (eventId: string) => `/organiser/events/${segment(eventId)}/preview`,
   eventQa: (eventId: string) => `/organiser/events/${segment(eventId)}/qa`,
   eventBoard: (eventId: string) => `/organiser/events/${segment(eventId)}/board`,
+  // the Stalls tab (O13); its dialogs (O72–O76) open with ?dialog=
+  eventStalls: (eventId: string) => `/organiser/events/${segment(eventId)}/stalls`,
   // the overview with a dialog open over it: postpone or cancel (O10, O53), confirm an announcement (O56)
   eventDialog: (eventId: string, dialog: "postpone" | "cancel" | "announce") =>
     `/organiser/events/${segment(eventId)}?dialog=${dialog}`,
