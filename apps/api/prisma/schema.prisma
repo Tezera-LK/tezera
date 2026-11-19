@@ -1,0 +1,41 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  attendee
+  organiser
+  vendor
+  freelancer
+  admin
+
+  @@map("user_role")
+}
+
+enum UserStatus {
+  pending
+  active
+  suspended
+  banned
+
+  @@map("user_status")
+}
+
+model User {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cognitoSub String     @unique @map("cognito_sub")
+  email      String?    @unique
+  phone      String?    @unique @db.VarChar(20)
+  role       UserRole
+  status     UserStatus @default(active)
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("users")
+}
