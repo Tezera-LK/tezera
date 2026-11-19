@@ -1,31 +1,117 @@
-/* Hero.css: headline + copy on the left, floating role cards on the right.
+/* Hero.css: a night stage. HeroStage draws the LED wall (beams, speakers, crowd) on a canvas behind
+   the copy and the three role cards, which glow like screens on the beat (--pulse, set by HeroStage).
    Entrance runs when Opening.tsx adds html.is-revealed; the idle float and cursor parallax keep going after. */
 
 .hero {
+  --stage-bg: #141113;
+  --stage-ink: #f7f0ed;
+  --stage-ink-soft: rgba(247, 240, 237, 0.76);
+  /* the crowd stands on the floor; below it the stage dithers out into the cream page */
+  --crowd-h: clamp(100px, 15svh, 150px);
+  --band-h: clamp(44px, 6svh, 64px);
+
+  position: relative;
+  /* own stacking context: the canvas sits behind the copy, never behind the page */
+  isolation: isolate;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(32px, 5vw, 80px);
   min-height: 100svh;
-  padding: calc(var(--nav-h) + 24px) var(--pad-x) clamp(40px, 6vw, 72px);
+  padding: calc(var(--nav-h) + 24px) var(--pad-x) calc(var(--crowd-h) + var(--band-h) + 20px);
+  color: var(--stage-ink);
+  /* fallback before the canvas draws: dark stage, cream band */
+  background: linear-gradient(to bottom, var(--stage-bg) calc(100% - var(--band-h)), var(--page-bg) 0);
 }
 
-/* ---------- Copy ---------- */
+/* ---------- Stage ---------- */
+.hero-stage {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* invisible marker: where the crowd stands. HeroStage reads its box */
+.hero-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--band-h);
+  height: var(--crowd-h);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* pause control for the moving stage; waits for the stage to power on */
+.hero-pause {
+  position: absolute;
+  right: var(--pad-x);
+  bottom: calc(var(--band-h) + 14px);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(247, 240, 237, 0.22);
+  border-radius: 999px;
+  background: rgba(20, 17, 19, 0.72);
+  color: var(--stage-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.6s ease 1.4s, background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+html:not(.is-revealed) .hero-pause {
+  opacity: 0;
+}
+
+.hero-pause:hover {
+  background: rgba(20, 17, 19, 0.92);
+  border-color: rgba(247, 240, 237, 0.45);
+}
+
+.hero-pause:active {
+  transform: scale(0.97);
+}
+
+.hero-pause:focus-visible {
+  outline: 3px solid var(--stage-ink);
+  outline-offset: 3px;
+}
+
+.hero-pause-icon {
+  font-size: 10px;
+  letter-spacing: -0.1em;
+}
+
+/* ---------- Copy: lit by the stage ---------- */
 .headline h1 {
   margin: 0 0 clamp(20px, 2.4vw, 32px);
-  color: var(--page-ink);
+  color: var(--stage-ink);
   font-size: clamp(42px, 1.2rem + 4.1vw, 76px);
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.035em;
   text-align: left;
   text-wrap: balance;
+  /* a soft spill of stage light around the letters */
+  text-shadow: 0 0 28px rgba(247, 240, 237, 0.14);
 }
 
 .headline h1 .highlight-red {
   color: var(--red);
   font-weight: 800;
+  /* "ONE" glows like a lit sign, a little brighter on the beat (--pulse, set by HeroStage) */
+  text-shadow: 0 0 calc(10px + var(--pulse, 0) * 16px) rgba(233, 107, 88, calc(0.35 + var(--pulse, 0) * 0.3));
 }
 
 /* each word sits in a mask and rises from behind its line */
@@ -38,15 +124,35 @@
   margin-bottom: -0.1em;
 }
 
+/* "ONE"'s mask is wider, so its glow isn't cut off */
+.hero-word:has(.highlight-red) {
+  padding: 0.2em 0.25em;
+  margin: -0.2em -0.25em;
+}
+
 .hero-word > span {
   display: inline-block;
   transition: transform 0.95s var(--ease-out) calc(0.05s + var(--i) * 0.06s);
 }
 
+/* a pool of shadow behind the paragraphs, so they sit in the scene and stay easy to read */
+.bottom {
+  position: relative;
+}
+
+.bottom::before {
+  content: "";
+  position: absolute;
+  inset: -56px -72px -48px -80px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(14, 12, 13, 0.82), rgba(14, 12, 13, 0.6) 55%, transparent);
+}
+
 .descriptions p {
   max-width: 62ch;
   margin: 0 0 14px;
-  color: rgba(40, 40, 41, 0.78);
+  color: var(--stage-ink-soft);
   font-size: clamp(16px, 0.9rem + 0.2vw, 18px);
   line-height: 1.6;
 }
@@ -63,20 +169,24 @@
 .signup {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 20px;
   flex-wrap: wrap;
   margin-top: clamp(24px, 3vw, 36px);
 }
 
-/* coral, like "ONE"; label stays >= 18.66px bold so white on coral passes contrast for large text */
+/* coral, like "ONE", glowing with the beat; label stays >= 18.66px bold so white on coral passes
+   contrast for large text */
 .signup button {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 34px 16px 40px;
+  min-height: 62px;
+  padding: 0 34px 0 40px;
   border: 0;
   border-radius: 999px;
-  background: var(--red);
+  background: linear-gradient(180deg, #e96b58, #d85b47);
   color: #fff;
   font: inherit;
   /* buttons don't inherit the page font by default */
@@ -85,14 +195,29 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 12px 26px -12px rgba(201, 74, 53, 0.75);
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* the glow, on its own layer so only its opacity follows the beat */
+.signup button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: 0 0 22px rgba(233, 107, 88, 0.5);
+  opacity: calc(0.25 + var(--pulse, 0) * 0.3);
+  transition: opacity 0.2s ease;
 }
 
 .signup button:hover {
-  background: #d9553f;
+  background: linear-gradient(180deg, #ee7462, #e0624e);
   transform: translateY(-2px);
-  box-shadow: 0 16px 30px -12px rgba(201, 74, 53, 0.7);
+}
+
+.signup button:hover::after {
+  opacity: 0.75;
 }
 
 /* the arrow nudges forward on hover */
@@ -105,36 +230,44 @@
   transform: translateX(4px);
 }
 
-.signup button:active {
+.signup button:active,
+.signup a:active {
   transform: translateY(0) scale(0.98);
 }
 
 .signup button:focus-visible,
 .signup a:focus-visible {
-  outline: 3px solid var(--page-ink);
+  outline: 3px solid var(--stage-ink);
   outline-offset: 3px;
 }
 
+/* the second action: a lit outline */
 .signup a {
-  color: var(--page-ink);
+  display: inline-flex;
+  align-items: center;
+  min-height: 62px;
+  box-sizing: border-box;
+  padding: 0 28px;
+  border: 1.5px solid rgba(247, 240, 237, 0.4);
+  border-radius: 999px;
+  background: rgba(20, 17, 19, 0.45);
+  color: var(--stage-ink);
   font-size: 18px;
   font-weight: 600;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
-  transition: text-underline-offset 0.2s ease;
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.25s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .signup a:hover {
-  text-decoration-thickness: 2px;
-  text-underline-offset: 7px;
+  border-color: rgba(247, 240, 237, 0.9);
+  background: rgba(20, 17, 19, 0.6);
+  box-shadow: 0 0 20px rgba(247, 240, 237, 0.18), inset 0 0 14px rgba(247, 240, 237, 0.08);
+  transform: translateY(-2px);
 }
 
 /* ---------- Card stage ---------- */
 .right {
   position: relative;
-  /* own stacking context, so the glow can sit behind the cards without going behind the page */
-  isolation: isolate;
   justify-self: center;
   width: min(100%, 560px);
   aspect-ratio: 541 / 566;
@@ -142,56 +275,7 @@
   container-type: inline-size;
 }
 
-/* ---------- Glow ---------- */
-/* soft radial blobs (no filter, so they stay cheap to animate) in the opening's three colours */
-.hero-glow {
-  position: absolute;
-  inset: -14% -20%;
-  z-index: -1;
-  pointer-events: none;
-  transition: opacity 1.6s ease 0.3s;
-}
-
-.hero-glow span {
-  position: absolute;
-  border-radius: 50%;
-  animation: glow-drift 18s ease-in-out infinite alternate;
-}
-
-.glow-a {
-  left: 4%;
-  top: 6%;
-  width: 58%;
-  aspect-ratio: 1;
-  background: radial-gradient(closest-side, rgba(121, 153, 177, 0.5), transparent);
-}
-
-.glow-b {
-  right: 2%;
-  top: 22%;
-  width: 54%;
-  aspect-ratio: 1;
-  background: radial-gradient(closest-side, rgba(215, 126, 112, 0.42), transparent);
-  animation-delay: -6s;
-}
-
-.glow-c {
-  left: 22%;
-  bottom: 0;
-  width: 60%;
-  aspect-ratio: 1;
-  background: radial-gradient(closest-side, rgba(112, 169, 146, 0.45), transparent);
-  animation-delay: -12s;
-}
-
-@keyframes glow-drift {
-  to {
-    transform: translate(4%, -5%) scale(1.08);
-  }
-}
-
-/* outer layer: position + cursor parallax (--mx/--my set by Hero.tsx, --z = depth).
-   `translate` (separate from transform) carries the hover scatter on chips. */
+/* outer layer: position + cursor parallax (--mx/--my set by Hero.tsx, --z = depth) */
 .hero-item {
   position: absolute;
   transform: translate3d(calc(var(--mx, 0) * var(--z, 1) * -18px),
@@ -199,35 +283,26 @@
       0);
 }
 
-.hero-chip {
-  left: calc(var(--x) * 1%);
-  top: calc(var(--y) * 1%);
-  width: calc(var(--s) * 1%);
-  transition: translate 0.6s var(--ease-out);
-}
-
 /* the hovered card comes to the front */
-.hero-card.is-hovered {
+.hero-card:hover {
   z-index: 2;
 }
 
-/* hover tilt layer (transform set by Hero.tsx while the pointer is over the card) */
-.hero-tilt {
+/* hover: the screen lifts a touch and its edge lights fully */
+.hero-lift {
   transition: transform 0.35s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-card:hover .hero-lift {
+    transform: translateY(-3px);
+  }
 }
 
 /* middle layer: entrance pop */
 .hero-pop {
   display: block;
   transition: transform 0.9s var(--ease-spring) var(--pop), opacity 0.35s ease var(--pop);
-}
-
-/* inner layer: idle float */
-.card,
-.chip {
-  animation: float var(--dur, 5s) ease-in-out infinite alternate;
-  animation-delay: var(--delay, 0s);
-  will-change: transform;
 }
 
 @keyframes float {
@@ -240,44 +315,46 @@
   }
 }
 
-.chip {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 24%;
-}
-
-.chip-gray {
-  background: #a19e9e;
-}
-
-.chip-green {
-  background: #a3c7b6;
-}
-
-.chip-red {
-  background: #d77e70;
-}
-
-.chip-blue {
-  background: #8fbcc4;
-}
-
+/* inner layer: idle float. A screen: dark glass in the card's colour, a dot-matrix face,
+   an edge that glows on the beat */
 .card {
   position: relative;
   box-sizing: border-box;
   --amp: 6px;
   padding: 4.6cqw 4.4cqw;
-  border-radius: 7cqw;
-  color: #fff;
-  background: var(--card-bg);
-  box-shadow: 0.7cqw 1.4cqw 3cqw -0.6cqw color-mix(in srgb, var(--card-bg) 55%, #282829);
-  transition: box-shadow 0.35s ease;
+  border-radius: 4.5cqw;
+  color: var(--stage-ink);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.07) 0.7px, transparent 1px) 0 0 / 5px 5px,
+    linear-gradient(155deg, color-mix(in srgb, var(--tone) 24%, #141113) 0%, #141113 72%);
+  border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 48px -20px rgba(0, 0, 0, 0.8);
+  animation: float var(--dur, 5s) ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
 }
 
-/* lifted: a longer, softer shadow */
-.hero-card.is-hovered .card {
-  box-shadow: 1.2cqw 4cqw 7cqw -1.5cqw color-mix(in srgb, var(--card-bg) 45%, #282829);
+.hero.is-paused .card {
+  animation-play-state: paused;
+}
+
+/* the glow, on its own layer so only its opacity follows the beat */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--tone) 80%, transparent),
+    0 0 4cqw 0.4cqw color-mix(in srgb, var(--tone) 45%, transparent);
+  opacity: calc(0.3 + var(--pulse, 0) * 0.7);
+}
+
+.hero-card:hover .card::after {
+  opacity: 1;
 }
 
 .card p {
@@ -285,60 +362,75 @@
 }
 
 .card-label {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 1.6cqw;
+  color: var(--tone);
   font-weight: 700;
-  font-size: 2.9cqw;
-  letter-spacing: 0.02em;
+  font-size: max(11px, 2.5cqw);
+  letter-spacing: 0.14em;
+}
+
+/* the screen's status light */
+.card-led {
+  flex: none;
+  width: 1.5cqw;
+  height: 1.5cqw;
+  border-radius: 0.3cqw;
+  background: var(--tone);
+  box-shadow: 0 0 calc(0.5cqw + var(--pulse, 0) * 1.6cqw) var(--tone);
 }
 
 .card .card-title {
-  margin-top: 3.8cqw;
+  margin-top: 3cqw;
   font-weight: 700;
-  font-size: 3.1cqw;
-  line-height: 1.25;
+  font-size: max(13px, 3.4cqw);
+  line-height: 1.22;
 }
 
 .card .card-sub {
-  margin-top: 3.4cqw;
-  font-size: 3cqw;
-  opacity: 0.92;
+  margin-top: 2.6cqw;
+  font-size: max(12px, 3cqw);
+  color: var(--stage-ink-soft);
 }
 
 .organiser-box {
   left: 12.4%;
   top: 19.4%;
   width: 40.8%;
-  --card-bg: #7fb0b8;
+  --tone: #f0806c;
 }
 
 .vendor-box {
   left: 56.4%;
   top: 23%;
   width: 38.8%;
-  --card-bg: #9bc1ae;
+  --tone: #8db2da;
 }
 
 .attendee-box {
   left: 22%;
   top: 55.8%;
   width: 36.8%;
-  --card-bg: #d77e70;
+  --tone: #72c6a2;
 }
 
+/* an LED meter: 20 segments; the lit layer is clipped to --fill (set in Hero.tsx) */
 .bar {
-  margin-top: 1.6cqw;
-  height: 2cqw;
-  border-radius: 99px;
-  background: #d8d8d8;
-  overflow: hidden;
+  position: relative;
+  margin-top: 2cqw;
+  height: 2.2cqw;
+  --segments: repeating-linear-gradient(90deg, #000 0 calc(5% - 0.5cqw), transparent 0 5%);
+  background: rgba(247, 240, 237, 0.12);
+  -webkit-mask: var(--segments);
+  mask: var(--segments);
 }
 
 .bar-fill {
   height: 100%;
-  border-radius: 99px;
-  background: #4f86f7;
+  background: var(--tone);
   /* live detail: fills from 0 in step with the count (delay = COUNT_DELAY in Hero.tsx) */
-  clip-path: inset(0 0 0 0 round 99px);
+  clip-path: inset(0 calc(100% - var(--fill, 0%)) 0 0);
   transition: clip-path 1.4s cubic-bezier(0.25, 1, 0.5, 1) 0.9s;
 }
 
@@ -355,6 +447,7 @@
   padding: 0 0.2em;
   margin: 0 -0.2em;
   border-radius: 0.3em;
+  color: var(--tone);
 }
 
 html.is-revealed .card-needed {
@@ -363,7 +456,7 @@ html.is-revealed .card-needed {
 
 @keyframes needed-pulse {
   50% {
-    background: rgba(255, 255, 255, 0.24);
+    background: color-mix(in srgb, var(--tone) 22%, transparent);
   }
 }
 
@@ -382,35 +475,35 @@ html:not(.is-revealed) .hero-pop {
   transform: scale(0.55) translateY(24px);
 }
 
-html:not(.is-revealed) .hero-glow {
-  opacity: 0;
-}
-
 html:not(.is-revealed) .bar-fill {
-  clip-path: inset(0 100% 0 0 round 99px);
+  clip-path: inset(0 100% 0 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
 
-  .card,
-  .chip {
+  .card {
     animation: none;
   }
 
   .hero-word > span,
   .hero-rise,
   .hero-pop,
-  .hero-glow,
-  .hero-chip,
-  .hero-tilt,
+  .hero-lift,
   .bar-fill,
-  .signup-arrow {
+  .signup-arrow,
+  .hero-pause {
     transition: none;
   }
 
-  .hero-glow span,
   html.is-revealed .card-needed {
     animation: none;
+  }
+}
+
+/* short laptop screens: the crowd stands up behind the buttons, so it still makes the first screen */
+@media (min-width: 900px) and (max-height: 860px) {
+  .hero {
+    padding-bottom: calc(var(--band-h) + var(--crowd-h) * 0.4);
   }
 }
 
@@ -451,6 +544,11 @@ html:not(.is-revealed) .bar-fill {
 }
 
 @media (max-width: 640px) {
+  .hero {
+    --crowd-h: 96px;
+    --band-h: 50px;
+  }
+
   .headline h1 {
     font-size: clamp(36px, 10.5vw, 52px);
     line-height: 1.05;
@@ -466,46 +564,35 @@ html:not(.is-revealed) .bar-fill {
     padding: 8px 0;
   }
 
-  /* glow stays inside the stage */
-  .hero-glow {
-    inset: 0;
-  }
-
-  /* five squares sit in the gaps beside the cards; the rest are hidden */
-  .hero-chip {
-    left: calc(var(--m-x, 0) * 1%);
-    top: calc(var(--m-y, 0) * 1%);
-    width: calc(var(--m-s, 0) * 1%);
-  }
-
-  .hero-chip:not([data-m]) {
-    display: none;
-  }
-
   .card {
     --amp: 5px;
     padding: 5cqw;
-    border-radius: 8cqw;
+    border-radius: 5cqw;
   }
 
   /* bigger type: ~15px on a 340px-wide stage */
   .card-label {
-    font-size: 4.2cqw;
+    font-size: 3.6cqw;
+  }
+
+  .card-led {
+    width: 2.2cqw;
+    height: 2.2cqw;
   }
 
   .card .card-title {
-    margin-top: 3.5cqw;
+    margin-top: 3cqw;
     font-size: 4.6cqw;
   }
 
   .card .card-sub {
-    margin-top: 3cqw;
+    margin-top: 2.6cqw;
     font-size: 4.4cqw;
   }
 
   .bar {
     margin-top: 2.5cqw;
-    height: 2.6cqw;
+    height: 2.8cqw;
   }
 
   /* cards in normal flow, staggered left / right / left; only their edges overlap (10px),
@@ -541,9 +628,19 @@ html:not(.is-revealed) .bar-fill {
     gap: 20px;
   }
 
+  .signup a {
+    min-height: 56px;
+  }
+
   .signup button {
-    padding: 14px 28px 14px 34px;
+    min-height: 56px;
+    padding: 0 28px 0 34px;
     /* stays above 18.66px bold for contrast */
     font-size: 19px;
+  }
+
+  .hero-pause {
+    font-size: 12px;
+    padding: 0 14px;
   }
 }

@@ -49,6 +49,35 @@ html:not(.is-revealed) .site-nav {
   opacity: 0;
 }
 
+/* ---------- Over the hero's night stage ---------- */
+/* cream text on the stage's dark; the menu keeps its cream look when open */
+.site-nav.is-on-stage:not(.is-open) {
+  --page-ink: #f7f0ed;
+  color: var(--page-ink);
+}
+
+/* at the top the bar is see-through, so the rig and its equaliser show behind it */
+.site-nav.is-on-stage:not(.is-open)::before {
+  background: transparent;
+}
+
+.site-nav.is-on-stage:not(.is-open) .nav,
+.site-nav.is-on-stage:not(.is-open) .nav-toggle {
+  background: rgba(20, 17, 19, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(247, 240, 237, 0.08);
+}
+
+.site-nav.is-on-stage.is-scrolled:not(.is-open)::before {
+  background: color-mix(in srgb, #141113 78%, transparent);
+  border-bottom-color: rgba(247, 240, 237, 0.08);
+}
+
+.site-nav.is-on-stage .nav-logo,
+.site-nav.is-on-stage .nav,
+.site-nav.is-on-stage .nav-toggle {
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
 /* ---------- Logo ---------- */
 .nav-logo {
   justify-self: start;

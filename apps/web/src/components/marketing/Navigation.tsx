@@ -8,6 +8,14 @@ import navLinks from "@/content/landing/navlinks.json";
 import { site } from "@/content";
 import "./Navigation.css"
 
+// true while the bar sits over the hero's dark stage (the floor line is the top of its dither band)
+function overStage() {
+  const floor = document.querySelector<HTMLElement>("#home .hero-floor");
+  if (!floor) return false;
+  const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 64;
+  return floor.getBoundingClientRect().bottom > navH;
+}
+
 export default function Navigation() {
   const lenis = useLenis();
   const pathname = usePathname();
@@ -15,12 +23,23 @@ export default function Navigation() {
   const [open, setOpen] = useState(false);
   // page scrolled past the top: the bar gets a hairline and a blur
   const [scrolled, setScrolled] = useState(false);
+  // bar is over the dark hero stage: cream text on a dark bar
+  const [onStage, setOnStage] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   // only re-renders when the scrolled flag actually flips
-  const onScroll = useCallback(({ scroll }: { scroll: number }) => setScrolled(scroll > 8), []);
+  const onScroll = useCallback(({ scroll }: { scroll: number }) => {
+    setScrolled(scroll > 8);
+    setOnStage(overStage());
+  }, []);
   useLenis(onScroll);
+
+  // first paint (the page may load scrolled): Lenis only reports once the page scrolls
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setOnStage(overStage()));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   // closes the mobile menu, then runs the scroll once Lenis is running again
   const close = useCallback((then?: () => void) => {
@@ -97,7 +116,7 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className={`site-nav${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`} aria-label="Main">
+      <nav className={`site-nav${scrolled ? " is-scrolled" : ""}${onStage ? " is-on-stage" : ""}${open ? " is-open" : ""}`} aria-label="Main">
         <Link href={navLinks.home} className="nav-logo" aria-label="Tezera home" onClick={goHome}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={navLinks.img} alt="" className="nav-icon" />
