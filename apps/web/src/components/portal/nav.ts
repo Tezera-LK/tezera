@@ -40,22 +40,24 @@ const SHARED = {
 // Vendors and freelancers have one "Reviews and rank" page; organisers have Leaderboards and Reviews.
 function general(role: PortalRole | null): NavGroup {
   const providers = role === "vendor" || role === "freelancer";
+  // pages built for the organiser so far; other roles get theirs in their own slices
+  const organiser = role === "organiser";
   return {
     title: "General",
     items: [
       SHARED.home,
-      SHARED.messages,
-      SHARED.community,
+      organiser ? { ...SHARED.messages, href: routes.messages } : SHARED.messages,
+      organiser ? { ...SHARED.community, href: routes.community } : SHARED.community,
       SHARED.notifications,
       ...(providers
         ? [SHARED.reviewsAndRank]
         : [
-            SHARED.leaderboards,
+            organiser ? { ...SHARED.leaderboards, href: routes.leaderboards } : SHARED.leaderboards,
             // everyone else writes or gets reviews; admins only moderate them, from their own tools
-            ...(role === "admin" ? [] : [SHARED.reviews]),
+            ...(role === "admin" ? [] : [organiser ? { ...SHARED.reviews, href: routes.reviews } : SHARED.reviews]),
           ]),
-      SHARED.profile,
-      SHARED.settings,
+      organiser ? { ...SHARED.profile, href: routes.myProfile } : SHARED.profile,
+      organiser ? { ...SHARED.settings, href: routes.settings } : SHARED.settings,
     ],
   };
 }
@@ -82,11 +84,11 @@ const TOOLS: Record<PortalRole, NavGroup | null> = {
     title: "Organiser tools",
     items: [
       { label: "My events", href: routes.myEvents },
-      { label: "Hiring" },
-      { label: "Feed and promotion" },
-      { label: "Analytics" },
-      { label: "Payments" },
-      { label: "Verification" },
+      { label: "Hiring", href: routes.hiring },
+      { label: "Feed and promotion", href: routes.feed },
+      { label: "Analytics", href: routes.analytics },
+      { label: "Payments", href: routes.payments },
+      { label: "Verification", href: routes.verification },
     ],
   },
   vendor: { title: "Vendor tools", items: vendorTools(true) },
@@ -135,13 +137,18 @@ export const NOTIFICATIONS_TEXT = {
 
 // The avatar's menu (O82), in Figma's order. None of these pages exist yet; Log out becomes a
 // link to O98's confirmation when the Account slice is built.
-export const PROFILE_MENU: NavItem[] = [
-  { label: "My profile" },
-  { label: "Edit profile" },
-  { label: "Payments" },
-  { label: "Settings" },
-  { label: "Log out" },
-];
+// The organiser's go to their pages; other roles get theirs in their own slices.
+export function profileMenu(role: PortalRole | null): NavItem[] {
+  const organiser = role === "organiser";
+  return [
+    { label: "My profile", href: organiser ? routes.myProfile : undefined },
+    { label: "Edit profile", href: organiser ? routes.editProfile : undefined },
+    { label: "Payments", href: organiser ? routes.payments : undefined },
+    { label: "Settings", href: organiser ? routes.settings : undefined },
+    // asks first (O98)
+    { label: "Log out", href: organiser ? `${routes.settings}?dialog=logout` : undefined },
+  ];
+}
 
 // The search box's hint: what each role looks for. Organiser, vendor and freelancer wording is from
 // the Figma files; consumer and admin wording is ours until they have designs.

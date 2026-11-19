@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireRole, type Session } from "@/lib/auth/session";
-import { getEventStalls, getMyEvent, getStallVendors, saveEventStalls } from "@/lib/data/portal";
+import { getEventStalls, getMyEvent, getStallVendors, isVerified, saveEventStalls } from "@/lib/data/portal";
 import type { EventStalls, StallType } from "@/lib/data/portal-types";
 import { routes } from "@/lib/routes";
 import { STALL_TYPES, usedNumbers } from "@/lib/stalls";
@@ -52,6 +52,8 @@ async function save(session: Session, eventId: string, stalls: EventStalls, list
 // slots changes that row. There can't be fewer slots than stalls already given out.
 export async function saveStallSlots(eventId: string, form: FormData) {
   const { session, event, stalls } = await load(eventId);
+  // opening stall slots needs the Verified badge (O41)
+  if (!(await isVerified(session))) redirect(tab(eventId, { dialog: "locked" }));
   const type = field(form, "type") as StallType;
   const slots = Number(field(form, "slots"));
   const feeLkr = lkr(field(form, "fee"));
@@ -80,6 +82,7 @@ export async function saveStallSlots(eventId: string, form: FormData) {
 // until they accept; accepting counts as approval (the vendor's side, a later slice).
 export async function inviteVendor(eventId: string, form: FormData) {
   const { session, stalls } = await load(eventId);
+  if (!(await isVerified(session))) redirect(tab(eventId, { dialog: "locked" }));
   const vendors = await getStallVendors(session);
   const vendor = vendors.find((v) => v.id === field(form, "vendor"));
   const type = field(form, "type") as StallType;

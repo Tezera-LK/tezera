@@ -58,6 +58,8 @@ export default async function SearchPage({
   const params = await searchParams;
   const query = typeof params.q === "string" ? params.q.trim() : "";
   const tab = pickTab(params.tab);
+  // only organisers hire, so only they get links to profiles and Find providers
+  const hiring = session.role === "organiser";
   const [results, recent] = await Promise.all([searchPortal(session, query), getRecentSearches(session)]);
   const { providers, events, communities } = results;
   const total = providers.length + events.length + communities.length;
@@ -117,10 +119,13 @@ export default async function SearchPage({
 
           {tab === "providers" && (
             <>
-              <ProviderList providers={providers.slice(0, PROVIDERS_SHOWN)} />
+              <ProviderList providers={providers.slice(0, PROVIDERS_SHOWN)} hiring={hiring} />
               {providers.length > PROVIDERS_SHOWN && (
-                // Find providers (O17) is in the Hiring slice
-                <MaybeLink className={`${ui.wideButton} ${styles.seeAll}`}>
+                // Find providers (O17) is the organiser's; other roles get it in their own slices
+                <MaybeLink
+                  href={hiring ? `${routes.hiring}?q=${encodeURIComponent(query)}` : undefined}
+                  className={`${ui.wideButton} ${styles.seeAll}`}
+                >
                   {TEXT.seeAllProviders(providers.length)}
                 </MaybeLink>
               )}
@@ -143,13 +148,13 @@ export default async function SearchPage({
 }
 
 // Provider rows: a round picture, the name, "Freelancer · Photographer · ★ 4.8 · from LKR 30,000"
-// and a badge. Provider profiles (O18) are in the Hiring slice, so rows don't link yet.
-function ProviderList({ providers }: { providers: ProviderResult[] }) {
+// and a badge. An organiser can open each profile (O18); other roles get profiles in their own slices.
+function ProviderList({ providers, hiring }: { providers: ProviderResult[]; hiring: boolean }) {
   return (
     <ul className={ui.rows}>
       {providers.map((p) => (
         <li key={p.id}>
-          <MaybeLink className={`${ui.row} ${styles.providerRow}`}>
+          <MaybeLink href={hiring ? routes.provider(p.id) : undefined} className={`${ui.row} ${styles.providerRow}`}>
             <Thumb size={40} shape="round" />
             <span className={ui.rowText}>
               <span className={ui.rowTitle}>{p.name}</span>

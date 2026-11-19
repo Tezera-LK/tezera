@@ -5,6 +5,7 @@ import { useState } from "react";
 import forms from "../forms.module.css";
 import shell from "../PortalShell.module.css";
 import styles from "./Stalls.module.css";
+import tables from "../tables.module.css";
 
 const TEXT = {
   number: "Stall number",
@@ -40,7 +41,7 @@ export default function StallNumberForm({ action, numbers, zone, initial, verb, 
   const free = numbers.filter((n) => n.free).map((n) => n.value);
 
   return (
-    <form action={action} className={styles.dialogForm}>
+    <form action={action} className={tables.dialogForm}>
       <label className={forms.field}>
         <span className={forms.label}>{TEXT.number}</span>
         <input
@@ -86,7 +87,7 @@ export default function StallNumberForm({ action, numbers, zone, initial, verb, 
         </p>
       )}
 
-      <div className={styles.dialogActions}>
+      <div className={tables.dialogActions}>
         <Link href={closeHref} scroll={false} className={`${forms.bigButton} ${forms.bigButtonQuiet}`}>
           {TEXT.cancel}
         </Link>

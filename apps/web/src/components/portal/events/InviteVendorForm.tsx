@@ -8,6 +8,7 @@ import forms from "../forms.module.css";
 import shell from "../PortalShell.module.css";
 import Thumb from "../Thumb";
 import styles from "./Stalls.module.css";
+import tables from "../tables.module.css";
 
 const TEXT = {
   search: "Search vendors by name, type or town",
@@ -69,7 +70,7 @@ export default function InviteVendorForm({ action, vendors, fees, closeHref, err
   }
 
   return (
-    <form action={action} className={styles.dialogForm}>
+    <form action={action} className={tables.dialogForm}>
       <label className={shell.srOnly} htmlFor="vendor-search">
         {TEXT.search}
       </label>
@@ -136,7 +137,7 @@ export default function InviteVendorForm({ action, vendors, fees, closeHref, err
         </p>
       )}
 
-      <div className={styles.dialogActions}>
+      <div className={tables.dialogActions}>
         <Link href={closeHref} scroll={false} className={`${forms.bigButton} ${forms.bigButtonQuiet}`}>
           {TEXT.cancel}
         </Link>

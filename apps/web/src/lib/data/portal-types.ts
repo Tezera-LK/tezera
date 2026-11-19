@@ -310,3 +310,371 @@ export type EventStalls = {
   collected: { paid: number; amountLkr: number };
   zones: Record<StallType, StallZone>;
 };
+
+// ---------- Hiring (O14, O17–O21, O77–O79, O89) ----------
+
+// "Top Rated" dark, "Rising" pale, "New" grey (O17)
+export type ProviderBadge = "Top Rated" | "Rising" | "New";
+
+// a vendor or freelancer an organiser can hire, as their profile shows them (O18)
+export type HireProvider = {
+  id: string;
+  name: string;
+  kind: "Vendor" | "Freelancer";
+  // what they are ("Photographer") and the category they're ranked in ("Photography")
+  role: string;
+  category: string;
+  // the category as they word it on their profile, e.g. "Photography and video"
+  categoryLabel: string;
+  districts: string[];
+  verified: boolean;
+  badge: ProviderBadge | null;
+  rating: number;
+  reviews: number;
+  jobs: number;
+  fromLkr: number;
+  // their place on the category's leaderboard in their first district; null when unranked
+  rank: number | null;
+  bio: string;
+  services: { name: string; detail: string; fromLkr: number }[];
+  // one entry per portfolio item; true for a video
+  portfolio: boolean[];
+  ratings: { quality: number; punctuality: number; communication: number; value: number };
+  reviewList: { id: string; by: string; byRole: string; event: string; month: string; stars: number; text: string }[];
+  // days they're already booked ("2026-12-13")
+  bookedDates: string[];
+};
+
+// one payment of a booking: the deposit or an instalment. `due` is a date ("2026-11-30"), or
+// empty when it's due on accepting.
+export type PaymentPart = { label: string; amountLkr: number; due: string };
+
+// what a booking request asks for, past the date and price (O19). Empty fields aren't shown.
+export type Brief = {
+  service: string;
+  duration: string;
+  audience: string;
+  deliverables: string;
+  runOfShow: string;
+  equipment: string;
+};
+
+// a provider's answer with their own price and terms (O78)
+export type OwnQuote = {
+  priceLkr: number;
+  payments: PaymentPart[];
+  cancellation: string;
+  message: string;
+};
+
+// a booking request (O19), and the booking it becomes once accepted (O14 "Confirmed bookings")
+export type BookingRequest = {
+  id: string;
+  eventId: string;
+  providerId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  budgetLkr: number;
+  brief: Brief;
+  payments: PaymentPart[];
+  sentAt: string;
+  // waiting for a reply, answered with their own quote, accepted (a booking), declined, or a
+  // booking that was later cancelled
+  status: "waiting" | "quoted" | "accepted" | "declined" | "cancelled";
+  answeredAt: string | null;
+  quote: OwnQuote | null;
+  // the job post it came from, when the organiser accepted a quote there (O89)
+  fromJob: string | null;
+  // ---- once it's a booking (O22, O83–O88); left out until something happens ----
+  // when the organiser marked it completed (O88), which opens reviews
+  completedAt?: string | null;
+  // who cancelled (O84, O85), when, why, and the note to the other side
+  cancelledBy?: "you" | "provider" | null;
+  cancelledAt?: string | null;
+  cancelReason?: string;
+  cancelNote?: string;
+  // new terms the organiser proposed and the provider hasn't answered yet (O83)
+  proposedTerms?: ProposedTerms | null;
+  // problems reported to an admin (O87)
+  reports?: { reason: string; text: string; at: string }[];
+};
+
+// "Propose new terms" (O83): a new price, times and instalments, for the provider to accept
+export type ProposedTerms = {
+  priceLkr: number;
+  startTime: string;
+  endTime: string;
+  payments: PaymentPart[];
+  note: string;
+  sentAt: string;
+};
+
+// a provider's quote on a job post (O21)
+export type JobQuote = {
+  id: string;
+  providerId: string;
+  priceLkr: number;
+  message: string;
+  status: "open" | "accepted" | "not-chosen";
+};
+
+// a job post (O20): providers who match send quotes until it closes
+export type JobPost = {
+  id: string;
+  eventId: string;
+  title: string;
+  category: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  district: string;
+  brief: Brief;
+  budgetMinLkr: number;
+  budgetMaxLkr: number;
+  closesAt: string;
+  status: "open" | "closed";
+  postedAt: string;
+  // how many matching providers it was shown to (O79)
+  seenBy: number;
+  quotes: JobQuote[];
+};
+
+// ---------- Payments (O60–O65) ----------
+
+// The organiser's PayHere merchant account (O61). Sandbox only for now.
+export type PaymentAccount = { merchantId: string; accountName: string; connectedAt: string };
+
+// One line of "History and receipts" (O60), and the receipt behind it (O64).
+// paid = the organiser paid a provider; received = a vendor paid a stall fee; refunded = money
+// came back; commission = Tezera's 5%, shown but not charged.
+export type PaymentRecord = {
+  // the receipt number, "TZ-R-55302"
+  id: string;
+  kind: "paid" | "received" | "refunded" | "commission";
+  // who the money went to or came from
+  party: string;
+  // "Deposit paid · photography"
+  label: string;
+  amountLkr: number;
+  at: string;
+  eventId: string | null;
+  // the booking and which of its payments, for money paid or refunded on a booking
+  requestId: string | null;
+  partIndex: number | null;
+  // "PayHere sandbox · card ending 4242", or "Outside Tezera"
+  method: string;
+};
+
+// ---------- Feed and analytics (O26, O99, O94, O50) ----------
+
+// a comment under a feed post (O94). `mine` = written by the organiser; `hidden` = hidden by them.
+export type PostComment = { id: string; by: string; text: string; at: string; mine: boolean; hidden: boolean };
+
+// a post the organiser put on the feed (O26). Media needs storage (EN-03), so only the file's
+// name is kept for now.
+export type FeedPost = {
+  id: string;
+  kind: "reel" | "poster" | "image";
+  eventId: string | null;
+  caption: string;
+  fileName: string;
+  // a reel's cover frame, in seconds from the start (O99)
+  coverSeconds?: number;
+  postedAt: string;
+  likes: number;
+  views: number;
+  // taps through to the event page (O50)
+  clicks: number;
+  comments: PostComment[];
+};
+
+// the numbers on Analytics (O50) that don't come from other records yet
+export type AnalyticsExtras = {
+  pageViews: number;
+  newFollowers: number;
+  // share of event page views from each place, in percent
+  sources: { label: string; percent: number }[];
+  // followers at the end of each of the last weeks, oldest first
+  followerWeeks: number[];
+};
+
+// ---------- The organiser's profile (O27, O42–O45) ----------
+
+export type OrganiserProfile = {
+  name: string;
+  // "Concerts and festivals"
+  eventTypes: string;
+  basedIn: string;
+  about: string;
+  phone: string;
+  email: string;
+  website: string;
+  // "agastra", for tezera.lk/agastra; it can change once every 30 days
+  shortLink: string;
+  shortLinkChangedAt: string | null;
+  // what shows on the public profile (O42's switches)
+  showContact: boolean;
+  showTrackRecord: boolean;
+  showFollowers: boolean;
+  verified: boolean;
+  verifiedAt: string | null;
+  // a renamed organiser keeps the badge while an admin checks the new name
+  nameCheckPending: boolean;
+  badge: "Top Rated" | "Rising" | null;
+  rating: number;
+  reviews: number;
+  // place among organisers on the leaderboard
+  rank: number | null;
+  followers: number;
+  followersThisWeek: number;
+  eventsRun: number;
+  trackRecord: { wentAhead: number; postponed: number; cancelled: number; paidOnTimePercent: number };
+  // events from before Tezera's records, for "Past events" (O45)
+  history: { id: string; title: string; venue: string; date: string; going: number; rating: number | null }[];
+};
+
+// someone who follows the organiser (O43)
+export type Follower = {
+  id: string;
+  name: string;
+  role: "Consumer" | "Vendor" | "Freelancer";
+  // "going to Colombo Music Fest", "followed Mon"
+  detail: string;
+  // a vendor or freelancer's profile, when they have one
+  providerId: string | null;
+};
+
+// ---------- Verification (O28, O38–O41) ----------
+
+// one document sent for verification. Files need storage (EN-03), so only the name is kept.
+// fix = the admin asked for a clearer copy
+export type VerificationDocument = { id: string; name: string; kind: string; state: "sent" | "ok" | "fix" };
+
+export type Verification = {
+  // not-started → pending → approved or rejected; a rejected one can be sent again
+  status: "not-started" | "pending" | "rejected" | "approved";
+  documents: VerificationDocument[];
+  submittedAt: string | null;
+  decidedAt: string | null;
+  // why it wasn't approved, from the admin
+  reason: string;
+};
+
+// ---------- Reviews and leaderboards (O29–O31, O46–O49) ----------
+
+// a review someone wrote about the organiser (O29 from providers, O49 from consumers)
+export type ReceivedReview = {
+  id: string;
+  from: "provider" | "consumer";
+  by: string;
+  // "Vendor", "Freelancer"; empty for consumers
+  byRole: string;
+  event: string;
+  at: string;
+  overall: number;
+  // the parts, e.g. Payment 5, Communication 5, Planning 4.5
+  scores: { label: string; value: number }[];
+  text: string;
+  // the organiser's one reply (O46)
+  reply: string | null;
+  // set once the organiser reported it (O47); an admin decides (EN-08)
+  reported: { reason: string; note: string; at: string } | null;
+};
+
+// a provider or stall vendor the organiser can review after an event (O30)
+export type ReviewTask = {
+  id: string;
+  name: string;
+  // "Sound and lighting", "Stall vendor"
+  kind: string;
+  eventTitle: string;
+  completedOn: string;
+  // reviews close two weeks after the event
+  closesOn: string;
+};
+
+// a review the organiser wrote, or saved to finish later (O30, O48)
+export type WrittenReview = {
+  taskId: string;
+  // who it's about, kept so "Review posted" (O48) can name them after the task is done
+  about: string;
+  scores: Record<string, number>;
+  text: string;
+  at: string;
+  submitted: boolean;
+};
+
+// one row of "Top organisers" (O31)
+export type OrganiserRank = { rank: number; name: string; rating: number; reviews: number; tier: "Top Rated" | "Rising" | "New"; districts: string[]; you: boolean };
+
+// ---------- Messages and community (O23–O25, O90–O93) ----------
+
+// one message in a conversation (O23). A file needs storage (EN-03), so only its name is kept.
+export type ChatMessage = {
+  id: string;
+  mine: boolean;
+  at: string;
+  text: string;
+  file: { name: string; label: string } | null;
+  // a picture, drawn as a placeholder until storage
+  image: boolean;
+};
+
+export type Conversation = {
+  id: string;
+  name: string;
+  kind: "Freelancer" | "Vendor" | "Consumer";
+  // "Photographer · Verified"
+  detail: string;
+  providerId: string | null;
+  unread: number;
+  blocked: boolean;
+  blockedAt?: string;
+  // set once the organiser reported them (O92)
+  reported: string | null;
+  messages: ChatMessage[];
+};
+
+// a community the organiser can join (O24)
+export type Community = { id: string; name: string; about: string; members: number; newPosts: number; joined: boolean };
+
+// a reply under a thread (O25)
+export type ThreadReply = { id: string; author: string; authorRole: string; verified: boolean; at: string; text: string; upvotes: number; voted?: boolean };
+
+// a thread on an event's board or in a community (O16, O24, O25)
+export type CommunityThread = {
+  id: string;
+  eventId: string | null;
+  communityId: string | null;
+  title: string;
+  body: string;
+  author: string;
+  authorRole: string;
+  verified: boolean;
+  at: string;
+  upvotes: number;
+  // the replies shown; `replyCount` counts older ones too
+  replies: ThreadReply[];
+  replyCount: number;
+  pinned: boolean;
+  // an event linked from the post
+  linkedEventId: string | null;
+  reported: boolean;
+  // the organiser upvoted it
+  voted?: boolean;
+};
+
+// ---------- Account settings (O32, O95–O98) ----------
+
+export type AccountSettings = {
+  email: string;
+  passwordChangedAt: string;
+  // a new email or phone waiting for its code (O95)
+  pendingContact: string | null;
+  // which notifications to send, by key; bookings are always on (O32)
+  notify: Record<"bookings" | "messages" | "stalls" | "questions" | "likes", boolean>;
+  language: "en" | "si" | "ta";
+  theme: "light" | "dark" | "system";
+};

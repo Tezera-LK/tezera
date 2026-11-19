@@ -86,3 +86,10 @@ export function formatStartsLabel(iso: string, now: Date): string {
 export function formatCount(n: number): string {
   return count.format(n);
 }
+
+// Sorts by time, newest or oldest first. Times are compared as dates, not text: samples are
+// written "…+05:30" and new records "…Z", so comparing the text would put them in the wrong order.
+// A missing time sorts last.
+const instant = (iso: string | null | undefined) => (iso ? Date.parse(iso) : Number.NEGATIVE_INFINITY);
+export const newestFirst = (a: string | null | undefined, b: string | null | undefined) => instant(b) - instant(a);
+export const oldestFirst = (a: string | null | undefined, b: string | null | undefined) => instant(a) - instant(b);

@@ -12,7 +12,7 @@ import ui from "@/components/portal/ui.module.css";
 import { requireRole } from "@/lib/auth/session";
 import { getMyEvent } from "@/lib/data/portal";
 import type { Question } from "@/lib/data/portal-types";
-import { daysFrom, formatWhen } from "@/lib/format";
+import { daysFrom, formatWhen, newestFirst } from "@/lib/format";
 import { routes } from "@/lib/routes";
 import { answerQuestion } from "../../actions";
 
@@ -63,7 +63,7 @@ export default async function EventQaPage({ params, searchParams }: Props) {
   const waiting = event.questions.filter((q) => !q.answer);
   const answered = event.questions
     .filter((q) => q.answer)
-    .sort((a, b) => (b.answeredAt ?? "").localeCompare(a.answeredAt ?? ""));
+    .sort((a, b) => newestFirst(a.answeredAt, b.answeredAt));
   const shown = showAnswered ? answered : waiting;
   const base = routes.eventQa(event.id);
 

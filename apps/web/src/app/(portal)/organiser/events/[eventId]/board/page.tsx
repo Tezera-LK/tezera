@@ -11,6 +11,7 @@ import styles from "@/components/portal/events/EventPages.module.css";
 import ui from "@/components/portal/ui.module.css";
 import { requireRole } from "@/lib/auth/session";
 import { getEventBoard, getMyEvent, getMyOrganiserProfile } from "@/lib/data/portal";
+import { newestFirst } from "@/lib/format";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "Discussion board" };
@@ -33,8 +34,8 @@ const TEXT = {
   badgeText: "Your threads and replies show these badges on every board and community.",
 } as const;
 
-// The event's discussion board (Figma O16): its threads, newest or most upvoted first. Posting
-// and replying are the People slice (O25, O93), so those buttons aren't wired up yet.
+// The event's discussion board (Figma O16): its threads, newest or most upvoted first. Reply
+// opens the thread (O25); New thread opens the dialog (O93) on the Community page.
 export default async function EventBoardPage({
   params,
   searchParams,
@@ -56,7 +57,7 @@ export default async function EventBoardPage({
   const sorted = [...threads].sort(
     (a, b) =>
       Number(b.pinned) - Number(a.pinned) ||
-      (top ? b.upvotes - a.upvotes : b.postedAt.localeCompare(a.postedAt)),
+      (top ? b.upvotes - a.upvotes : newestFirst(a.postedAt, b.postedAt)),
   );
   const base = routes.eventBoard(event.id);
 
@@ -93,7 +94,9 @@ export default async function EventBoardPage({
               {TEXT.top}
             </Link>
           </nav>
-          <MaybeLink className={`${styles.filter} ${styles.filterPrimary}`}>{TEXT.newThread}</MaybeLink>
+          <MaybeLink href={`${routes.community}?dialog=new&in=event:${event.id}`} className={`${styles.filter} ${styles.filterPrimary}`}>
+            {TEXT.newThread}
+          </MaybeLink>
         </div>
       </div>
 
@@ -113,7 +116,9 @@ export default async function EventBoardPage({
                 </span>
                 <span className={ui.muted}>{`▲ ${t.upvotes}`}</span>
               </span>
-              <MaybeLink className={ui.rowButton}>{TEXT.reply}</MaybeLink>
+              <MaybeLink href={routes.thread(t.id)} className={ui.rowButton}>
+                {TEXT.reply}
+              </MaybeLink>
             </li>
           ))}
         </ul>

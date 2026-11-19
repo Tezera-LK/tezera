@@ -12,12 +12,14 @@ import InviteVendorForm from "@/components/portal/events/InviteVendorForm";
 import StallNumberForm from "@/components/portal/events/StallNumberForm";
 import StallSlotsForm, { type SlotValues } from "@/components/portal/events/StallSlotsForm";
 import styles from "@/components/portal/events/Stalls.module.css";
+import tables from "@/components/portal/tables.module.css";
 import { hasEnded } from "@/components/portal/events/eventText";
 import forms from "@/components/portal/forms.module.css";
 import shell from "@/components/portal/PortalShell.module.css";
 import ui from "@/components/portal/ui.module.css";
 import { requireRole } from "@/lib/auth/session";
-import { getEventStalls, getMyEvent, getStallVendors } from "@/lib/data/portal";
+import { getEventStalls, getMyEvent, getStallVendors, isVerified } from "@/lib/data/portal";
+import LockedDialog from "@/components/portal/verification/LockedDialog";
 import type { ApprovedStall, EventStalls, ManagedEvent, StallApplication, StallType, StallVendor } from "@/lib/data/portal-types";
 import { formatCount, formatDayMonth, formatShortDate } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -125,23 +127,22 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
         <div className={styles.collected}>
           <span className={ui.rowText}>
             <span className={ui.rowTitle}>{TEXT.collected}</span>
-            <span className={styles.small}>
+            <span className={tables.small}>
               {TEXT.collectedValue(record.collected.paid, approvedTotal, record.collected.amountLkr)}
             </span>
           </span>
           {record.collected.paid > 0 && <Chip tone="good">{TEXT.paid}</Chip>}
         </div>
-        <p className={styles.panelText}>{TEXT.feesText}</p>
-        {/* the Payments page is the money slice (O60–O65) */}
-        <MaybeLink className={`${ui.rowButton} ${ui.rowButtonWhite} ${styles.panelLink}`}>{TEXT.payments}</MaybeLink>
+        <p className={tables.panelText}>{TEXT.feesText}</p>
+        <MaybeLink href={routes.payments} className={`${ui.rowButton} ${ui.rowButtonWhite} ${tables.panelLink}`}>{TEXT.payments}</MaybeLink>
       </Panel>
       <Panel title={TEXT.onMap}>
         <span className={styles.mapThumb}>
           <Thumb size={308} height={140} shape="image" />
         </span>
-        <p className={styles.panelText}>{TEXT.onMapText}</p>
+        <p className={tables.panelText}>{TEXT.onMapText}</p>
         {/* the map builder is its own slice (O11–O71) */}
-        <MaybeLink className={`${ui.rowButton} ${ui.rowButtonWhite} ${styles.panelLink}`}>{TEXT.openMapBuilder}</MaybeLink>
+        <MaybeLink className={`${ui.rowButton} ${ui.rowButtonWhite} ${tables.panelLink}`}>{TEXT.openMapBuilder}</MaybeLink>
       </Panel>
     </>
   );
@@ -156,13 +157,13 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
           </p>
         )}
 
-        <section className={`${styles.section} ${styles.sectionTight}`} aria-labelledby="slots-title">
-          <div className={styles.sectionHead}>
+        <section className={`${tables.section} ${tables.sectionTight}`} aria-labelledby="slots-title">
+          <div className={tables.sectionHead}>
             <h2 id="slots-title" className={ui.sectionTitle}>
               {TEXT.slots}
             </h2>
             {open && (
-              <div className={styles.headButtons}>
+              <div className={tables.headButtons}>
                 <Link href={href({ dialog: "invite" })} scroll={false} className={`${ui.rowButton} ${ui.rowButtonWhite}`}>
                   {TEXT.invite}
                 </Link>
@@ -175,8 +176,8 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
           {record.slots.length === 0 ? (
             <p className={ui.muted}>{open ? TEXT.noSlots : TEXT.noSlotsClosed}</p>
           ) : (
-            <div className={styles.tableCard}>
-              <table className={`${styles.table} ${styles.slotsTable}`}>
+            <div className={tables.tableCard}>
+              <table className={`${tables.table} ${styles.slotsTable}`}>
                 <thead>
                   <tr>
                     <th scope="col">{TEXT.type}</th>
@@ -193,7 +194,7 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
                 <tbody>
                   {record.slots.map((s) => (
                     <tr key={s.type}>
-                      <th scope="row" className={styles.strong}>
+                      <th scope="row" className={tables.strong}>
                         {s.type}
                       </th>
                       <td>{s.slots}</td>
@@ -201,7 +202,7 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
                       <td>{day(s.closesOn)}</td>
                       <td>{s.applied}</td>
                       <td>{s.approved}</td>
-                      <td className={styles.end}>
+                      <td className={tables.end}>
                         {open && (
                           <Link
                             href={href({ dialog: "slots", type: s.type })}
@@ -221,15 +222,15 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
           )}
         </section>
 
-        <section className={styles.section} aria-labelledby="applications-title">
+        <section className={tables.section} aria-labelledby="applications-title">
           <h2 id="applications-title" className={ui.sectionTitle}>
             {TEXT.applications(record.applications.length)}
           </h2>
           {record.applications.length === 0 ? (
             <p className={ui.muted}>{TEXT.noApplications}</p>
           ) : (
-            <div className={styles.tableCard}>
-              <table className={`${styles.table} ${styles.applicationsTable}`}>
+            <div className={tables.tableCard}>
+              <table className={`${tables.table} ${styles.applicationsTable}`}>
                 <thead>
                   <tr>
                     <th scope="col">{TEXT.vendor}</th>
@@ -245,8 +246,8 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
                   {record.applications.map((a) => (
                     <tr key={a.id}>
                       <th scope="row">
-                        <span className={styles.strong}>{a.vendor.name}</span>
-                        <span className={styles.small}>{rating(a.vendor)}</span>
+                        <span className={tables.strong}>{a.vendor.name}</span>
+                        <span className={tables.small}>{rating(a.vendor)}</span>
                       </th>
                       <td>{a.type}</td>
                       <td>{formatDayMonth(a.receivedAt)}</td>
@@ -255,10 +256,10 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
                       </td>
                       <td>
                         {a.status === "invited" ? (
-                          <span className={styles.small}>{TEXT.waiting}</span>
+                          <span className={tables.small}>{TEXT.waiting}</span>
                         ) : (
                           open && (
-                            <span className={styles.rowActions}>
+                            <span className={tables.rowActions}>
                               <Link
                                 href={href({ dialog: "reject", application: a.id })}
                                 scroll={false}
@@ -287,8 +288,8 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
           )}
         </section>
 
-        <section className={styles.section} aria-labelledby="approved-title">
-          <div className={styles.sectionHead}>
+        <section className={tables.section} aria-labelledby="approved-title">
+          <div className={tables.sectionHead}>
             <h2 id="approved-title" className={ui.sectionTitle}>
               {TEXT.approvedVendors}
             </h2>
@@ -297,8 +298,8 @@ export default async function EventStallsPage({ params, searchParams }: Props) {
           {record.approved.length === 0 ? (
             <p className={ui.muted}>{TEXT.noApproved}</p>
           ) : (
-            <div className={styles.tableCard}>
-              <table className={`${styles.table} ${styles.approvedTable}`}>
+            <div className={tables.tableCard}>
+              <table className={`${tables.table} ${styles.approvedTable}`}>
                 <thead>
                   <tr>
                     <th scope="col">{TEXT.stallNo}</th>
@@ -374,7 +375,7 @@ function ApprovedRow({
           "–"
         )}
       </td>
-      <th scope="row" className={styles.strong}>
+      <th scope="row" className={tables.strong}>
         {stall.vendor.name}
       </th>
       <td>{stall.type}</td>
@@ -388,8 +389,8 @@ function ApprovedRow({
         )}
       </td>
       <td>{fee}</td>
-      <td className={styles.end}>
-        <span className={styles.rowActions}>
+      <td className={tables.end}>
+        <span className={tables.rowActions}>
           {stall.listing ? (
             <>
               <Link
@@ -469,6 +470,13 @@ async function StallDialog({ event, stalls, query }: { event: ManagedEvent; stal
   const close = routes.eventStalls(event.id);
   const application = stalls.applications.find((a) => a.id === query.application && a.status === "applied");
   const stall = stalls.approved.find((s) => s.id === query.stall);
+
+  // opening slots and inviting vendors need the Verified badge (O41)
+  if (query.dialog === "slots" || query.dialog === "invite" || query.dialog === "locked") {
+    const session = await requireRole("organiser");
+    if (!(await isVerified(session))) return <LockedDialog title="Get verified to open stall slots" closeHref={close} />;
+    if (query.dialog === "locked") return null;
+  }
 
   switch (query.dialog) {
     case "slots":
@@ -646,7 +654,7 @@ function RejectDialog({
       closeLabel={DIALOG_TEXT.close}
       narrow
     >
-      <form action={rejectApplication.bind(null, event.id, application.id)} className={styles.dialogForm}>
+      <form action={rejectApplication.bind(null, event.id, application.id)} className={tables.dialogForm}>
         <fieldset className={styles.reasons}>
           <legend className={shell.srOnly}>{DIALOG_TEXT.reasonLabel}</legend>
           {DIALOG_TEXT.reasons.map((r) => (
@@ -666,7 +674,7 @@ function RejectDialog({
           <span className={forms.label}>{DIALOG_TEXT.note}</span>
           <textarea name="note" rows={2} placeholder={DIALOG_TEXT.notePlaceholder} className={`${forms.input} ${styles.rules}`} />
         </label>
-        <div className={styles.dialogActions}>
+        <div className={tables.dialogActions}>
           <Link href={close} scroll={false} className={`${forms.bigButton} ${forms.bigButtonQuiet}`}>
             {DIALOG_TEXT.cancel}
           </Link>
@@ -693,7 +701,7 @@ function ListingDialog({ event, stall, close }: { event: ManagedEvent; stall: Ap
           <li key={item.id} className={`${styles.item} ${item.note && !item.hidden ? styles.itemFlagged : ""} ${item.hidden ? styles.itemHidden : ""}`}>
             <span className={ui.rowText}>
               <span className={ui.rowTitle}>{item.name}</span>
-              <span className={styles.small}>
+              <span className={styles.itemMeta}>
                 {[item.kind, item.note, item.hidden && DIALOG_TEXT.hidden].filter(Boolean).join(" · ")}
               </span>
             </span>

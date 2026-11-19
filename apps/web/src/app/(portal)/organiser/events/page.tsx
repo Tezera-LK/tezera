@@ -14,7 +14,7 @@ import EmptyState from "@/components/states/EmptyState";
 import { requireRole } from "@/lib/auth/session";
 import { getReviewsToWrite, listMyEvents } from "@/lib/data/portal";
 import type { ManagedEvent } from "@/lib/data/portal-types";
-import { daysFrom, formatStartsLabel, formatTime, formatWhen } from "@/lib/format";
+import { daysFrom, formatStartsLabel, formatTime, formatWhen, newestFirst } from "@/lib/format";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "My events" };
@@ -60,7 +60,7 @@ export default async function MyEventsPage({ searchParams }: { searchParams: Pro
   const [all, reviews] = await Promise.all([listMyEvents(session), getReviewsToWrite(session)]);
   const now = new Date();
 
-  const drafts = all.filter((e) => e.status === "draft").sort((a, b) => b.editedAt.localeCompare(a.editedAt));
+  const drafts = all.filter((e) => e.status === "draft").sort((a, b) => newestFirst(a.editedAt, b.editedAt));
   const upcoming = all.filter((e) => e.status !== "draft" && !hasEnded(e)).sort(byStart);
   const past = all.filter((e) => e.status !== "draft" && hasEnded(e)).sort((a, b) => byStart(b, a));
   const shown = { upcoming, drafts, past }[tab];
@@ -126,8 +126,9 @@ export default async function MyEventsPage({ searchParams }: { searchParams: Pro
                       {[review.eventTitle, event?.startsAt && whenShort(event).split(" · ")[0]].filter(Boolean).join(" · ")}
                     </span>
                   </span>
-                  {/* writing a review is the Reviews slice (O30) */}
-                  <MaybeLink className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>{TEXT.review}</MaybeLink>
+                  <MaybeLink href={routes.writeReview(review.id)} className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>
+                    {TEXT.review}
+                  </MaybeLink>
                 </li>
               );
             })}

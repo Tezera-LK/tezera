@@ -5,7 +5,7 @@
 // Times are built from "now" on every request, so "Tonight", "Today" and "Mon" stay true whenever
 // someone runs the app. Names are the Figma file's; "(sample)" isn't added because these screens
 // never leave `next dev`.
-import { colomboDay } from "@/lib/format";
+import { colomboDay, formatShortDate } from "@/lib/format";
 import type { PortalRole } from "@/lib/portal-roles";
 import type {
   Account,
@@ -14,6 +14,23 @@ import type {
   ManagedEvent,
   Question,
   StallToReview,
+  AccountSettings,
+  Community,
+  CommunityThread,
+  Conversation,
+  OrganiserRank,
+  ReceivedReview,
+  ReviewTask,
+  Verification,
+  Follower,
+  OrganiserProfile,
+  AnalyticsExtras,
+  FeedPost,
+  PaymentAccount,
+  PaymentRecord,
+  BookingRequest,
+  HireProvider,
+  JobPost,
   EventStalls,
   StallType,
   StallVendor,
@@ -328,15 +345,7 @@ export function sampleNotifications(now: Date): PortalNotification[] {
 
 // ---------- Search (O80) ----------
 
-export const sampleProviders: ProviderResult[] = [
-  { id: "prv-1", name: "Tharindu Jayawardena", kind: "freelancer", category: "Photographer", rating: 4.8, priceFrom: 30000, badge: "Top Rated" },
-  { id: "prv-2", name: "Frame & Focus Studio", kind: "vendor", category: "Photography and video", rating: 4.7, priceFrom: 45000, badge: "Top Rated" },
-  { id: "prv-3", name: "Malsha Gunasekara", kind: "freelancer", category: "Photographer", rating: 4.6, priceFrom: 25000, badge: "Rising" },
-  { id: "prv-4", name: "Kasun Wickramasinghe", kind: "freelancer", category: "Photographer", rating: 4.4, priceFrom: 20000, badge: null },
-  { id: "prv-5", name: "Lens & Light Collective", kind: "vendor", category: "Photography and video", rating: 4.3, priceFrom: 60000, badge: null },
-  { id: "prv-6", name: "Dilshan Perera", kind: "freelancer", category: "DJ", rating: 4.5, priceFrom: 45000, badge: "Rising" },
-  { id: "prv-7", name: "Lumen Stage Co.", kind: "vendor", category: "Sound and lighting", rating: 4.2, priceFrom: 80000, badge: null },
-];
+// The search page's providers (O80) are the hiring samples; see sampleHireProviders below.
 
 export function sampleEventResults(now: Date): EventResult[] {
   return [
@@ -543,5 +552,709 @@ export function sampleStalls(now: Date): Record<string, EventStalls> {
       collected: { paid: 12, amountLkr: 168000 },
       zones: sampleStallZones,
     },
+  };
+}
+
+// ---------- Hiring (O14, O17–O21, O77–O79, O89) ----------
+
+const noBrief = { service: "", duration: "", audience: "", deliverables: "", runOfShow: "", equipment: "" };
+const someReviews = (event: string) => [
+  { id: "rv-1", by: "Hill Events", byRole: "Organiser", event, month: "Nov", stars: 5, text: "On time, easy to work with, and the results were what we asked for." },
+];
+
+// Vendors and freelancers an organiser can hire (O17, O18). The search page's providers (O80)
+// come from this list too.
+export const sampleHireProviders: HireProvider[] = [
+  {
+    id: "prv-1",
+    name: "Tharindu Jayawardena",
+    kind: "Freelancer",
+    role: "Photographer",
+    category: "Photography",
+    categoryLabel: "Photographer",
+    districts: ["Colombo", "Gampaha"],
+    verified: true,
+    badge: "Top Rated",
+    rating: 4.8,
+    reviews: 126,
+    jobs: 210,
+    fromLkr: 30000,
+    rank: 2,
+    bio: "Event and concert photographer. Fast edits, and calm on a busy stage.",
+    services: [
+      { name: "Event coverage, 6 hours", detail: "300 edited photos within 7 days", fromLkr: 35000 },
+      { name: "Half-day coverage, 3 hours", detail: "120 edited photos within 5 days", fromLkr: 20000 },
+      { name: "Photo booth with prints", detail: "Unlimited prints for 3 hours", fromLkr: 45000 },
+    ],
+    portfolio: [false, true, false, false, true, false],
+    ratings: { quality: 4.9, punctuality: 4.8, communication: 4.7, value: 4.6 },
+    reviewList: [
+      { id: "rv-1", by: "Hill Events", byRole: "Organiser", event: "Kandy Food Carnival", month: "Nov", stars: 5, text: "Great shots of the food stalls, delivered in four days. We will book again." },
+      { id: "rv-2", by: "Punchline LK", byRole: "Organiser", event: "Laugh Out Loud Comedy", month: "Oct", stars: 4, text: "Good photos. Arrived 20 minutes late but caught every set." },
+    ],
+    bookedDates: [],
+  },
+  {
+    id: "prv-2",
+    name: "Frame & Focus Studio",
+    kind: "Vendor",
+    role: "Photography and video",
+    category: "Photography",
+    categoryLabel: "Photography and video",
+    districts: ["Colombo", "Kandy", "Galle"],
+    verified: true,
+    badge: "Top Rated",
+    rating: 4.7,
+    reviews: 98,
+    jobs: 164,
+    fromLkr: 45000,
+    rank: 1,
+    bio: "A studio of five shooters and two editors. Photo and video for festivals and launches.",
+    services: [
+      { name: "Photo and video, full day", detail: "Two shooters, a 3-minute highlight film", fromLkr: 120000 },
+      { name: "Event photography, 6 hours", detail: "400 edited photos within 4 days", fromLkr: 45000 },
+    ],
+    portfolio: [true, false, false, true, false, false],
+    ratings: { quality: 4.8, punctuality: 4.7, communication: 4.6, value: 4.5 },
+    reviewList: someReviews("Galle Literary Night"),
+    bookedDates: [],
+  },
+  {
+    id: "prv-3",
+    name: "Malsha Gunasekara",
+    kind: "Freelancer",
+    role: "Photographer",
+    category: "Photography",
+    categoryLabel: "Photographer",
+    districts: ["Colombo", "Gampaha"],
+    verified: true,
+    badge: "Rising",
+    rating: 4.6,
+    reviews: 41,
+    jobs: 58,
+    fromLkr: 25000,
+    rank: 3,
+    bio: "Live music and crowd photography. Edits within five days.",
+    services: [{ name: "Event coverage, 5 hours", detail: "250 edited photos within 5 days", fromLkr: 25000 }],
+    portfolio: [false, false, true, false],
+    ratings: { quality: 4.7, punctuality: 4.6, communication: 4.6, value: 4.5 },
+    reviewList: someReviews("Rooftop Sessions Vol. 1"),
+    bookedDates: [],
+  },
+  {
+    id: "prv-8",
+    name: "Nadeesha Perera",
+    kind: "Freelancer",
+    role: "Photographer",
+    category: "Photography",
+    categoryLabel: "Photographer",
+    districts: ["Colombo"],
+    verified: false,
+    badge: "Rising",
+    rating: 4.5,
+    reviews: 30,
+    jobs: 40,
+    fromLkr: 28000,
+    rank: 4,
+    bio: "Portraits and events around Colombo.",
+    services: [{ name: "Event coverage, 4 hours", detail: "200 edited photos within 7 days", fromLkr: 28000 }],
+    portfolio: [false, false, false],
+    ratings: { quality: 4.6, punctuality: 4.5, communication: 4.4, value: 4.4 },
+    reviewList: [],
+    bookedDates: [],
+  },
+  {
+    id: "prv-9",
+    name: "Chamath Rodrigo",
+    kind: "Freelancer",
+    role: "Photographer",
+    category: "Photography",
+    categoryLabel: "Photographer",
+    districts: ["Colombo"],
+    verified: false,
+    badge: "New",
+    rating: 4.3,
+    reviews: 6,
+    jobs: 9,
+    fromLkr: 18000,
+    rank: 5,
+    bio: "New on Tezera. Three outdoor festivals shot this year.",
+    services: [{ name: "Event coverage, 4 hours", detail: "150 edited photos within 7 days", fromLkr: 18000 }],
+    portfolio: [false, false],
+    ratings: { quality: 4.4, punctuality: 4.3, communication: 4.3, value: 4.4 },
+    reviewList: [],
+    bookedDates: [],
+  },
+  {
+    id: "prv-4",
+    name: "Kasun Wickramasinghe",
+    kind: "Freelancer",
+    role: "Photographer",
+    category: "Photography",
+    categoryLabel: "Photographer",
+    districts: ["Kandy"],
+    verified: false,
+    badge: null,
+    rating: 4.4,
+    reviews: 22,
+    jobs: 31,
+    fromLkr: 20000,
+    rank: null,
+    bio: "Weddings and events in the hill country.",
+    services: [{ name: "Event coverage, 4 hours", detail: "180 edited photos within 7 days", fromLkr: 20000 }],
+    portfolio: [false, false, false],
+    ratings: { quality: 4.5, punctuality: 4.4, communication: 4.3, value: 4.4 },
+    reviewList: [],
+    bookedDates: [],
+  },
+  {
+    id: "prv-5",
+    name: "Lens & Light Collective",
+    kind: "Vendor",
+    role: "Photography and video",
+    category: "Photography",
+    categoryLabel: "Photography and video",
+    districts: ["Galle"],
+    verified: true,
+    badge: null,
+    rating: 4.3,
+    reviews: 18,
+    jobs: 25,
+    fromLkr: 60000,
+    rank: null,
+    bio: "Drone, video and stills for coastal events.",
+    services: [{ name: "Drone and video, half day", detail: "A 2-minute film within 10 days", fromLkr: 60000 }],
+    portfolio: [true, true, false],
+    ratings: { quality: 4.4, punctuality: 4.3, communication: 4.2, value: 4.1 },
+    reviewList: [],
+    bookedDates: [],
+  },
+  {
+    id: "prv-6",
+    name: "Dilshan Perera",
+    kind: "Freelancer",
+    role: "DJ",
+    category: "DJ",
+    categoryLabel: "DJ",
+    districts: ["Colombo"],
+    verified: true,
+    badge: "Rising",
+    rating: 4.5,
+    reviews: 33,
+    jobs: 47,
+    fromLkr: 45000,
+    rank: 3,
+    bio: "House and Sri Lankan classics. Brings his own lighting rig.",
+    services: [{ name: "DJ set, 3 hours", detail: "Own decks and lighting", fromLkr: 45000 }],
+    portfolio: [true, false, false],
+    ratings: { quality: 4.6, punctuality: 4.4, communication: 4.5, value: 4.4 },
+    reviewList: someReviews("Rooftop Sessions Vol. 1"),
+    bookedDates: [],
+  },
+  {
+    id: "prv-7",
+    name: "Lumen Stage Co.",
+    kind: "Vendor",
+    role: "Staging",
+    category: "Staging",
+    categoryLabel: "Staging and trussing",
+    districts: ["Colombo", "Gampaha"],
+    verified: true,
+    badge: null,
+    rating: 4.2,
+    reviews: 27,
+    jobs: 60,
+    fromLkr: 80000,
+    rank: 2,
+    bio: "Stages, trussing and barriers for outdoor shows.",
+    services: [{ name: "Stage, 8 x 6 m", detail: "Set up and taken down by our crew", fromLkr: 80000 }],
+    portfolio: [false, false],
+    ratings: { quality: 4.3, punctuality: 4.1, communication: 4.2, value: 4.2 },
+    reviewList: [],
+    bookedDates: [],
+  },
+  {
+    id: "prv-10",
+    name: "Pulse Sound & Light",
+    kind: "Vendor",
+    role: "Sound and lighting",
+    category: "Sound and lighting",
+    categoryLabel: "Sound and lighting",
+    districts: ["Colombo", "Gampaha", "Kalutara"],
+    verified: true,
+    badge: "Top Rated",
+    rating: 4.8,
+    reviews: 75,
+    jobs: 140,
+    fromLkr: 150000,
+    rank: 1,
+    bio: "PA, stage lighting and an engineer for crowds up to 5,000.",
+    services: [{ name: "Festival PA and lights", detail: "Engineer and crew included", fromLkr: 150000 }],
+    portfolio: [true, false, false],
+    ratings: { quality: 4.9, punctuality: 4.8, communication: 4.7, value: 4.6 },
+    reviewList: someReviews("Kandy Lake Lights"),
+    bookedDates: [],
+  },
+  {
+    id: "prv-11",
+    name: "Ruwan Silva",
+    kind: "Freelancer",
+    role: "MC",
+    category: "Hosting",
+    categoryLabel: "MC and host",
+    districts: ["Colombo"],
+    verified: true,
+    badge: null,
+    rating: 4.6,
+    reviews: 52,
+    jobs: 88,
+    fromLkr: 20000,
+    rank: 2,
+    bio: "Bilingual MC for concerts and launches.",
+    services: [{ name: "MC, one evening", detail: "Sinhala and English", fromLkr: 20000 }],
+    portfolio: [true, false],
+    ratings: { quality: 4.7, punctuality: 4.6, communication: 4.7, value: 4.5 },
+    reviewList: [],
+    bookedDates: [],
+  },
+];
+
+// The organiser's booking requests and job posts. Colombo Music Fest has Figma's O14; the dates
+// count from tonight, when the samples hold it.
+export function sampleHiring(now: Date): { requests: BookingRequest[]; jobs: JobPost[] } {
+  const day = (days: number) => dayAt(now, days, "10:00").slice(0, 10);
+  const at = (days: number, time: string) => dayAt(now, days, time);
+  const base = {
+    eventId: "evt-colombo-music-fest",
+    date: day(0),
+    startTime: "17:00",
+    endTime: "23:30",
+    location: "Viharamahadevi Park, Colombo 07",
+    fromJob: null,
+  };
+  const photoBrief = {
+    ...noBrief,
+    service: "Photography",
+    duration: "6.5 hours",
+    audience: "3,000",
+    deliverables: "300 edited photos within 7 days",
+    runOfShow: "Gates 5:30 PM · headline set 9:00 PM · finish 11:30 PM",
+  };
+  const split = (total: number, deposit: number) => [
+    { label: "Deposit", amountLkr: deposit, due: day(-19) },
+    { label: "Instalment 1", amountLkr: total - deposit, due: day(0) },
+  ];
+
+  return {
+    requests: [
+      { ...base, id: "req-1", providerId: "prv-3", budgetLkr: 30000, brief: photoBrief, payments: split(30000, 10000), sentAt: at(-1, "11:00"), status: "waiting", answeredAt: null, quote: null },
+      {
+        ...base,
+        id: "req-2",
+        providerId: "prv-6",
+        budgetLkr: 35000,
+        brief: { ...noBrief, service: "DJ set", duration: "3 hours", runOfShow: "Opening set 5:00 PM to 8:00 PM" },
+        payments: [
+          { label: "Deposit", amountLkr: 10000, due: day(-19) },
+          { label: "Instalment 1", amountLkr: 25000, due: day(-1) },
+        ],
+        sentAt: at(-2, "15:20"),
+        status: "quoted",
+        answeredAt: at(-1, "09:40"),
+        quote: {
+          priceLkr: 45000,
+          payments: [
+            { label: "Deposit", amountLkr: 15000, due: "" },
+            { label: "Rest", amountLkr: 30000, due: day(-1) },
+          ],
+          cancellation: "Deposit kept if you cancel within 14 days",
+          message: "The extra covers a second set from 9:30 and my own lighting rig. Happy to start at 5:45 instead of 5.",
+        },
+      },
+      {
+        ...base,
+        id: "req-3",
+        providerId: "prv-1",
+        budgetLkr: 35000,
+        brief: photoBrief,
+        // Figma O22: a paid deposit, an instalment due and one still to come
+        payments: [
+          { label: "Deposit", amountLkr: 10000, due: day(-19) },
+          { label: "Instalment 1", amountLkr: 15000, due: day(0) },
+          { label: "Instalment 2", amountLkr: 10000, due: day(2) },
+        ],
+        sentAt: at(-4, "10:15"),
+        status: "accepted",
+        answeredAt: at(-3, "18:00"),
+        quote: null,
+      },
+      {
+        ...base,
+        id: "req-4",
+        providerId: "prv-7",
+        budgetLkr: 90000,
+        brief: { ...noBrief, service: "Staging", equipment: "Power at the stage" },
+        payments: split(90000, 30000),
+        sentAt: at(-5, "12:00"),
+        status: "declined",
+        answeredAt: at(-4, "10:00"),
+        quote: null,
+      },
+      {
+        ...base,
+        id: "req-5",
+        providerId: "prv-10",
+        budgetLkr: 180000,
+        brief: { ...noBrief, service: "Sound and lighting", audience: "3,000" },
+        payments: split(180000, 60000),
+        sentAt: at(-25, "10:00"),
+        status: "accepted",
+        answeredAt: at(-24, "16:00"),
+        quote: null,
+      },
+      {
+        ...base,
+        id: "req-6",
+        providerId: "prv-11",
+        budgetLkr: 25000,
+        brief: { ...noBrief, service: "MC" },
+        payments: split(25000, 5000),
+        sentAt: at(-20, "10:00"),
+        status: "cancelled",
+        answeredAt: at(-19, "10:00"),
+        quote: null,
+        // Figma O85: the provider cancelled, more than 7 days out
+        cancelledBy: "provider",
+        cancelledAt: at(-10, "10:00"),
+        cancelReason: "a family emergency",
+      },
+    ],
+    jobs: [
+      {
+        id: "job-1",
+        eventId: "evt-colombo-music-fest",
+        title: `2 photographers, ${formatShortDate(dayAt(now, 0, "12:00"))}, Colombo`,
+        category: "Photography",
+        date: day(0),
+        startTime: "17:00",
+        endTime: "23:30",
+        district: "Colombo",
+        brief: { ...photoBrief, service: "Event photography, 2 people", deliverables: "300 edited photos each within 7 days" },
+        budgetMinLkr: 25000,
+        budgetMaxLkr: 40000,
+        closesAt: at(0, "15:00"),
+        status: "open",
+        postedAt: at(-6, "10:00"),
+        seenBy: 42,
+        quotes: [
+          { id: "q-1", providerId: "prv-3", priceLkr: 32000, message: "Happy to shoot alongside a second photographer. Edits within 5 days.", status: "open" },
+          { id: "q-2", providerId: "prv-9", priceLkr: 28000, message: "New on Tezera, but I have shot three outdoor festivals this year.", status: "open" },
+          { id: "q-3", providerId: "prv-2", priceLkr: 38000, message: "One of our two shooters can cover this. Edits within 4 days.", status: "open" },
+          { id: "q-4", providerId: "prv-8", priceLkr: 41000, message: "Both evening sets, with a quick turnaround.", status: "open" },
+        ],
+      },
+      {
+        id: "job-2",
+        eventId: "evt-colombo-music-fest",
+        title: "Sound and lighting",
+        category: "Sound and lighting",
+        date: day(0),
+        startTime: "14:00",
+        endTime: "23:59",
+        district: "Colombo",
+        brief: { ...noBrief, service: "PA and stage lighting", audience: "3,000" },
+        budgetMinLkr: 150000,
+        budgetMaxLkr: 200000,
+        closesAt: at(-3, "18:00"),
+        status: "closed",
+        postedAt: at(-30, "10:00"),
+        seenBy: 12,
+        quotes: [
+          { id: "q-5", providerId: "prv-10", priceLkr: 180000, message: "PA, lights and an engineer.", status: "not-chosen" },
+          { id: "q-6", providerId: "prv-7", priceLkr: 195000, message: "Lights only, with trussing.", status: "not-chosen" },
+          { id: "q-7", providerId: "prv-5", priceLkr: 170000, message: "Video wall and lights.", status: "not-chosen" },
+        ],
+      },
+    ],
+  };
+}
+
+// Messages with providers on the event's Hiring tab (O14). Read-only until the Messages slice.
+export const sampleHiringMessages: Record<string, { id: string; name: string; text: string }[]> = {
+  "evt-colombo-music-fest": [
+    { id: "msg-1", name: "Dilshan Perera", text: "Can we start at 5:45?" },
+    { id: "msg-2", name: "Pulse Sound & Light", text: "Rigging starts at 2 PM" },
+  ],
+};
+
+// The search page's providers (O80), from the hiring samples.
+export const sampleProviders: ProviderResult[] = sampleHireProviders.map((p) => ({
+  id: p.id,
+  name: p.name,
+  kind: p.kind === "Vendor" ? "vendor" : "freelancer",
+  category: p.categoryLabel,
+  rating: p.rating,
+  priceFrom: p.fromLkr,
+  badge: p.badge === "New" ? null : p.badge,
+}));
+
+// ---------- Payments (O60–O65) ----------
+
+// The organiser's payment account and history in `next dev`. The sandbox account is connected,
+// as on O60; O61 can change it.
+export function samplePayments(now: Date): { account: PaymentAccount | null; records: PaymentRecord[] } {
+  const at = (days: number, time: string) => dayAt(now, days, time);
+  const fest = "evt-colombo-music-fest";
+  const card = "PayHere sandbox · card ending 4242";
+  return {
+    account: { merchantId: "1218007", accountName: "Agastra Events (Pvt) Ltd", connectedAt: at(-40, "10:00") },
+    records: [
+      { id: "TZ-R-55290", kind: "paid", party: "Pulse Sound & Light", label: "Deposit paid · sound and lighting", amountLkr: 60000, at: at(-23, "11:30"), eventId: fest, requestId: "req-5", partIndex: 0, method: card },
+      { id: "TZ-R-55291", kind: "paid", party: "Tharindu Jayawardena", label: "Deposit paid · photography", amountLkr: 10000, at: at(-2, "09:14"), eventId: fest, requestId: "req-3", partIndex: 0, method: card },
+      { id: "TZ-R-55292", kind: "commission", party: "Tezera", label: "Commission 5% · shown, not charged", amountLkr: 500, at: at(-2, "09:14"), eventId: fest, requestId: "req-3", partIndex: null, method: "Not charged" },
+      { id: "TZ-R-55293", kind: "refunded", party: "Ruwan Silva", label: "Deposit refunded · MC cancelled", amountLkr: 5000, at: at(-10, "10:30"), eventId: fest, requestId: "req-6", partIndex: 0, method: card },
+      { id: "TZ-R-55294", kind: "received", party: "Spice Route Catering", label: "Stall fee received · B-14 · Colombo Music Fest", amountLkr: 15000, at: at(0, "08:40"), eventId: fest, requestId: null, partIndex: null, method: card },
+    ],
+  };
+}
+
+// ---------- Feed and analytics (O26, O94, O50) ----------
+
+// The organiser's feed posts in `next dev`, Figma's four, newest first.
+export function sampleFeedPosts(now: Date): FeedPost[] {
+  const at = (days: number, time: string) => dayAt(now, days, time);
+  const fest = "evt-colombo-music-fest";
+  const c = (id: string, by: string, text: string, when: string, mine = false) => ({ id, by, text, at: when, mine, hidden: false });
+  return [
+    {
+      id: "post-1",
+      kind: "reel",
+      eventId: fest,
+      caption: "Line-up reveal · Music Fest",
+      fileName: "lineup-reveal.mp4",
+      postedAt: at(-3, "18:00"),
+      likes: 1200,
+      views: 14800,
+      clicks: 880,
+      comments: [
+        c("cm-1", "Sanduni Fernando", "Who's closing the night?", at(-3, "18:20")),
+        c("cm-2", "Ravindu Jayasuriya", "Can't wait! Is there parking near Gate 2?", at(-3, "19:05")),
+        c("cm-3", "Agastra Events", "Yes, Green Path car park from 4 PM.", at(-3, "19:30"), true),
+        c("cm-4", "Brew Bros", "See you at C-02!", at(-2, "09:00")),
+      ],
+    },
+    { id: "post-2", kind: "poster", eventId: fest, caption: "Gates, parking and what to bring", fileName: "gates.png", postedAt: at(-4, "12:00"), likes: 640, views: 8100, clicks: 410, comments: [] },
+    { id: "post-3", kind: "image", eventId: "evt-jazz-on-the-green", caption: "Jazz on the Green is on", fileName: "jazz.jpg", postedAt: at(-6, "10:00"), likes: 410, views: 5300, clicks: 260, comments: [] },
+    { id: "post-4", kind: "reel", eventId: fest, caption: "Behind the scenes: the stage build", fileName: "stage-build.mp4", postedAt: at(-7, "17:00"), likes: 2300, views: 21400, clicks: 1020, comments: [] },
+  ];
+}
+
+// The analytics numbers with no records behind them yet (O50).
+export const sampleAnalytics: AnalyticsExtras = {
+  pageViews: 18400,
+  newFollowers: 214,
+  sources: [
+    { label: "Feed posts", percent: 42 },
+    { label: "Search", percent: 27 },
+    { label: "Shared links", percent: 21 },
+    { label: "Community boards", percent: 10 },
+  ],
+  followerWeeks: [986, 1010, 1040, 1072, 1105, 1150, 1200],
+};
+
+// ---------- The organiser's profile (O27, O42–O45) ----------
+
+// Agastra Events, as Figma draws them.
+export function sampleProfile(now: Date): OrganiserProfile {
+  return {
+    name: "Agastra Events",
+    eventTypes: "Concerts and festivals",
+    basedIn: "Colombo",
+    about: "Concerts and music festivals in Colombo. We run Colombo Music Fest and Jazz on the Green.",
+    phone: "+94 71 234 5678",
+    email: "agastra@example.com",
+    website: "instagram.com/agastraevents",
+    shortLink: "agastra",
+    shortLinkChangedAt: null,
+    showContact: true,
+    showTrackRecord: true,
+    showFollowers: true,
+    verified: true,
+    verifiedAt: dayAt(now, -48, "10:00"),
+    nameCheckPending: false,
+    badge: "Top Rated",
+    rating: 4.6,
+    reviews: 214,
+    rank: 4,
+    followers: 1200,
+    followersThisWeek: 86,
+    eventsRun: 38,
+    trackRecord: { wentAhead: 36, postponed: 2, cancelled: 0, paidOnTimePercent: 96 },
+    history: [
+      { id: "past-1", title: "Indie Night Vol. 3", venue: "Barefoot Garden", date: dayAt(now, -61, "19:00").slice(0, 10), going: 320, rating: 4.5 },
+      { id: "past-2", title: "Colombo Music Fest 2025", venue: "Viharamahadevi Park", date: "2025-12-13", going: 2140, rating: 4.6 },
+      { id: "past-3", title: "Jazz on the Green 2025", venue: "Race Course Grounds", date: "2025-12-14", going: 710, rating: 4.8 },
+    ],
+  };
+}
+
+// The organiser's followers (O43), newest first.
+export const sampleFollowers: Follower[] = [
+  { id: "f-1", name: "Sanduni Fernando", role: "Consumer", detail: "going to Colombo Music Fest", providerId: null },
+  { id: "f-2", name: "Ravindu Jayasuriya", role: "Consumer", detail: "followed Mon", providerId: null },
+  { id: "f-3", name: "Spice Route Catering", role: "Vendor", detail: "stall B-14 at your fest", providerId: null },
+  { id: "f-4", name: "Nethmi Silva", role: "Consumer", detail: "followed Sun", providerId: null },
+  { id: "f-5", name: "Tharindu Jayawardena", role: "Freelancer", detail: "Photographer", providerId: "prv-1" },
+];
+
+// ---------- Verification (O28, O38–O41) ----------
+
+// Approved, as the profile's Verified badge (O27, O40) shows.
+export function sampleVerification(now: Date): Verification {
+  return {
+    status: "approved",
+    documents: [
+      { id: "doc-1", name: "Document-1.pdf", kind: "Business registration", state: "ok" },
+      { id: "doc-2", name: "Document-2.jpg", kind: "NIC, front and back", state: "ok" },
+    ],
+    submittedAt: dayAt(now, -50, "10:20"),
+    decidedAt: dayAt(now, -48, "10:00"),
+    reason: "",
+  };
+}
+
+// ---------- Reviews and leaderboards (O29–O31, O46–O49) ----------
+
+// How many reviews of each kind the organiser has; the samples below are the latest few.
+export const sampleReviewTotals = { provider: 38, consumer: 176 };
+
+// The latest reviews of the organiser, from providers (O29) and consumers (O49).
+export function sampleReceivedReviews(now: Date): ReceivedReview[] {
+  const r = (id: string, from: "provider" | "consumer", by: string, byRole: string, event: string, days: number, overall: number, scores: [string, number][], text: string): ReceivedReview => ({
+    id, from, by, byRole, event, at: dayAt(now, days, "12:00"), overall, scores: scores.map(([label, value]) => ({ label, value })), text, reply: null, reported: null,
+  });
+  return [
+    r("rr-1", "provider", "Pulse Sound & Light", "Vendor", "Rooftop Sessions Vol. 1", -26, 5, [["Payment", 5], ["Communication", 5], ["Planning", 4.5]], "Paid on time and the run-of-show was clear."),
+    r("rr-2", "provider", "Tharindu Jayawardena", "Freelancer", "Indie Night Vol. 3", -60, 4.5, [["Payment", 5], ["Communication", 4], ["Planning", 4.5]], "Good brief. The stage times moved on the night without warning."),
+    r("rr-3", "provider", "Spice Route Catering", "Vendor", "Colombo Music Fest 2025", -340, 4, [["Payment", 4], ["Communication", 4], ["Planning", 4.5]], "Busy, well-run fest. Power for the stalls arrived late."),
+    r("rr-4", "consumer", "Sanduni Fernando", "", "Colombo Music Fest 2025", -338, 5, [["Organisation", 5], ["Value", 4.5]], "Great line-up and the map made finding food easy."),
+    r("rr-5", "consumer", "Ravindu Jayasuriya", "", "Rooftop Sessions Vol. 1", -4, 4, [["Organisation", 4], ["Value", 3.5]], "Loved the music. Drinks queue was long after 9."),
+    r("rr-6", "consumer", "Nethmi Silva", "", "Jazz on the Green 2025", -337, 4.5, [["Organisation", 5], ["Value", 4.5]], "Calm, well-run evening. More seating next time please."),
+  ];
+}
+
+// The averages over all of the organiser's reviews, by part (O29, O49).
+export const sampleReviewAverages = {
+  provider: [["Payment", 4.7], ["Communication", 4.5], ["Planning", 4.6]] as [string, number][],
+  consumer: [["Organisation", 4.7], ["Value for money", 4.4], ["Overall experience", 4.6], ["Facilities", 4.2]] as [string, number][],
+};
+
+// Who the organiser can still review from Rooftop Sessions Vol. 1 (O29's "Waiting for your
+// review", O57). The ids match O57's rows.
+export function sampleReviewTasks(now: Date): ReviewTask[] {
+  const ended = dayAt(now, -5, "22:30");
+  const closes = dayAt(now, 9, "22:30");
+  return [
+    { id: "bk-1", name: "Pulse Sound & Light", kind: "Sound and lighting", eventTitle: "Rooftop Sessions Vol. 1", completedOn: ended, closesOn: closes },
+    { id: "st-1", name: "Batik Lane", kind: "Stall vendor", eventTitle: "Rooftop Sessions Vol. 1", completedOn: ended, closesOn: closes },
+  ];
+}
+
+// "Top organisers" (O31). Agastra Events is the signed-in organiser.
+export const sampleOrganiserRanks: OrganiserRank[] = [
+  { rank: 1, name: "Hill Events", rating: 4.8, reviews: 412, tier: "Top Rated", districts: ["Kandy"], you: false },
+  { rank: 2, name: "Punchline LK", rating: 4.7, reviews: 268, tier: "Top Rated", districts: ["Colombo"], you: false },
+  { rank: 3, name: "TechLK", rating: 4.7, reviews: 190, tier: "Top Rated", districts: ["Colombo", "Gampaha"], you: false },
+  { rank: 4, name: "Agastra Events", rating: 4.6, reviews: 214, tier: "Top Rated", districts: ["Colombo"], you: true },
+  { rank: 5, name: "SoundWave LK", rating: 4.5, reviews: 96, tier: "Rising", districts: ["Galle"], you: false },
+  { rank: 6, name: "Lotus Live", rating: 4.4, reviews: 58, tier: "Rising", districts: ["Colombo"], you: false },
+];
+
+// ---------- Messages and community (O23–O25, O90–O93) ----------
+
+// The organiser's conversations (O23), Figma's four.
+export function sampleConversations(now: Date): Conversation[] {
+  const at = (days: number, time: string) => dayAt(now, days, time);
+  const m = (id: string, mine: boolean, when: string, text: string, extra: Partial<{ file: { name: string; label: string }; image: boolean }> = {}) => ({
+    id, mine, at: when, text, file: extra.file ?? null, image: extra.image ?? false,
+  });
+  return [
+    {
+      id: "c-1", name: "Tharindu Jayawardena", kind: "Freelancer", detail: "Photographer · Verified", providerId: "prv-1", unread: 0, blocked: false, reported: null,
+      messages: [
+        m("m-1", false, at(-4, "10:00"), "Hi! Here's my quote for the 12th."),
+        m("m-2", false, at(-4, "10:01"), "", { file: { name: "Quote.pdf", label: "Quote · PDF" } }),
+        m("m-3", true, at(-4, "11:30"), "Thanks. Here's the brief and run-of-show."),
+        m("m-4", true, at(-4, "11:31"), "", { file: { name: "Brief.pdf", label: "Brief · PDF" } }),
+        m("m-5", false, at(-4, "12:10"), "From last year's fest", { image: true }),
+        m("m-6", false, at(0, "17:02"), "Booked! See you at Gate 1 at 5."),
+      ],
+    },
+    {
+      id: "c-2", name: "Spice Route Catering", kind: "Vendor", detail: "Stall B-14 · Verified", providerId: null, unread: 0, blocked: false, reported: null,
+      messages: [m("m-7", false, at(-1, "15:00"), "Our menu for stall B-14 is up")],
+    },
+    {
+      id: "c-3", name: "Sanduni Fernando", kind: "Consumer", detail: "Going to Colombo Music Fest", providerId: null, unread: 0, blocked: false, reported: null,
+      messages: [m("m-8", false, at(0, "09:00"), "Is the show still on tonight?")],
+    },
+    {
+      id: "c-4", name: "Dilshan Perera", kind: "Freelancer", detail: "DJ · Verified", providerId: "prv-6", unread: 2, blocked: false, reported: null,
+      messages: [m("m-9", false, at(-1, "09:40"), "Sent you my own quote."), m("m-10", false, at(-1, "09:41"), "Can we start at 5:45?")],
+    },
+    {
+      id: "c-5", name: "Quick Promo LK", kind: "Vendor", detail: "Flyers and banners", providerId: null, unread: 0, blocked: true, blockedAt: at(-36, "10:00"), reported: "Spam or scam",
+      messages: [m("m-11", false, at(-37, "10:00"), "Cheap flyers!!! Pay us first and we print tomorrow.")],
+    },
+  ];
+}
+
+// Communities about topics and cities (O24).
+export const sampleCommunities2: Community[] = [
+  { id: "com-music", name: "Colombo Music Scene", about: "Live music in Colombo: gigs, line-ups and venues.", members: 4200, newPosts: 12, joined: true },
+  { id: "com-organisers", name: "Event Organisers LK", about: "Organisers swapping notes on venues, permits and suppliers.", members: 640, newPosts: 3, joined: true },
+  { id: "com-food", name: "Food Festivals LK", about: "Food fairs and night markets around the island.", members: 2800, newPosts: 4, joined: true },
+  { id: "com-live", name: "Live Music Sri Lanka", about: "Bands, DJs and shows across Sri Lanka.", members: 6100, newPosts: 9, joined: false },
+  { id: "com-galle", name: "Galle Events", about: "What's on in Galle and the south coast.", members: 1100, newPosts: 2, joined: false },
+];
+
+// Threads on the event boards (O16, O24) and in communities (O25).
+export function sampleThreads(now: Date): CommunityThread[] {
+  const at = (days: number, time: string) => dayAt(now, days, time);
+  const fest = "evt-colombo-music-fest";
+  const t = (id: string, where: { eventId?: string; communityId?: string }, title: string, author: string, authorRole: string, verified: boolean, when: string, upvotes: number, replyCount: number, pinned = false) => ({
+    id, eventId: where.eventId ?? null, communityId: where.communityId ?? null, title, body: "", author, authorRole, verified, at: when, upvotes, replies: [], replyCount, pinned, linkedEventId: null, reported: false,
+  });
+  return [
+    t("th-1", { eventId: fest }, "Set times are up: see the Line-up tab", "Agastra Events", "Organiser", true, at(-2, "10:00"), 64, 12, true),
+    { ...t("th-2", { eventId: fest }, "Who's going? Meet at Gate 2 at 5:30", "Sanduni", "Consumer", false, at(-1, "21:00"), 52, 34), body: "A few of us are meeting at Gate 2. Come say hi!" },
+    t("th-3", { eventId: fest }, "Carpool from Nugegoda, 2 seats left", "Ravindu", "Consumer", false, at(0, "08:00"), 17, 8),
+    t("th-4", { eventId: fest }, "Which stalls are worth it?", "Spice Route Catering", "Vendor", false, at(-3, "13:00"), 30, 21),
+    t("th-5", { eventId: "evt-jazz-on-the-green" }, "Bring a mat or rent one?", "Nethmi", "Consumer", false, at(-1, "18:00"), 9, 3),
+    {
+      ...t("th-6", { communityId: "com-music" }, "Best open-air gigs this December?", "Nethmi Silva", "Consumer", false, at(-3, "10:00"), 48, 18),
+      body: "Looking for outdoor shows in Colombo with good food stalls. What is everyone going to?",
+      linkedEventId: fest,
+      replies: [
+        { id: "rp-1", author: "Agastra Events", authorRole: "Organiser", verified: true, at: at(-3, "11:00"), text: "Come to ours! The line-up and the stall list are on the event page.", upvotes: 12 },
+        { id: "rp-2", author: "Brew Bros", authorRole: "Vendor", verified: false, at: at(-3, "12:00"), text: "We'll be at stall C-02 with cold brew.", upvotes: 5 },
+        { id: "rp-3", author: "Ravindu Jayasuriya", authorRole: "Consumer", verified: false, at: at(-2, "09:00"), text: "Jazz on the Green looks good too.", upvotes: 3 },
+      ],
+    },
+    t("th-7", { communityId: "com-organisers" }, "Who do you use for barricades?", "Hill Events", "Organiser", true, at(-2, "09:00"), 14, 6),
+    t("th-8", { communityId: "com-food" }, "Night market permits in Colombo", "Lotus Live", "Organiser", false, at(-1, "16:00"), 8, 4),
+  ];
+}
+
+// ---------- Account settings (O32) ----------
+
+export function sampleAccountSettings(now: Date): AccountSettings {
+  return {
+    email: "agastra@example.com",
+    passwordChangedAt: dayAt(now, -48, "10:00"),
+    pendingContact: null,
+    notify: { bookings: true, messages: true, stalls: true, questions: true, likes: false },
+    language: "en",
+    theme: "light",
   };
 }

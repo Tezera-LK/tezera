@@ -6,6 +6,7 @@ import type { StallType } from "@/lib/data/portal-types";
 import { STALL_TYPES } from "@/lib/stalls";
 import forms from "../forms.module.css";
 import styles from "./Stalls.module.css";
+import tables from "../tables.module.css";
 
 const TEXT = {
   type: "Stall type",
@@ -60,7 +61,7 @@ export default function StallSlotsForm({ action, initial, editing, lastDay, clos
   const invalid = (name: string) => error === name || undefined;
 
   return (
-    <form action={action} className={styles.dialogForm}>
+    <form action={action} className={tables.dialogForm}>
       <fieldset className={styles.typeField}>
         <legend className={styles.fieldTitle}>{TEXT.type}</legend>
         <div className={styles.typePills}>
@@ -136,7 +137,7 @@ export default function StallSlotsForm({ action, initial, editing, lastDay, clos
         </p>
       )}
 
-      <div className={styles.dialogActions}>
+      <div className={tables.dialogActions}>
         <Link href={closeHref} scroll={false} className={`${forms.bigButton} ${forms.bigButtonQuiet}`}>
           {TEXT.cancel}
         </Link>

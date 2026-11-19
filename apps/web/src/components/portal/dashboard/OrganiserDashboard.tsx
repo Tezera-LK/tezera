@@ -113,7 +113,7 @@ export default function OrganiserDashboard({ data, now }: { data: Data; now: Dat
         description={`${organiserName} · ${upcoming(upcomingCount)}`}
         actions={
           <>
-            <ButtonLink>{TEXT.postJob}</ButtonLink>
+            <ButtonLink href={routes.newJob}>{TEXT.postJob}</ButtonLink>
             <ButtonLink href={routes.newEvent} primary>
               {TEXT.createEvent}
             </ButtonLink>

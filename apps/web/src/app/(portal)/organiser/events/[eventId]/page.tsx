@@ -193,7 +193,7 @@ export default async function ManageEventPage({ params, searchParams }: Props) {
           <dl className={styles.tiles}>
             <Tile value={String(work?.requestsSent ?? event.bookings?.requested ?? 0)} label={TEXT.requestsSent} />
             <Tile value={String(work?.quotesReceived ?? 0)} label={TEXT.quotesReceived} />
-            <Tile value={String(event.bookings?.confirmed ?? 0)} label={TEXT.bookings} />
+            <Tile value={String(work?.confirmed ?? event.bookings?.confirmed ?? 0)} label={TEXT.bookings} />
             <Tile value={String(event.stalls?.offered ?? 0)} label={TEXT.stallApplications} />
             <Tile value={String(event.stalls?.approved ?? 0)} label={TEXT.stallsApproved} />
           </dl>
@@ -205,9 +205,9 @@ export default async function ManageEventPage({ params, searchParams }: Props) {
               <h2 id="map-title" className={styles.cardTitle}>
                 {TEXT.venueMap}
               </h2>
-              {work && <Chip tone="good">{EVENT_STATUS.published.label}</Chip>}
+              {work?.map && <Chip tone="good">{EVENT_STATUS.published.label}</Chip>}
             </div>
-            <p className={ui.muted}>{work ? TEXT.mapVersion(work.mapVersion, ago(work.mapPublishedAt, now)) : TEXT.noMap}</p>
+            <p className={ui.muted}>{work?.map ? TEXT.mapVersion(work.map.version, ago(work.map.publishedAt, now)) : TEXT.noMap}</p>
             {/* the map builder is its own slice (O11–O71) */}
             <MaybeLink className={`${ui.rowButton} ${ui.rowButtonWhite} ${styles.centred}`}>{TEXT.openMapBuilder}</MaybeLink>
           </section>
@@ -605,7 +605,8 @@ const PAST_TEXT = {
 } as const;
 
 // An event that has ended (Figma O57): how it went, bookings to close, vendors to review.
-// Reviewing and marking bookings complete are the Bookings and Reviews slices.
+// "Review" opens the review form (O30); "Mark completed" on these older sample bookings waits
+// for them to move into the booking records.
 async function PastEvent({ event }: { event: ManagedEvent }) {
   const session = await requireRole("organiser");
   const summary = await getPastEventSummary(session, event.id);
@@ -658,7 +659,9 @@ async function PastEvent({ event }: { event: ManagedEvent }) {
                     </td>
                     <td>
                       {b.status === "completed" ? (
-                        <MaybeLink className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>{PAST_TEXT.review}</MaybeLink>
+                        <MaybeLink href={routes.writeReview(b.id)} className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>
+                          {PAST_TEXT.review}
+                        </MaybeLink>
                       ) : (
                         <MaybeLink className={`${ui.rowButton} ${ui.rowButtonWhite}`}>{PAST_TEXT.markCompleted}</MaybeLink>
                       )}
@@ -702,7 +705,9 @@ async function PastEvent({ event }: { event: ManagedEvent }) {
                       <Chip tone="neutral">{PAST_TEXT.ended}</Chip>
                     </td>
                     <td>
-                      <MaybeLink className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>{PAST_TEXT.review}</MaybeLink>
+                      <MaybeLink href={routes.writeReview(s.id)} className={`${ui.rowButton} ${ui.rowButtonPrimary}`}>
+                        {PAST_TEXT.review}
+                      </MaybeLink>
                     </td>
                   </tr>
                 ))}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ROLE_LABEL, type PortalRole } from "@/lib/portal-roles";
 import { routes } from "@/lib/routes";
 import { MessageIcon, SearchIcon } from "./icons";
-import { NAV_TEXT, NOTIFICATIONS_TEXT, PROFILE_MENU, TOP_BAR, TOP_BAR_TEXT, searchHint, type NavItem } from "./nav";
+import { NAV_TEXT, NOTIFICATIONS_TEXT, TOP_BAR, TOP_BAR_TEXT, profileMenu, searchHint, type NavItem } from "./nav";
 import NotificationsMenu, { type NotificationPreview } from "./NotificationsMenu";
 import ProfileMenu from "./ProfileMenu";
 import styles from "./PortalShell.module.css";
@@ -17,8 +17,8 @@ export type TopBarProps = {
 };
 
 // The bar across the top of every signed-in page (Figma O05): logo, search, messages,
-// notifications, the role and the profile. Messages belongs to another ticket (EP-09); until it's
-// built its button is shown but doesn't do anything.
+// notifications, the role and the profile. The messages button opens the organiser's
+// conversations; other roles get theirs with their own pages (EP-09).
 export default function TopBar({ role, notifications, account }: TopBarProps) {
   return (
     <header className={styles.topBar}>
@@ -41,14 +41,14 @@ export default function TopBar({ role, notifications, account }: TopBarProps) {
       </form>
 
       <div className={styles.topActions}>
-        <Shortcut item={TOP_BAR.messages}>
+        <Shortcut item={role === "organiser" ? { ...TOP_BAR.messages, href: routes.messages } : TOP_BAR.messages}>
           <MessageIcon />
         </Shortcut>
         <NotificationsMenu {...notifications} text={NOTIFICATIONS_TEXT} />
         {role && <span className={styles.roleChip}>{ROLE_LABEL[role]}</span>}
         <ProfileMenu
           account={account && role ? { ...account, roleLabel: ROLE_LABEL[role] } : null}
-          items={PROFILE_MENU}
+          items={profileMenu(role)}
           label={TOP_BAR_TEXT.profile}
         />
       </div>

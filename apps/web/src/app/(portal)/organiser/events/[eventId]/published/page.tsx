@@ -29,11 +29,12 @@ const TEXT = {
   openBoard: "Open board",
 } as const;
 
-// What comes next after publishing; each opens a later slice, so none are links yet.
-const NEXT_STEPS = [
+// What comes next after publishing. The venue map and posts are later slices, so those two
+// aren't links yet.
+const NEXT_STEPS: { title: string; detail: string; href?: (eventId: string) => string }[] = [
   { title: "Add a venue map", detail: "Zones, stalls and pins" },
-  { title: "Open stall slots", detail: "Food, drinks, merchandise" },
-  { title: "Hire providers", detail: "Send requests or post a job" },
+  { title: "Open stall slots", detail: "Food, drinks, merchandise", href: (id) => `${routes.eventStalls(id)}?dialog=slots` },
+  { title: "Hire providers", detail: "Send requests or post a job", href: routes.eventHiring },
   { title: "Post about it", detail: "Image or reel linked to the event" },
 ];
 
@@ -84,7 +85,7 @@ export default async function EventPublishedPage({ params }: { params: Promise<{
       <ul className={styles.steps}>
         {NEXT_STEPS.map((step) => (
           <li key={step.title}>
-            <MaybeLink className={`${ui.row} ${styles.announcement}`}>
+            <MaybeLink href={step.href?.(event.id)} className={`${ui.row} ${styles.announcement}`}>
               <Thumb size={36} />
               <span className={ui.rowText}>
                 <span className={ui.rowTitle}>{step.title}</span>
