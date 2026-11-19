@@ -81,17 +81,18 @@ import type {
 } from "@/lib/data/portal-types";
 import type { Session } from "@/lib/auth/session";
 import { newestFirst } from "@/lib/format";
+import { previewMode } from "@/lib/preview";
 import { routes } from "@/lib/routes";
 
 // The only way signed-in portal pages read data, like lib/data/public.ts for public pages.
 // Pages call these functions and never talk to the backend directly.
 //
 // STAND-IN until EN-03 (data) and EN-04 (sign-in) are wired in: sample records from
-// portal-samples.ts in `next dev`, nothing in production builds, so a deployed site never shows
-// made-up bookings. Every function takes the session, because the real versions will read as that user.
+// portal-samples.ts in preview mode (`next dev` and dev.tezera.lk, lib/preview.ts), nothing in other
+// builds, so the live site never shows made-up bookings. Every function takes the session, because the real versions will read as that user.
 // React cache(): the layout and the page share one read per request.
 
-const useSamples = process.env.NODE_ENV === "development";
+const useSamples = previewMode;
 
 // The signed-in account, for the profile menu (O82). null for an account with no role yet.
 export const getAccount = cache(async (session: Session): Promise<Account | null> => {

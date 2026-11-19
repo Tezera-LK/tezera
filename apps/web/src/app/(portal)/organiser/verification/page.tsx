@@ -14,6 +14,7 @@ import { requireRole } from "@/lib/auth/session";
 import { getVerification } from "@/lib/data/portal";
 import type { Verification } from "@/lib/data/portal-types";
 import { formatShortDate, formatTime, formatWhen } from "@/lib/format";
+import { previewMode } from "@/lib/preview";
 import { routes } from "@/lib/routes";
 import { devDecide, devReset, submitDocuments } from "./actions";
 
@@ -66,7 +67,7 @@ const TEXT = {
   support: "Message support",
 } as const;
 
-const dev = process.env.NODE_ENV === "development";
+const dev = previewMode;
 
 // Verification (Figma O28 not started, O38 pending, O39 rejected, O40 approved): one page that
 // shows wherever the organiser is.

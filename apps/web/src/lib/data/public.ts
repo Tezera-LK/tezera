@@ -4,15 +4,16 @@ import { allStoredEvents, findStoredEvent } from "@/lib/data/event-store";
 import { sampleOrganiserProfile } from "@/lib/data/portal-samples";
 import { sampleEvents, sampleOrganisers, sampleVendors } from "@/lib/data/samples";
 import type { PublicEvent, PublicOrganiser, PublicVendor } from "@/lib/data/types";
+import { previewMode } from "@/lib/preview";
 
 // The only way public pages read data. Pages call these functions and never talk to the backend
 // directly, so the backend can change (Amplify, or NestJS if the team picks it) without touching them.
 //
-// STAND-IN until EN-03 and EN-04 exist: sample records in `next dev`, nothing in production builds,
-// so a deployed site never shows made-up events. Phase B replaces the insides with reads as a guest.
+// STAND-IN until EN-03 and EN-04 exist: sample records in preview mode (`next dev` and dev.tezera.lk,
+// lib/preview.ts), nothing in other builds, so the live site never shows made-up events. Phase B replaces the insides with reads as a guest.
 // React cache(): generateMetadata() and the page share one read per request.
 
-const useSamples = process.env.NODE_ENV === "development";
+const useSamples = previewMode;
 
 export const getPublicEvent = cache(async (eventId: string): Promise<PublicEvent | null> => {
   if (!useSamples) return null;
