@@ -51,9 +51,10 @@ export function startShow(root, opts = {}) {
     tb.btns.forEach((b, k) => { b.setAttribute("aria-selected", String(k === i)); b.tabIndex = k === i ? 0 : -1; });
     tb.b.classList.remove("flick");
     void tb.b.offsetWidth; // restart the scan-in
+    tb.b.srcset = b0.dataset.srcset;
     tb.b.src = b0.dataset.src;
     tb.b.alt = `${b0.dataset.title}: ${b0.dataset.point}`;
-    if (reduce) tb.a.src = tb.b.src;
+    if (reduce) { tb.a.srcset = tb.b.srcset; tb.a.src = tb.b.src; }
     else tb.b.classList.add("flick");
     tb.capTitle.textContent = b0.dataset.title;
     tb.capText.textContent = b0.dataset.point;
@@ -61,7 +62,7 @@ export function startShow(root, opts = {}) {
   for (const root2 of root.querySelectorAll(".role")) {
     const id = root2.dataset.stop;
     const tb = { id, idx: 0, pinUntil: 0, wasOn: false, base: 0, btns: [...root2.querySelectorAll('[role="tab"]')], a: root2.querySelector("img.a"), b: root2.querySelector("img.b"), capTitle: root2.querySelector(".cap b"), capText: root2.querySelector(".cap span") };
-    tb.b.addEventListener("animationend", () => (tb.a.src = tb.b.src));
+    tb.b.addEventListener("animationend", () => { tb.a.srcset = tb.b.srcset; tb.a.src = tb.b.src; });
     tb.btns.forEach((b, i) => {
       b.addEventListener("click", () => { selectTab(tb, i); tb.pinUntil = performance.now() + 20000; });
       b.addEventListener("keydown", (ev) => {
@@ -150,6 +151,18 @@ export function startShow(root, opts = {}) {
     T.tracks[key] = Object.assign(T.tracks[key] || {}, { anchorClock: atClock, anchorPos: pos });
   }
 
+  // songs load one at a time: the playing one first, the next one in the background well before its crossfade,
+  // and a song is freed once it has faded out (it comes back from the browser cache when the playlist loops)
+  const decoding = {};
+  function loadSong(key, ctx = T.ctx) {
+    if (T.buffers[key]) return Promise.resolve(T.buffers[key]);
+    return (decoding[key] ||= fetch(SONGS[key].src)
+      .then((r) => r.arrayBuffer())
+      .then((b) => ctx.decodeAudioData(b))
+      .then((buf) => { T.buffers[key] = buf; return buf; })
+      .finally(() => { delete decoding[key]; }));
+  }
+
   // audio graph per song: source -> lowpass -> gain -> bus (analyser) -> master
   function startSource(key, when, offset, gain0) {
     if (!T.ctx || !T.buffers[key]) return;
@@ -164,7 +177,8 @@ export function startShow(root, opts = {}) {
     const gain = T.ctx.createGain();
     gain.gain.value = gain0;
     src.connect(filter).connect(gain).connect(T.bus);
-    src.start(Math.max(T.ctx.currentTime, when), Math.max(0, offset));
+    const late = Math.max(0, T.ctx.currentTime - when); // a song that starts late joins in step with the clock
+    src.start(Math.max(T.ctx.currentTime, when), Math.max(0, offset + late));
     Object.assign(tr, { src, filter, gain });
   }
   function stopSource(key, when) {
@@ -187,6 +201,12 @@ export function startShow(root, opts = {}) {
     if (T.ctx) scheduleAudio(T.next);
   }
   function scheduleAudio(n) {
+    if (!T.buffers[n.to]) {
+      // load it in the background: shortly after this crossfade settles, or now if the hand-off is close
+      const wait = n.tb - clock() > 40 ? 15000 : 0;
+      setTimeout(() => { if (!dead) loadSong(n.to).then(() => { if (!dead && T.next === n) scheduleAudio(n); }).catch(() => {}); }, wait);
+      return;
+    }
     const ts = SONGS[n.to];
     startSource(n.to, n.tb, ts.barT(ts.enter), 0.0001);
     const ti = T.tracks[n.to], to = T.tracks[n.from];
@@ -213,6 +233,7 @@ export function startShow(root, opts = {}) {
         setTrackLabel();
       }
       if (now >= n.tb + n.fade) {
+        if (n.from !== T.lead) delete T.buffers[n.from];
         T.next = null;
         scheduleNext();
       } else break;
@@ -228,8 +249,12 @@ export function startShow(root, opts = {}) {
     const AC = window.AudioContext || window.webkitAudioContext;
     const ctx = new AC({ latencyHint: "interactive" });
     try {
-      const bufs = await Promise.all(ORDER.map((k) => fetch(SONGS[k].src).then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b))));
-      ORDER.forEach((k, i) => (T.buffers[k] = bufs[i]));
+      // only the song that's playing; a crossfade that finishes while it loads moves on to the next one
+      for (let k = 0; k < 3; k++) {
+        if (T.next && clock() >= T.next.tb) { T.lead = T.next.to; T.next = null; setTrackLabel(); scheduleNext(); }
+        if (T.buffers[T.lead]) break;
+        await loadSong(T.lead, ctx);
+      }
     } catch (e) {
       console.error(e);
       T.loading = false;
@@ -352,7 +377,13 @@ export function startShow(root, opts = {}) {
   };
   // per-frame CSS values, collected here and written at the end of the frame by flushVars
   const VARS = {};
-  function setVar(k, v) { VARS[k] = v; }
+  // phones: the lamp colour reaches the page (text glows, panels, screens) at most ~10 times a second; every change
+  // re-rasters those, and colour fades last seconds, so the steps don't show. The LED wall still gets it every frame.
+  let lampAt = 0;
+  function setVar(k, v) {
+    if (TOUCH && k === "--lamp" && VARS[k] !== undefined) { const t = performance.now(); if (t - lampAt < 100) return; lampAt = t; }
+    VARS[k] = v;
+  }
   const journeyEl = root.querySelector("#journey");
   const panels = STOPS.map((id) => {
     const el = root.querySelector(`[data-stop="${id}"]`);
@@ -365,7 +396,7 @@ export function startShow(root, opts = {}) {
   // them; the inherited --sec and --sec-fill on the page's top-level parts; --prog on the progress bar.
   // Parts inside a stop are written only while it's on stage, the sections after the show only while in view.
   const USES = {
-    "--pulse": ".panel, .led, .screen, .one, .sw .track",
+    "--pulse": TOUCH ? ".led, .screen, .one, .sw .track" : ".panel, .led, .screen, .one, .sw .track",
     "--lamp": ".nav .logo, .panel, .lab, .led, .screen, .lit h2, #hero-main h1, .hub .brand",
   };
   const afterEl = root.querySelector(".after");
@@ -404,22 +435,74 @@ export function startShow(root, opts = {}) {
   }
   // wheel and trackpad glide (touch stays native); same settings as the site's SmoothScroll
   const getLenis = opts.getLenis || (() => null);
-  function goTo(idx) {
-    idx = clamp(idx, 0, STOPS.length - 1);
-    const top = scrollFromU(holdCentre(idx));
+  // a glide to a scroll position, longer for longer trips, so the camera flies through the show on the way
+  function glideTo(top, onDone) {
     const lenis = getLenis();
     if (lenis) {
       const dist = Math.abs(top - scrollY) / VH;
-      lenis.scrollTo(top, { duration: Math.min(3.2, 1.2 + dist * 0.18), easing: (x) => 0.5 - 0.5 * Math.cos(Math.PI * x) });
-    } else scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
+      lenis.scrollTo(top, { duration: Math.min(3.2, 1.2 + dist * 0.18), easing: (x) => 0.5 - 0.5 * Math.cos(Math.PI * x), onComplete: onDone });
+    } else { scrollTo({ top, behavior: reduce ? "auto" : "smooth" }); onDone?.(); }
+  }
+  function goTo(idx) {
+    glideTo(scrollFromU(holdCentre(clamp(idx, 0, STOPS.length - 1))));
+  }
+  // in-page links to the sections after the show (Team, Contact) glide there too: a jump would land on them while
+  // the camera, still racing through the stops behind, drew those stops under them
+  function glideToSection(el) {
+    const top = el.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0);
+    glideTo(top, () => {
+      // keyboard focus follows, as it would for a plain jump
+      if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+      el.focus({ preventScroll: true });
+    });
+  }
+  // settle: if scrolling stops partway through a flight, glide on to the stop it was heading for (resting on a stop,
+  // nothing moves). Waits for the finger to lift and any fling or wheel glide to end.
+  const SNAP = { u: -1, dir: 1, movedAt: 0, touching: false, until: 0 };
+  on(window, "touchstart", () => {
+    SNAP.touching = true;
+    if (performance.now() < SNAP.until) { const lz = getLenis(); if (lz) lz.scrollTo(scrollY, { immediate: true }); SNAP.until = 0; }
+  }, { passive: true });
+  on(window, "touchend", () => (SNAP.touching = false), { passive: true });
+  on(window, "touchcancel", () => (SNAP.touching = false), { passive: true });
+  function settle(now, u) {
+    if (Math.abs(u - SNAP.u) > 0.01) { if (SNAP.u >= 0) SNAP.dir = u > SNAP.u ? 1 : -1; SNAP.u = u; SNAP.movedAt = now; return; }
+    if (SNAP.touching || now < SNAP.until || now - SNAP.movedAt < 160 || OPEN.phase !== "done" || u <= 0 || u >= U_END) return;
+    const lz = getLenis();
+    if (lz && lz.isScrolling === "smooth") return;
+    const W = where(u);
+    if (W.i === W.j) return;
+    const top = scrollFromU(holdCentre(SNAP.dir > 0 ? W.j : W.i));
+    const dur = Math.min(1.1, 0.45 + (Math.abs(top - scrollY) / VH) * 0.5);
+    SNAP.until = now + dur * 1000 + 250;
+    if (lz) lz.scrollTo(top, { duration: dur, easing: (x) => 1 - Math.pow(1 - x, 3) });
+    else scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
   }
   // nav, rail and role buttons jump to a stop; [data-open] opens a dialog
   on(document, "click", (ev) => {
     const a = ev.target.closest("[data-go]");
     if (a) { ev.preventDefault(); goTo(+a.dataset.go); return; }
+    const h = ev.target.closest('a[href^="#"]');
+    const sec = h && h.getAttribute("href").length > 1 && !h.classList.contains("skip-link") ? afterEl.querySelector(h.getAttribute("href")) : null;
+    if (sec) {
+      ev.preventDefault();
+      history.replaceState(history.state, "", h.getAttribute("href"));
+      glideToSection(sec);
+      return;
+    }
     const o = ev.target.closest("[data-open]");
-    if (o) root.querySelector("#" + o.dataset.open).showModal();
+    if (o) openDialog(root.querySelector("#" + o.dataset.open));
   });
+  // a dialog opens in the top layer, over everything, the LED cursor included: raise the cursor (a manual popover)
+  // into the top layer after it, so it stays on top and keeps hugging the dialog's buttons; it drops back on close
+  function openDialog(dlg) {
+    dlg.showModal();
+    if (curEl.popover !== undefined && curEl.isConnected) {
+      if (curEl.matches(":popover-open")) curEl.hidePopover();
+      curEl.showPopover();
+      dlg.addEventListener("close", () => { if (curEl.matches(":popover-open")) curEl.hidePopover(); }, { once: true });
+    }
+  }
   const rail = root.querySelector(".rail");
   const RAIL_NAMES = { hero: "Home", problem: "Why Tezera", audience: "Who it's for", organiser: "Organisers", vendor: "Vendors", freelancer: "Freelancers", attendee: "Attendees", outro: "After the show" };
   POOLS.forEach((p) => { const st = p.el.closest(".stop"); p.pn = st ? panels.find((q) => q.el === st) : null; });
@@ -440,7 +523,20 @@ export function startShow(root, opts = {}) {
     st.textContent = `:root { ${css.join(" ")} }`;
     document.head.appendChild(st);
   })();
+  // phones fade each line in (with the same small rise) on its own layer instead of dissolving it through the
+  // dither masks: a mask change re-rasters the whole stop on every scroll frame, a fade costs the GPU nothing
+  if (TOUCH) root.classList.add("tz-touch");
   function setLevel(item, v) {
+    if (TOUCH) {
+      const lvl = Math.round(clamp(v) * 32);
+      if (lvl === item.lvl) return;
+      item.lvl = lvl;
+      const s = item.n.style;
+      s.visibility = lvl === 0 ? "hidden" : "";
+      s.opacity = lvl >= 32 ? "" : (lvl / 32).toFixed(3);
+      s.translate = lvl >= 32 ? "" : `0 ${((32 - lvl) * 0.25).toFixed(2)}px`;
+      return;
+    }
     const lvl = Math.round(clamp(v) * 16);
     if (lvl === item.lvl) return;
     item.lvl = lvl;
@@ -467,13 +563,26 @@ export function startShow(root, opts = {}) {
   // ============================================================================================
   const canvas = root.querySelector("#stage");
   const ctx2 = canvas.getContext("2d");
+  // phones: the static gap grid over the stage (see buildLayout)
+  const gridEl = document.createElement("canvas");
+  if (TOUCH) { gridEl.className = "stage-grid"; gridEl.setAttribute("aria-hidden", "true"); canvas.after(gridEl); }
   let L = null;
 
+  // the tallest the viewport gets (Chrome on phones hides its address bar while scrolling)
+  const fullHeight = () => {
+    const p = document.createElement("div");
+    p.style.cssText = "position:fixed;left:0;top:0;width:0;height:100lvh;visibility:hidden;pointer-events:none";
+    document.body.appendChild(p);
+    const v = p.offsetHeight;
+    p.remove();
+    return v || innerHeight;
+  };
   function buildLayout() {
-    const w = innerWidth, h = innerHeight;
+    // phones: size the wall for the full-screen height, so it still covers the screen when the address bar hides
+    const w = innerWidth, h = TOUCH ? Math.max(innerHeight, fullHeight()) : innerHeight;
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const narrow = w < 900;
-    const css = narrow ? 7 : 12; // phones: a finer wall, so close-ups keep their detail on a small screen
+    const css = narrow ? 9 : 12; // phones: a finer wall than desktop, so close-ups keep detail on a small screen (9, not 7: the per-cell pass is the phone's biggest cost)
     const cell = Math.round(css * dpr);
     const cols = Math.ceil((w * dpr) / cell), rows = Math.ceil((h * dpr) / cell);
     const lamp = Math.ceil(64 / css);
@@ -589,8 +698,18 @@ export function startShow(root, opts = {}) {
       attendee: { x: P.crowd, y: F - cr * 1.0, fh: cr * 1.4, fw: 24 * u },
     };
 
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
+    if (TOUCH) {
+      // phones: the stage canvas holds one pixel per LED cell and the compositor scales it up (nearest-neighbour,
+      // a whole number of device pixels per cell); the gaps between cells are a static layer drawn once. Each frame
+      // then uploads a tiny image instead of re-rastering two full-screen fills on the phone's GPU.
+      canvas.width = cols; canvas.height = rows;
+      canvas.style.width = `${(cols * cell) / dpr}px`;
+      canvas.style.height = `${(rows * cell) / dpr}px`;
+      canvas.style.imageRendering = "pixelated";
+    } else {
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+    }
     const small = document.createElement("canvas");
     small.width = cols; small.height = rows;
     const sctx = small.getContext("2d");
@@ -603,10 +722,23 @@ export function startShow(root, opts = {}) {
     tc.globalCompositeOperation = "destination-out";
     tc.beginPath(); tc.roundRect(g / 2, g / 2, cell - g, cell - g, Math.round(2 * dpr)); tc.fill();
     const grid = ctx2.createPattern(tile, "repeat");
+    if (TOUCH) {
+      gridEl.width = Math.round(w * dpr); gridEl.height = Math.round(h * dpr);
+      gridEl.style.width = `${w}px`; gridEl.style.height = `${h}px`;
+      const gx = gridEl.getContext("2d");
+      gx.fillStyle = gx.createPattern(tile, "repeat");
+      gx.fillRect(0, 0, gridEl.width, gridEl.height);
+    }
 
     L = { dpr, cell, cols, rows, lamp, F, cr, u, narrow, P, noise, pool: new Float32Array(cols * rows), word: null, order, spk, spkD, people, beams, shots, small, sctx, img, grid,
       R: new Float32Array(cols * rows), G: new Float32Array(cols * rows), B: new Float32Array(cols * rows),
-      back: new Uint8Array(cols * rows), front: new Uint8Array(cols * rows), beamGain: narrow ? 1.5 : 1 };
+      back: new Uint8Array(cols * rows), front: new Uint8Array(cols * rows), glow: new Float32Array(cols * rows), beamGain: narrow ? 1.5 : 1 };
+  }
+
+  // distance from a point to a rounded rectangle (x, y, w, h, corner radius rad); 0 inside it
+  function rrDist(px, py, x, y, w, h, rad) {
+    const qx = Math.max(Math.abs(px - (x + w / 2)) - (w / 2 - rad), 0), qy = Math.max(Math.abs(py - (y + h / 2)) - (h / 2 - rad), 0);
+    return Math.max(0, Math.sqrt(qx * qx + qy * qy) - rad);
   }
 
   function segDist(px, py, ax, ay, bx, by) {
@@ -654,7 +786,8 @@ export function startShow(root, opts = {}) {
   if (new URLSearchParams(location.search).has("intro")) OPEN.short = false;
   document.documentElement.classList.add("tz-opening");
   const markLoaded = () => document.fonts.ready.then(() => { if (dead) return; OPEN.loaded = true; if (L) L.word = null; measureHung(); });
-  if (document.readyState === "complete") markLoaded(); else on(window, "load", markLoaded);
+  // the gate waits for the document and the fonts, not for every image (the stops' screenshots keep loading behind it)
+  if (document.readyState !== "loading") markLoaded(); else on(document, "DOMContentLoaded", markLoaded);
   const gate = root.querySelector(".gate");
   function boot(withSound) {
     if (OPEN.phase === "boot" || OPEN.phase === "done") return;
@@ -683,13 +816,40 @@ export function startShow(root, opts = {}) {
     return mix(TRI[k], TRI[(k + 1) % 3], smooth(0.72, 1, f));
   }
   // the wordmark rasterised into wall cells (built on layout, once fonts are in)
+  // phones: the wordmark in LED-board letters (5 wide, 9 tall counting the t's stem), crisp at a phone's cell size
+  const LED_FONT = {
+    t: [".#...", ".#...", "####.", ".#...", ".#...", ".#...", ".#...", ".#..#", "..##."],
+    e: [".....", ".....", ".###.", "#...#", "#...#", "#####", "#....", "#...#", ".###."],
+    z: [".....", ".....", "#####", "....#", "...#.", "..#..", ".#...", "#....", "#####"],
+    r: [".....", ".....", "#.##.", "##..#", "#....", "#....", "#....", "#....", "#...."],
+    a: [".....", ".....", ".###.", "....#", "....#", ".####", "#...#", "#...#", ".####"],
+  };
+  function ledWord(cols, rows) {
+    const word = "tezera", gw = 5, gh = 9, gap = 1;
+    const span = word.length * (gw + gap) - gap;
+    const k = Math.floor((cols * 0.9) / span);
+    if (k < 1) return null;
+    const ox = Math.round((cols - span * k) / 2), oy = Math.round(rows * 0.42 - (gh * k) / 2);
+    const m = new Uint8Array(cols * rows);
+    let n = 0;
+    [...word].forEach((ch, li) => LED_FONT[ch].forEach((line, gy) => [...line].forEach((px, gx) => {
+      if (px !== "#") return;
+      for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) {
+        const x = ox + (li * (gw + gap) + gx) * k + b, y = oy + gy * k + a;
+        if (x >= 0 && x < cols && y >= 0 && y < rows && !m[y * cols + x]) { m[y * cols + x] = 1; n++; }
+      }
+    })));
+    return { m, n, x0: ox, x1: ox + span * k - 1, cx: cols / 2, cy: rows * 0.42, base: oy + gh * k };
+  }
   function wordMask() {
     const { cols, rows } = L;
+    if (L.narrow) { const led = ledWord(cols, rows); if (led) return led; }
     const c = document.createElement("canvas");
     c.width = cols; c.height = rows;
     const x = c.getContext("2d");
+    const family = getComputedStyle(root.querySelector(".logo")).fontFamily;
     const size = Math.round(Math.min(cols * 0.2, rows * 0.32));
-    x.font = `800 ${size}px ${getComputedStyle(root.querySelector(".logo")).fontFamily}`;
+    x.font = `800 ${size}px ${family}`;
     x.textAlign = "center";
     x.textBaseline = "middle";
     x.fillStyle = "#fff";
@@ -707,10 +867,13 @@ export function startShow(root, opts = {}) {
   // one frame
   // ============================================================================================
   let powerStart = Infinity;
+  const MERGE = { v: 0, to: 0 }, MERGE_S = 1.5; // the problem stop's notes-into-Tezera merge, 0..1, and its length in s
   const bassState = { v: 0 };
   let lastStop = -1;
 
   // everything the frame needs to measure, read before any style is written (no forced layouts mid-frame)
+  // phones: the role screenshots; the wall draws their glow (see "screen glows" in the frame)
+  const SHOTS = TOUCH ? [...root.querySelectorAll(".role .screen")].map((el) => ({ el, pn: panels.find((q) => q.el === el.closest(".stop")), rad: -1 })) : [];
   function readPhase() {
     const pr = [];
     for (const p of POOLS) {
@@ -727,14 +890,25 @@ export function startShow(root, opts = {}) {
       if (tg) cur = { r: tg.getBoundingClientRect(), rad: parseFloat(getComputedStyle(tg).borderTopLeftRadius) || 6 };
     }
     const afterIn = afterEl.getBoundingClientRect().top < innerHeight;
-    return { pr, pst, cur, afterIn };
+    const sr = [];
+    for (const s of SHOTS) {
+      if (!s.pn || !s.pn.on) continue;
+      if (s.rad < 0) s.rad = parseFloat(getComputedStyle(s.el).borderTopLeftRadius) || 0; // read once, while the stop is shown
+      sr.push({ r: s.el.getBoundingClientRect(), pn: s.pn, rad: s.rad });
+    }
+    return { pr, pst, cur, afterIn, sr };
   }
   let lastNow = 0;
   function frame(now) {
     if (dead) return;
     rafId = requestAnimationFrame(frame);
+    drawFrame(now);
+  }
+  function drawFrame(now) {
     const lz = getLenis();
-    if (lz) { const hold = OPEN.phase !== "done"; if (hold !== !!lz.isStopped) { if (hold) lz.stop(); else lz.start(); } }
+    // the opening holds the page still. Desktop: stop Lenis. Phones scroll natively, and Lenis's stop toggles the page's
+    // overflow, which repaints the whole page the moment it ends; there html.tz-opening sets touch-action: none instead
+    if (lz && !TOUCH) { const hold = OPEN.phase !== "done"; if (hold !== !!lz.isStopped) { if (hold) lz.stop(); else lz.start(); } }
     const dtF = lastNow ? Math.min(0.1, (now - lastNow) / 1000) : 0.016;
     lastNow = now;
     if (!L) { tickCursor(null); return; }
@@ -756,6 +930,7 @@ export function startShow(root, opts = {}) {
 
     // ---- where along the journey (the scroll, eased a touch so wheel steps glide)
     J.u = uFromScroll();
+    settle(now, J.u);
     // the camera trails the scroll by about a quarter of a second, so starts and stops feel cushioned
     J.us = reduce ? J.u : J.us + (J.u - J.us) * (1 - Math.exp(-dtF / (TOUCH ? 0.12 : 0.24)));
     if (Math.abs(J.u - J.us) < 0.01) J.us = J.u;
@@ -813,7 +988,11 @@ export function startShow(root, opts = {}) {
 
     // ---- the problem stop: the scattered fragments drift, then pull together into Tezera as you scroll
     const pHold = holdOf(PK);
-    const fixT = smooth(0.5, 0.86, pHold);
+    // the merge plays through by itself: once the hold passes its midpoint it runs to the end over MERGE_S, and back
+    // the same way if you scroll back up past it (a little lower, so resting near the point can't flicker it)
+    if (pHold >= 0.5) MERGE.to = 1; else if (pHold < 0.42) MERGE.to = 0;
+    MERGE.v = reduce ? MERGE.to : MERGE.v + clamp(MERGE.to - MERGE.v, -dtF / MERGE_S, dtF / MERGE_S);
+    const fixT = smooth(0, 1, MERGE.v);
     if (panels[PK].on && RD.pst) {
       const st = RD.pst;
       const pv = panels[PK].v;
@@ -852,11 +1031,6 @@ export function startShow(root, opts = {}) {
     });
     reveals.forEach((r) => { if (r.start) setLevel(r, (now - r.start) / 650); });
 
-    if (TOUCH) {
-      const pn = panels[W.i];
-      const el = pn.el.firstElementChild;
-      if (el && W.i === W.j && pn.id !== "hero") { const tf = `translateY(${((0.5 - W.hold) * 26).toFixed(1)}px)`; if (el.dataset.tf !== tf) { el.dataset.tf = tf; el.style.transform = tf; } }
-    }
     setVar("--prog", (clamp(J.us / U_END)).toFixed(4));
 
     // ---- feature tabs at each role stop: they move on with the song, one every 8 bars, from the first
@@ -930,7 +1104,7 @@ export function startShow(root, opts = {}) {
     const power = reduce && OPEN.phase === "done" ? 1 : clamp((now - powerStart) / 1300);
     const house = w.outro;
     const level = (0.45 + 0.55 * e) * (0.62 + 0.38 * kick) * (1 - 0.6 * house) * (1 - 0.4 * dis);
-    setVar("--lamp", A.map((v) => Math.round(clamp(v, 0, 255))).join(", "));
+    if (!TOUCH) setVar("--lamp", A.map((v) => Math.round(clamp(v, 0, 255))).join(", "));
     let sl = [0, 0, 0], sf = [0, 0, 0];
     for (const id of STOPS) {
       if (!w[id]) continue;
@@ -939,6 +1113,9 @@ export function startShow(root, opts = {}) {
       sf = sf.map((v, k) => v + c2[1][k] * w[id]);
     }
     setVar("--sec", sl.map(Math.round).join(", "));
+    // phones: the page's glows take the section's colour, not the moving lamp colour. Each change re-rasters big
+    // blurred glows (the hero screen's especially), and the section colour only moves in flights between stops
+    if (TOUCH) setVar("--lamp", sl.map(Math.round).join(", "));
     setVar("--sec-fill", sf.map(Math.round).join(", "));
 
     // ---- light pools behind the copy (screen space): the wall dims and takes a soft tint there
@@ -957,6 +1134,31 @@ export function startShow(root, opts = {}) {
           const k = smooth(0, 4, Math.min(ex, ey)) * vis;
           const i = y * cols + x;
           if (k > pool[i]) pool[i] = k;
+        }
+      }
+    }
+
+    // ---- phones: screen glows. The wall lights the cells round the hero screen and the role screenshots in the
+    // section's colour, pulsing with the beat (a CSS halo would be a huge layer to draw the moment a screen appears)
+    const glow = L.glow;
+    let glowOn = false;
+    if (TOUCH) {
+      glow.fill(0);
+      const boxes = [];
+      for (const h of L.hung) if (h.show && heroV > 0.01) boxes.push([(h.x - camL) * z, (h.y - camT) * z, h.w * z, h.h * z, heroV, h.rad * z]);
+      for (const { r, pn, rad } of RD.sr) if (pn.v > 0.01 && r.width) boxes.push([r.left / cssCell, r.top / cssCell, r.width / cssCell, r.height / cssCell, pn.v, rad / cssCell]);
+      const GR = 6, gk = 0.5 * (0.7 + 0.6 * pulse);
+      for (const [bx, by, bw, bh, vis, brad] of boxes) {
+        glowOn = true;
+        const y0 = Math.max(0, Math.floor(by - GR)), y1 = Math.min(rows, Math.ceil(by + bh + GR));
+        const x0 = Math.max(0, Math.floor(bx - GR)), x1 = Math.min(cols, Math.ceil(bx + bw + GR));
+        for (let y = y0; y < y1; y++) {
+          for (let x = x0; x < x1; x++) {
+            const d = rrDist(x + 0.5, y + 0.5, bx, by, bw, bh, brad);
+            if (d === 0 || d >= GR) continue; // under the screen (round its corners too), or out of reach
+            const kk = (1 - d / GR) * (1 - d / GR) * gk * vis, i = y * cols + x;
+            if (kk > glow[i]) glow[i] = kk;
+          }
         }
       }
     }
@@ -1063,10 +1265,10 @@ export function startShow(root, opts = {}) {
           if (wx < h.x - 7 || wx > h.x + h.w + 7) continue;
           // two cables per screen, from the rail down to the bezel
           if (wy > lamp && wy < h.y && (Math.abs(wx - (h.x + 2)) < 0.5 || Math.abs(wx - (h.x + h.w - 2)) < 0.5)) { r = 74; g = 68; b = 72; }
-          // the screen's light spilling onto the wall round it
-          const ddx = Math.max(h.x - wx, 0, wx - (h.x + h.w)), ddy = Math.max(h.y - wy, 0, wy - (h.y + h.h));
-          if (ddx === 0 && ddy === 0) continue; // inside the screen: hidden behind it
-          const dd = Math.sqrt(ddx * ddx + ddy * ddy);
+          // the screen's light spilling onto the wall round it, following its rounded corners (a square cut-out
+          // would leave unlit cells showing past each corner)
+          const dd = rrDist(wx, wy, h.x, h.y, h.w, h.h, h.rad);
+          if (dd === 0) continue; // inside the screen: hidden behind it
           if (dd < 7) { const kk = (1 - dd / 7) ** 2 * 0.16 * heroV * lit; r += A[0] * kk; g += A[1] * kk; b += A[2] * kk; }
         }
         for (const pr of rowPr) {
@@ -1440,7 +1642,7 @@ export function startShow(root, opts = {}) {
         }
         // loader: an equaliser under the wordmark, filling left to right as the page loads
         const eqA = OPEN.phase === "loading" ? smooth(150, 600, ageMs) : 0;
-        const bars = 24, y0 = Wm.base + 4;
+        const bars = Math.min(24, Math.floor((cols - 4) / 2)), y0 = Wm.base + 4; // fits a narrow phone wall
         for (let k = 0; k < bars && eqA > 0; k++) {
           const x = Math.round(Wm.cx - bars + k * 2);
           const filled = k / bars < loadP;
@@ -1491,14 +1693,18 @@ export function startShow(root, opts = {}) {
       }
       const pl = pool[i];
       if (pl > 0) { const k = 1 - 0.58 * pl; r = r * k + A[0] * 0.035 * pl; g = g * k + A[1] * 0.035 * pl; b = b * k + A[2] * 0.035 * pl; }
+      if (glowOn) { const gl = glow[i]; if (gl > 0) { r += sl[0] * gl; g += sl[1] * gl; b += sl[2] * gl; } }
       const o = i * 4;
       data[o] = r; data[o + 1] = g; data[o + 2] = b; data[o + 3] = 255;
     }
-    L.sctx.putImageData(L.img, 0, 0);
-    ctx2.imageSmoothingEnabled = false;
-    ctx2.drawImage(L.small, 0, 0, cols * cell, rows * cell);
-    ctx2.fillStyle = L.grid;
-    ctx2.fillRect(0, 0, cols * cell, rows * cell);
+    if (TOUCH) ctx2.putImageData(L.img, 0, 0);
+    else {
+      L.sctx.putImageData(L.img, 0, 0);
+      ctx2.imageSmoothingEnabled = false;
+      ctx2.drawImage(L.small, 0, 0, cols * cell, rows * cell);
+      ctx2.fillStyle = L.grid;
+      ctx2.fillRect(0, 0, cols * cell, rows * cell);
+    }
 
     setVar("--pulse", (T.paused || reduce ? 0.35 : pulse * power).toFixed(3));
     flushVars(RD.afterIn);
@@ -1513,13 +1719,15 @@ export function startShow(root, opts = {}) {
     const main = root.querySelector("#hero-main");
     main.style.width = mainW + "px";
     const top = (64 + Math.max(10, innerHeight * 0.045)) / css;
-    L.hung = [{ el: main, x: L.cols / 2 - mainW / css / 2, y: top, w: mainW / css, h: main.offsetHeight / css, show: true, tf: "" }];
+    const rad = (parseFloat(getComputedStyle(main).borderTopLeftRadius) || 0) / css;
+    L.hung = [{ el: main, x: L.cols / 2 - mainW / css / 2, y: top, w: mainW / css, h: main.offsetHeight / css, rad, show: true, tf: "" }];
   }
 
   // ---- the cursor: an LED dot, and a ring that hugs links and buttons (mouse and trackpad only)
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
   const CUR = { x: -200, y: -200, rx: -200, ry: -200, rw: 28, rh: 28, rr: 14, a: 0, ta: 0, target: null };
   const curEl = root.querySelector(".cur"), dotEl = curEl.querySelector(".dot"), ringEl = curEl.querySelector(".ring");
+  if ("popover" in curEl) curEl.popover = "manual"; // see openDialog
   const syncFancy = () => document.documentElement.classList.toggle("tz-cursor", fine.matches);
   syncFancy();
   on(fine, "change", syncFancy);
@@ -1555,6 +1763,55 @@ export function startShow(root, opts = {}) {
     ringEl.style.opacity = cur ? "1" : "0.4";
   }
 
+  // ---- phones: the team row loops forever (copies of the cards either side) and moves on by itself every few
+  // seconds; it can't be swiped (a swipe over it scrolls the page). Desktop keeps the grid.
+  const teamEl = root.querySelector(".team");
+  const teamMQ = matchMedia("(max-width: 900px)");
+  let teamStop = null;
+  function teamCarousel() {
+    if (teamStop) { teamStop(); teamStop = null; }
+    if (!teamEl || !teamMQ.matches) return;
+    const cards = [...teamEl.children];
+    if (cards.length < 2) return;
+    const copy = () => cards.map((c) => {
+      const n = c.cloneNode(true);
+      n.classList.remove("px", "reveal");
+      for (const k of ["opacity", "visibility", "translate", "mask-image", "-webkit-mask-image"]) n.style.removeProperty(k);
+      n.setAttribute("aria-hidden", "true");
+      n.inert = true;
+      return n;
+    });
+    const before = copy(), after = copy();
+    teamEl.prepend(...before);
+    teamEl.append(...after);
+    const centre = (el) => el.offsetLeft - (teamEl.clientWidth - el.offsetWidth) / 2;
+    teamEl.scrollLeft = centre(cards[0]);
+    const wrap = () => {
+      const set = after[0].offsetLeft - cards[0].offsetLeft, off = teamEl.scrollLeft - centre(cards[0]);
+      if (off < -set / 2) teamEl.scrollLeft += set; else if (off > set / 2) teamEl.scrollLeft -= set;
+    };
+    let inView = false;
+    // jump back into the middle set once a scroll settles (scrollend isn't fired for every kind of scroll)
+    let settleT = 0;
+    const onScroll = () => { clearTimeout(settleT); settleT = setTimeout(wrap, 140); };
+    teamEl.addEventListener("scroll", onScroll, { passive: true });
+    const seen = new IntersectionObserver(([e]) => (inView = e.isIntersecting), { threshold: 0.3 });
+    seen.observe(teamEl);
+    const tick = setInterval(() => {
+      if (!inView || reduce || document.hidden) return;
+      teamEl.scrollBy({ left: cards[1].offsetLeft - cards[0].offsetLeft, behavior: "smooth" });
+    }, 3500);
+    teamStop = () => {
+      clearInterval(tick);
+      seen.disconnect();
+      teamEl.removeEventListener("scroll", onScroll);
+      clearTimeout(settleT);
+      before.concat(after).forEach((n) => n.remove());
+    };
+  }
+  teamCarousel();
+  on(teamMQ, "change", teamCarousel);
+
   layoutJourney();
   buildLayout();
   measureHung();
@@ -1579,8 +1836,11 @@ export function startShow(root, opts = {}) {
     clearInterval(tickTimer);
     offs.forEach((f) => f());
     io.disconnect();
+    if (teamStop) teamStop();
     if (T.ctx) T.ctx.close().catch(() => {});
     document.documentElement.classList.remove("tz-opening", "tz-cursor");
+    root.classList.remove("tz-touch");
+    gridEl.remove();
     history.scrollRestoration = prevRestore;
     const lz2 = getLenis();
     if (lz2 && lz2.isStopped) lz2.start();

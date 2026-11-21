@@ -32,6 +32,9 @@ const go = (stop: string) => STOPS.indexOf(stop);
 const TINT: Record<string, string> = { org: "var(--org)", ven: "var(--ven)", att: "var(--att)", fre: "var(--fre)" };
 const FILL: Record<string, string> = { org: "var(--org-fill)", ven: "var(--ven-fill)", att: "var(--att-fill)", fre: "var(--ven-fill)" };
 const css = (vars: Record<string, string>) => vars as CSSProperties;
+// feature screenshots: phones get the 1100px copy (*-m.webp), about the size they show at, instead of decoding the full one
+const shotSet = (src: string) => `${src.replace(/\.webp$/, "-m.webp")} 1100w, ${src} 1940w`;
+const SHOT_SIZES = "(max-width: 899px) 90vw, 2000px";
 
 const ROLES = [
   { id: "organiser", content: organiser, tint: "org" },
@@ -114,7 +117,7 @@ export default function LandingShow() {
           <div className="hung screen px live" id="hero-main">
             <div className="face">
               <p className="onair"><i aria-hidden="true" />{hero.onair}</p>
-              <h1 id="hero-title">{hero.headline.before}<span className="one">{hero.headline.highlight}</span>{hero.headline.after}</h1>
+              <h1 id="hero-title">{hero.headline.before}<span className="one" data-glow={hero.headline.highlight}>{hero.headline.highlight}</span>{hero.headline.after}</h1>
               <p className="value">{hero.value}</p>
               <div className="cta">
                 <Link className="btn solid" href={hero.primary.href}>{hero.primary.label}<Chip>{ARROW}</Chip></Link>
@@ -212,9 +215,9 @@ export default function LandingShow() {
                     <div className="imgs">
                       {/* plain img: the stage swaps these sources as the tabs change */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="a" alt="" src={first.img} />
+                      <img className="a" alt="" src={first.img} srcSet={shotSet(first.img)} sizes={SHOT_SIZES} />
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="b" alt={`${first.title}: ${first.point}`} src={first.img} />
+                      <img className="b" alt={`${first.title}: ${first.point}`} src={first.img} srcSet={shotSet(first.img)} sizes={SHOT_SIZES} />
                     </div>
                     <p className="cap" id={`${id}-cap`} role="tabpanel" aria-live="polite"><b>{first.title}</b><span>{first.point}</span></p>
                   </div>
@@ -222,7 +225,7 @@ export default function LandingShow() {
                 <div className="tabs px live" role="tablist" aria-label={`${content.name} features`}>
                   {content.cards.map((c, i) => (
                     <button key={c.title} type="button" role="tab" aria-selected={i === 0} aria-controls={`${id}-cap`} tabIndex={i === 0 ? 0 : -1}
-                      data-src={c.img} data-title={c.title} data-point={c.point}>
+                      data-src={c.img} data-srcset={shotSet(c.img)} data-title={c.title} data-point={c.point}>
                       <i className="led" />{c.title}<span className="bar" />
                     </button>
                   ))}
@@ -255,7 +258,7 @@ export default function LandingShow() {
             <div className="team">
               {team.cards.map((m, i) => (
                 <div key={m.name} className="panel px reveal" style={css({ "--c": ["var(--org)", "var(--ven)", "var(--att)", "var(--fre)", "var(--ven)"][i % 5] })}>
-                  <Image src={m.image} alt={m.name} width={320} height={320} sizes="(max-width: 900px) 45vw, 18vw" style={{ height: "auto" }} />
+                  <Image src={m.image} alt={m.name} width={320} height={320} sizes="(max-width: 900px) 70vw, 18vw" style={{ height: "auto" }} />
                   <b>{m.name}</b>
                   <p className="lab"><i className="led" />{m.title}</p>
                   <small>{m.hobby}</small>
@@ -290,6 +293,7 @@ export default function LandingShow() {
               <h3>{footer.contact.title}</h3>
               <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
               <a href={footer.contact.instagram} rel="noopener">Instagram</a>
+              <a href={footer.contact.tiktok} rel="noopener">TikTok</a>
             </div>
             <p className="credit">{footer.credit}</p>
           </footer>

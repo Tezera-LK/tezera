@@ -9,22 +9,22 @@
     {
       "title": "Professional portfolios",
       "point": "Showcase your work, experience and creative skills.",
-      "img": "/images/marketing/vendor/vendor-1.png"
+      "img": "/images/marketing/vendor/vendor-1.webp"
     },
     {
       "title": "Booking requests",
       "point": "Receive and respond to requests from event organisers.",
-      "img": "/images/marketing/vendor/vendor-2.png"
+      "img": "/images/marketing/vendor/vendor-2.webp"
     },
     {
       "title": "Job opportunities",
       "point": "Discover opportunities that match your skills and services.",
-      "img": "/images/marketing/vendor/vendor-3.png"
+      "img": "/images/marketing/vendor/vendor-3.webp"
     },
     {
       "title": "Reviews & reputation",
       "point": "Build your professional reputation through verified reviews.",
-      "img": "/images/marketing/vendor/vendor-4.png"
+      "img": "/images/marketing/vendor/vendor-4.webp"
     }
   ]
 }

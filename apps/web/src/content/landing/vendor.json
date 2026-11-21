@@ -9,22 +9,22 @@
     {
       "title": "Business profiles",
       "point": "Showcase your services, products, prices and business details.",
-      "img": "/images/marketing/vendor/vendor-1.png"
+      "img": "/images/marketing/vendor/vendor-1.webp"
     },
     {
       "title": "Stall applications",
       "point": "Discover and apply for available event stalls.",
-      "img": "/images/marketing/vendor/vendor-2.png"
+      "img": "/images/marketing/vendor/vendor-2.webp"
     },
     {
       "title": "Job opportunities",
       "point": "Find relevant opportunities and connect with event organisers.",
-      "img": "/images/marketing/vendor/vendor-3.png"
+      "img": "/images/marketing/vendor/vendor-3.webp"
     },
     {
       "title": "Reviews & ratings",
       "point": "Build credibility through reviews from completed jobs.",
-      "img": "/images/marketing/vendor/vendor-4.png"
+      "img": "/images/marketing/vendor/vendor-4.webp"
     }
   ]
 }
