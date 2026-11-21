@@ -226,7 +226,7 @@ The shell sets a `data-palette` attribute (`Palette.module.css`) that maps the g
 - The Cognito groups stay `vendor` and `freelancer`. The `/vendor` gate lists both, with a comment saying not to narrow it.
 - On screen, freelancers see "Freelancer tools" and "Freelancer" on their profile; only the URL says "vendor".
 
-A role's own tools use the singular (`/organiser/…`, "my organiser workspace"); public pages use the plural (`/organisers/<id>`, "organiser 45 of all organisers"), the same pattern as `/events/<id>`. Options considered: `provider` (Claude's recommendation: matches the PRD), `vendor` (chosen), and separate `vendor` and `freelancer` folders (rejected: almost every tool page would exist twice). Every URL is built in `lib/routes.ts`, so a later rename means that file plus the folder names, and a permanent redirect once real links are being shared.
+A role's own tools use the singular (`/organiser/…`, "my organiser workspace"); public pages use the plural (`/organisers/<id>`, "organiser 45 of all organisers"), the same pattern as `/events/<id>`. Options considered: `provider` (matches the PRD), `vendor` (chosen), and separate `vendor` and `freelancer` folders (rejected: almost every tool page would exist twice). Every URL is built in `lib/routes.ts`, so a later rename means that file plus the folder names, and a permanent redirect once real links are being shared.
 
 **Changed 18 Nov: freelancers get `/freelancer` and `/freelancers/<id>`.** Danella's log-in screens, which `dev` brought in, live at `/<role>/login` for each sign-up role, `/freelancer/login` included. Two things followed:
 
@@ -741,7 +741,7 @@ The 3 Nov plan deleted the "View as" box once real sign-in arrived. On 18 Nov re
 
 ## Decision 7: Following the wireframes
 
-**Status:** *Proposed*, built 4 Nov. Navindu asked for the shell to follow the two portal wireframes in the ATP repo. The choices below where the two disagree are Claude's and are waiting for review.
+**Status:** *Proposed*, built 4 Nov. Navindu asked for the shell to follow the two portal wireframes in the ATP repo. The choices below where the two disagree are waiting for review.
 
 ### The problem
 
@@ -750,7 +750,7 @@ Phase A took only the vendor wireframe's **sidebar items**. Its look was a plain
 | | Vendor portal | Organiser flow |
 | --- | --- | --- |
 | Where | `brand/tezera-vendor-portal/` on `main` (PR #9, merged) | `wireframes/tezera-organiser-wireframe.html` on branch `docs/organiser-flow` (PR #10, **still open**) |
-| Who, when | Reshan, 22 Oct | Navindu with Claude, 28 Oct |
+| Who, when | Reshan, 22 Oct | Navindu, 28 Oct |
 | What | 18 linked HTML pages, desktop only (no phone layout) | 32 SVG screens (O01–O32), 8 journeys, light and dark |
 
 **What they share (the template).** Both are 1440px desktop screens:
