@@ -1,35 +1,30 @@
 {
+  "theme": "The crew",
+  "name": "Freelancers",
+  "signup": "/freelancer/signup",
+  "signupLabel": "Sign up as a freelancer",
   "heading": "Your talent, centre stage.",
   "subheading": "Build a portfolio, answer bookings and grow a reputation that follows you from gig to gig.",
-  "details": "Become one of our vendors and let your work speak for itself. Build a profile, answer booking requests, quote on jobs and apply for stall slots at events across Sri Lanka. Every finished job leaves a review, so the next organiser can see your record before they hire you.",
   "cards": [
     {
       "title": "Professional portfolios",
       "point": "Showcase your work, experience and creative skills.",
-      "img": "/images/marketing/freelance/freelance-1.png",
-      "bg": "#658095",
-      "ink": "#ffff"
+      "img": "/images/marketing/vendor/vendor-1.png"
     },
     {
       "title": "Booking requests",
       "point": "Receive and respond to requests from event organisers.",
-      "img": "/images/marketing/freelance/freelance-2.png",
-      "bg": "#ffff",
-      "ink": "#050316"
+      "img": "/images/marketing/vendor/vendor-2.png"
     },
     {
       "title": "Job opportunities",
       "point": "Discover opportunities that match your skills and services.",
-      "img": "/images/marketing/freelance/freelance-3.png",
-      "bg": "#70a992",
-      "ink": "#050316"
+      "img": "/images/marketing/vendor/vendor-3.png"
     },
     {
       "title": "Reviews & reputation",
       "point": "Build your professional reputation through verified reviews.",
-      "img": "/images/marketing/freelance/freelance-4.png",
-      "bg": "#b6c3a7",
-      "ink": "#050316"
+      "img": "/images/marketing/vendor/vendor-4.png"
     }
   ]
 }

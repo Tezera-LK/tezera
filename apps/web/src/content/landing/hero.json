@@ -1,5 +1,43 @@
 {
-  "headline": "Every event in Sri Lanka, in <span class='highlight-red'>ONE</span> place",
-  "subhead": "Everything an event needs already exists: performers, caterers, crews and audiences. It is just scattered across chats, contacts and platforms. Tezera brings the pieces into one place. Organisers hire verified vendors and freelancers, fill stalls and share the venue map. Attendees find what is on, who is going and where everything is.",
-  "detail": "Every finished job leaves a review the next organiser can read, so vendors and freelancers win work on their track record, not their contacts. Accounts are checked by our team before hiring or stalls open."
+  "onair": "Now showing across Sri Lanka",
+  "headline": {
+    "before": "Every event in Sri Lanka, in ",
+    "highlight": "ONE",
+    "after": " place"
+  },
+  "value": "Performers, caterers, crews and crowds are all out there, just scattered across chats and contacts. Tezera puts them on one stage: organisers hire verified vendors and freelancers, vendors fill stalls, and attendees find what's on.",
+  "primary": {
+    "label": "Sign up",
+    "href": "/signup"
+  },
+  "secondary": {
+    "label": "See how it works"
+  },
+  "ticker": [
+    {
+      "role": "org",
+      "title": "Saturday Colombo Food Fair",
+      "detail": "68% of vendor stalls filled"
+    },
+    {
+      "role": "ven",
+      "title": "Wedding photographer needed",
+      "detail": "Kandy"
+    },
+    {
+      "role": "att",
+      "title": "Rooftop Sunset Set",
+      "detail": "112 going"
+    },
+    {
+      "role": "fre",
+      "title": "Sound engineer booked",
+      "detail": "Galle Face, Friday"
+    }
+  ],
+  "gate": {
+    "withSound": "Enter with sound",
+    "quiet": "Enter quietly",
+    "note": "Sound plays at 50%. You can change it any time."
+  }
 }

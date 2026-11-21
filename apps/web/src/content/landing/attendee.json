@@ -1,35 +1,30 @@
 {
+  "theme": "The crowd",
+  "name": "Attendees",
+  "signup": "/attendee/signup",
+  "signupLabel": "Sign up as an attendee",
   "heading": "Never miss a moment.",
-  "subheading": "Find what is on near you, see who is going and stay in the loop on the day.",
-  "details": "Become one of our attendees and never miss what's happening near you. Search events by date, district, category or price, and see which of your friends are going. Join the event chat and open the venue map on the day, so you know where to be.",
+  "subheading": "Find what's on near you, see who's going and stay in the loop on the day.",
   "cards": [
     {
       "title": "Discover events",
       "point": "Explore events by category, date, district and price.",
-      "img": "/images/marketing/attendee/attendee-1.png",
-      "bg": "#d77e70",
-      "ink": "#ffff"
+      "img": "/images/marketing/attendee/attendee-1.png"
     },
     {
       "title": "Personalised feed",
       "point": "Find events and content tailored to your interests.",
-      "img": "/images/marketing/attendee/attendee-2.png",
-      "bg": "#e5c76c",
-      "ink": "#282829"
+      "img": "/images/marketing/attendee/attendee-2.png"
     },
     {
       "title": "Friends & community",
       "point": "See which friends are attending and connect with other attendees.",
-      "img": "/images/marketing/attendee/attendee-3.png",
-      "bg": "#f09eb4",
-      "ink": "#ffff"
+      "img": "/images/marketing/attendee/attendee-3.png"
     },
     {
       "title": "Live event updates",
       "point": "Stay informed with event announcements, discussions and updates.",
-      "img": "/images/marketing/attendee/attendee-4.png",
-      "bg": "#ffffff",
-      "ink": "#282829"
+      "img": "/images/marketing/attendee/attendee-4.png"
     }
   ]
 }

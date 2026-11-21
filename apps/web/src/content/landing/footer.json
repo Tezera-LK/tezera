@@ -1,42 +1,23 @@
 {
   "brand": "tezera",
-  "tagline": "Stream line events in Sri Lanka",
-  "columns": [
-    {
-      "title": "Explore",
-      "links": [
-        {
-          "label": "Attendee",
-          "href": "/#attendee"
-        },
-        {
-          "label": "Team",
-          "href": "/#team"
-        }
-      ]
-    },
-    {
-      "title": "Contact",
-      "links": [
-        {
-          "label": "hello@yourdomain.com",
-          "href": "mailto:hello@yourdomain.com"
-        },
-        {
-          "label": "Instagram",
-          "href": "https://instagram.com/yourhandle"
-        }
-      ]
-    }
-  ],
-  "legal": [
-    {
-      "label": "Privacy",
-      "href": "/privacy"
-    },
-    {
-      "label": "Terms",
-      "href": "/terms"
-    }
-  ]
+  "tagline": "Streamline events in Sri Lanka",
+  "explore": {
+    "title": "Explore",
+    "links": [
+      {
+        "label": "Attendees",
+        "stop": "attendee"
+      },
+      {
+        "label": "Team",
+        "href": "#team"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "instagram": "https://instagram.com/yourhandle"
+  },
+  "privacyLabel": "Privacy notice",
+  "credit": "Music: Janji, “Heroes Tonight” (feat. Johnning) · Cartoon & Jéja, “On & On” (feat. Daniel Levi) · Diviners, “Savannah” (feat. Philly K). Music provided by NoCopyrightSounds."
 }

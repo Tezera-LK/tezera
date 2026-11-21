@@ -1,42 +1,36 @@
 {
-  "img": "./tezera.svg",
-  "home": "/#home",
   "links": [
     {
-      "name": "HOME",
-      "href": "/#home"
+      "name": "Home",
+      "stop": "hero"
     },
     {
-      "name": "PEOPLE",
-      "href": "/#audience"
+      "name": "Why Tezera",
+      "stop": "problem"
     },
     {
-      "name": "ORGANISER",
-      "href": "/#organiser"
+      "name": "Organisers",
+      "stop": "organiser"
     },
     {
-      "name": "VENDOR",
-      "href": "/#vendor"
+      "name": "Vendors",
+      "stop": "vendor"
     },
     {
-      "name": "FREELANCER",
-      "href": "/#freelancer"
+      "name": "Freelancers",
+      "stop": "freelancer"
     },
     {
-      "name": "ATTENDEE",
-      "href": "/#attendee"
+      "name": "Attendees",
+      "stop": "attendee"
     },
     {
-      "name": "PURPOSE",
-      "href": "/#purpose"
+      "name": "Team",
+      "href": "#team"
     },
     {
-      "name": "TEAM",
-      "href": "/#team"
-    },
-    {
-      "name": "CONTACT",
-      "href": "/#contact"
+      "name": "Contact",
+      "href": "#contact"
     }
   ]
 }
