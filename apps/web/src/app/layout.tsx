@@ -12,6 +12,14 @@ const bricolage = localFont({
   display: "swap",
 })
 
+// the landing page's body text
+const instrument = localFont({
+  src: "./fonts/InstrumentSans-Latin.woff2",
+  weight: "400 700",
+  variable: "--font-instrument",
+  display: "swap",
+})
+
 export const metadata: Metadata = {
   title: { default: "tezera", template: "%s | Tezera" },
   description: "Every event in Sri Lanka, in one place.",
@@ -20,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${bricolage.variable}`}>
+    <html lang="en" className={`${bricolage.variable} ${instrument.variable}`}>
       <body>{children}</body>
     </html>
   );
