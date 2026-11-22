@@ -1,18 +1,35 @@
+import type { Target } from "@/lib/data/portal-types";
+import MaybeLink from "./MaybeLink";
 import styles from "./PortalShell.module.css";
+import ui from "./ui.module.css";
 
 type PanelProps = {
+  // the panel's heading, e.g. "Needs your attention"
   title: string;
+  // a link on the right of the title, e.g. "Leaderboards"
+  link?: Target;
   // shown as one row while there's nothing to list
   empty?: string;
+  // the panel's rows; when left out, the empty line shows instead
   children?: React.ReactNode;
 };
 
-// One card in a page's right-hand column ("Needs your attention", "Coming up"…), tinted with the
-// role's secondary colour like the wireframes' cards.
-export default function Panel({ title, empty, children }: PanelProps) {
+// One card in a page's right-hand column ("Needs your attention", "Your rank"…), in the pill
+// colour like Figma's panels.
+export default function Panel({ title, link, empty, children }: PanelProps) {
+  const heading = <h2 className={styles.panelTitle}>{title}</h2>;
   return (
     <section className={styles.panel}>
-      <h2 className={styles.panelTitle}>{title}</h2>
+      {link ? (
+        <div className={styles.panelHead}>
+          {heading}
+          <MaybeLink href={link.href} className={ui.textLink}>
+            {link.label}
+          </MaybeLink>
+        </div>
+      ) : (
+        heading
+      )}
       {children ?? (empty && <p className={styles.panelEmpty}>{empty}</p>)}
     </section>
   );

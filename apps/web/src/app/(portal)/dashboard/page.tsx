@@ -3,8 +3,10 @@ import ButtonLink from "@/components/portal/ButtonLink";
 import Columns from "@/components/portal/Columns";
 import PageHeader from "@/components/portal/PageHeader";
 import Panel from "@/components/portal/Panel";
+import OrganiserDashboard from "@/components/portal/dashboard/OrganiserDashboard";
 import EmptyState from "@/components/states/EmptyState";
 import { requireSession } from "@/lib/auth/session";
+import { getOrganiserDashboard } from "@/lib/data/portal";
 import type { PortalRole } from "@/lib/portal-roles";
 import { routes } from "@/lib/routes";
 
@@ -76,7 +78,8 @@ const DASHBOARD: Record<PortalRole, Dashboard> = {
 // The one "after you sign in, go here" page. Every role shares the URL and sees its own dashboard.
 export default async function DashboardPage() {
   // signed in is enough: requiring a role here would bounce a user with no role between redirects forever
-  const { role } = await requireSession();
+  const session = await requireSession();
+  const { role } = session;
 
   if (!role) {
     return (
@@ -88,6 +91,13 @@ export default async function DashboardPage() {
         />
       </>
     );
+  }
+
+  // Organisers get Figma's dashboard (O05) once there's data for it; the other roles' dashboards
+  // come with their own slices, so they keep the placeholder below.
+  if (role === "organiser") {
+    const data = await getOrganiserDashboard(session);
+    if (data) return <OrganiserDashboard data={data} now={new Date()} />;
   }
 
   const { description, empty, tools, panels } = DASHBOARD[role];

@@ -1,0 +1,428 @@
+/* Messages (Figma O23, O90–O92) and Community (O24, O25, O93). */
+
+.small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plain {
+  background: transparent;
+}
+
+.notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* a white track of tabs, the current one filled */
+.tabs {
+  display: flex;
+  justify-self: start;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 21px;
+  background: var(--card);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 17px;
+  color: var(--t);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tab[aria-current="page"] {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* ---------- Messages (O23) ---------- */
+/* no right-hand column: 340px of conversations, then the open one */
+.messages {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+
+.listColumn {
+  display: grid;
+  gap: 8px;
+}
+
+.conversations {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conversation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.conversation:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.conversationOpen {
+  background: var(--unread);
+}
+
+/* the count of unread messages */
+.unread {
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 11px;
+  background: var(--p);
+  color: var(--on-p);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chat {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.chatHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--line);
+}
+
+.chatButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+a.greenButton {
+  background: var(--pill);
+}
+
+.bubbles {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bubbleItem {
+  display: grid;
+  gap: 10px;
+}
+
+/* "Fri 20 Nov", "Today" between days */
+.day {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* theirs on the left in the page colour, mine on the right in green */
+.bubble {
+  display: grid;
+  gap: 8px;
+  justify-self: start;
+  max-width: min(440px, 80%);
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  font-size: 13px;
+}
+
+.mine {
+  justify-self: end;
+  background: var(--pill);
+}
+
+.imageBubble {
+  width: min(440px, 80%);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attachIcon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--avatar);
+}
+
+.compose {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 78px;
+  align-items: center;
+  gap: 8px;
+}
+
+/* the round "+" that opens Attach */
+.plus {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--pill);
+  color: var(--t);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+button.send {
+  justify-content: center;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* ---------- Attach (O90) ---------- */
+.attachKinds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.attachKind {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-height: 94px;
+  padding: 16px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--pill);
+  color: var(--t);
+  font: 700 14px/1.2 var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+.drop {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+  min-height: 150px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--page);
+  text-align: center;
+  cursor: pointer;
+}
+
+.drop:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+/* ---------- Report (O92) ---------- */
+.reasons {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radio input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--p);
+}
+
+textarea.textarea {
+  min-height: 90px;
+}
+
+/* ---------- Community (O24, O25) ---------- */
+.headRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* one thread: votes on the left, the title and who posted, Reply on the right */
+.thread {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px 16px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.votes {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.voteButton {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--page);
+  color: var(--t);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.voteButtonOn {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.threadTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+a.threadLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.threadLink:hover {
+  text-decoration: underline;
+}
+
+.bigTitle {
+  margin: 4px 0 0;
+  font: 700 20px/1.25 var(--title-font);
+}
+
+.body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* the event linked from a post */
+.linked {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  color: var(--t);
+  text-decoration: none;
+}
+
+.threadButtons {
+  display: flex;
+  gap: 8px;
+}
+
+/* a community row: a square, its name and numbers, and Open or Join */
+.communityRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.replyForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px;
+  gap: 8px;
+}
+
+.replyForm input {
+  background: var(--card);
+}
+
+.replyForm button {
+  justify-content: center;
+  height: 44px;
+  border-radius: 22px;
+  font-size: 14px;
+}
+
+button.wide {
+  width: 100%;
+}
+
+.replyLink {
+  justify-self: start;
+}
+
+.sortButtons {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .messages {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

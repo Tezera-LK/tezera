@@ -1,0 +1,314 @@
+/* The event's Stalls tab (Figma O13) and its dialogs (O72–O76): what only stalls use. Sections,
+   tables and dialog forms are in ../tables.module.css; buttons, chips and fields in
+   ../ui.module.css and ../forms.module.css. */
+
+/* column widths from Figma; the last column takes what's left */
+.slotsTable {
+  min-width: 640px;
+}
+
+.slotsTable thead th:nth-child(1) { width: 147px; }
+.slotsTable thead th:nth-child(2) { width: 79px; }
+.slotsTable thead th:nth-child(3) { width: 124px; }
+.slotsTable thead th:nth-child(4) { width: 125px; }
+.slotsTable thead th:nth-child(5) { width: 90px; }
+.slotsTable thead th:nth-child(6) { width: 91px; }
+
+.applicationsTable {
+  min-width: 640px;
+}
+
+.applicationsTable thead th:nth-child(1) { width: 202px; }
+.applicationsTable thead th:nth-child(2) { width: 118px; }
+.applicationsTable thead th:nth-child(3) { width: 119px; }
+.applicationsTable thead th:nth-child(4) { width: 107px; }
+
+.approvedTable {
+  min-width: 700px;
+}
+
+.approvedTable thead th:nth-child(1) { width: 80px; }
+.approvedTable thead th:nth-child(2) { width: 165px; }
+.approvedTable thead th:nth-child(3) { width: 94px; }
+.approvedTable thead th:nth-child(4) { width: 124px; }
+.approvedTable thead th:nth-child(5) { width: 94px; }
+
+/* the stall number: a 28px pill, or a green "Add" that opens the number dialog */
+.stallNo {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--page);
+  color: var(--t);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.stallNoAdd {
+  background: var(--pill);
+}
+
+a.stallNoAdd:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
+}
+
+/* ---------- Right-hand panels ---------- */
+/* "Collected: 12 of 16 · LKR 168,000" on a white card, the Paid chip on the right */
+.collected {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.mapThumb {
+  display: block;
+  overflow: hidden;
+  border-radius: 12px;
+  line-height: 0;
+}
+
+.mapThumb > span {
+  width: 100% !important;
+}
+
+/* O72: "Stall type" and its five pills */
+.typeField {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldTitle {
+  margin: 0 0 19px;
+  padding: 0;
+  font: 700 15px/1.2 var(--title-font);
+}
+
+.typePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.typePill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--page);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.typePill input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.typePill:has(input:checked) {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.typePill:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.typePill:has(input:disabled) {
+  cursor: default;
+  opacity: 0.5;
+}
+
+textarea.rules {
+  min-height: 76px;
+}
+
+textarea.message {
+  min-height: 70px;
+}
+
+/* O73: one vendor as a 60px choice: a round picture, name, details and the dot */
+.vendorList {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+label.vendorChoice {
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  min-height: 60px;
+  padding: 10px 14px;
+}
+
+.vendorMeta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* O75: the area's numbers as 54 x 48 squares on a pale 120px panel */
+.numberGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  /* 36 + 48 + 36 makes Figma's 120px panel; a fieldset ignores flex centring */
+  padding: 36px 20px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--soft);
+}
+
+.numberTile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--card);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.numberTile input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.numberTile:has(input:checked) {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.numberTile:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* a number another stall has: still drawn, but it can't be picked */
+.numberTile:has(input:disabled) {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* O76: three 56px reasons, 8px apart */
+.reasons {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+label.reason {
+  min-height: 56px;
+}
+
+/* O74: the vendor's listing */
+.blurb {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.items {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* one item: name and kind, the price, and Hide; tinted when it breaks a rule */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.itemMeta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.itemFlagged {
+  background: var(--pill);
+}
+
+.itemHidden {
+  opacity: 0.6;
+}
+
+.price {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.itemButton {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--page);
+  color: var(--t);
+  font: 700 12px/1 var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+.itemButton:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
+}
+
+.itemButtonOn {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* "Hide whole listing" on the left, "Done" on the right */
+.listingActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 0;
+}
+
+a.done {
+  min-width: 140px;
+}
+

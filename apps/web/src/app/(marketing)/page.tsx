@@ -1,50 +1,32 @@
-import Opening from "@/components/marketing/Opening";
-import Hero from "@/components/marketing/Hero";
-import Navigation from "@/components/marketing/Navigation";
-import Audience from "@/components/marketing/Audience";
-import Organiser from "@/components/marketing/Organiser";
-import Vendor from "@/components/marketing/Vendor";
-import Freelance from "@/components/marketing/Freelance";
-import Attendee from "@/components/marketing/Attendee";
-import Purpose from "@/components/marketing/Purpose";
-import Team from "@/components/marketing/Team";
-import Footer from "@/components/marketing/Footer";
+import type { Metadata } from "next";
+import LandingShow from "@/components/landing/LandingShow";
+import site from "@/content/site.json";
+
+const title = "Tezera | Every event in Sri Lanka, in one place";
+const description =
+  "Tezera brings organisers, vendors, freelancers and attendees onto one platform. Hire verified people, fill your stalls, share the venue map and find what's on in Sri Lanka.";
+
+export const metadata: Metadata = {
+  title: { absolute: title },
+  description,
+  metadataBase: new URL(site.url),
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    title,
+    description: "Organisers, vendors, freelancers and attendees on one stage. Hire verified people, fill stalls and find what's on.",
+    images: [{
+      url: "/images/marketing/meta/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: "The Tezera LED stage with a crowd and the headline Every event in Sri Lanka, in one place",
+    }],
+  },
+  twitter: { card: "summary_large_image" },
+};
+
+export const viewport = { themeColor: "#0e0c0d" };
 
 export default function Home() {
-  return (
-    <>
-      <Opening />
-      <main>
-        <Navigation />
-        <section id="home">
-          <Hero />
-        </section>
-        <section id="audience">
-          <Audience />
-        </section>
-        <section id="organiser">
-          <Organiser />
-        </section>
-        <section id="vendor">
-          <Vendor />
-        </section>
-        <section id="freelancer">
-          <Freelance />
-        </section>
-        <section id="attendee">
-          <Attendee />
-        </section>
-        <section id="purpose">
-          <Purpose />
-        </section>
-        <section id="team">
-          <Team />
-        </section>
-        <section id="contact">
-          <Footer />
-        </section>
-
-      </main>
-    </>
-  )
+  return <LandingShow />;
 }

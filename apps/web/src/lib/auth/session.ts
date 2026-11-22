@@ -2,32 +2,31 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { runWithAmplifyServerContext } from "@/lib/amplify/server";
-import { VIEW_AS, readSession, type Session } from "@/lib/auth/cognito";
-import { DEV_ROLE_COOKIE, DEV_ROLE_DEFAULT, VIEW_AS_NAME } from "@/lib/auth/dev-role";
+import { DEV_ROLE_COOKIE, DEV_ROLE_DEFAULT } from "@/lib/auth/dev-role";
+import { previewMode } from "@/lib/preview";
 import { isPortalRole, type PortalRole } from "@/lib/portal-roles";
 import { routes } from "@/lib/routes";
 
-export type { Session };
-export { VIEW_AS };
+export type Session = {
+  userId: string;
+  // null = signed in, but not in any role group yet (each account should be in exactly one)
+  role: PortalRole | null;
+};
 
 // Who is signed in, or null for a visitor. React cache(): many calls during one request = one lookup.
 //
-// Reads the Cognito tokens that Amplify keeps in cookies (EN-04-T4; docs/learning/web-portal-shell.md,
-// Decision 1c). src/proxy.ts has already checked them and refreshed them if they had expired, and
-// Next.js hands the refreshed cookies on to this render.
-// `next dev` without a user pool (CI's placeholder amplify_outputs.json): the role picked in the
-// "View as" box, bottom-right, instead (organiser by default). Never in production builds.
+// STAND-IN until EN-04 (Cognito) exists. Phase B replaces the body with a real read of the Amplify
+// session; the callers below don't change (docs/learning/web-portal-shell.md, Decisions 1c and 6).
+// - preview mode (`next dev`, and dev.tezera.lk until sign-in is hosted: lib/preview.ts): you are signed
+//   in as the role picked in the "View as" box, bottom-right (organiser by default).
+// - other builds: nobody is signed in, so every portal page sends you to the login page.
 export const getSession = cache(async (): Promise<Session | null> => {
-  if (VIEW_AS) {
-    const picked = (await cookies()).get(DEV_ROLE_COOKIE)?.value ?? DEV_ROLE_DEFAULT;
-    return { userId: "view-as", role: isPortalRole(picked) ? picked : null, name: VIEW_AS_NAME };
-  }
+  // read cookies in every mode, like the real version will, so portal pages always render per request
+  const cookieStore = await cookies();
+  if (!previewMode) return null;
 
-  return runWithAmplifyServerContext({
-    nextServerContext: { cookies },
-    operation: readSession,
-  });
+  const picked = cookieStore.get(DEV_ROLE_COOKIE)?.value ?? DEV_ROLE_DEFAULT;
+  return { userId: "dev-user", role: isPortalRole(picked) ? picked : null };
 });
 
 // Signed in, any role: the portal shell, /dashboard and pages every role shares.

@@ -1,35 +1,30 @@
 {
+  "theme": "Event HQ",
+  "name": "Organisers",
+  "signup": "/organiser/signup",
+  "signupLabel": "Sign up as an organiser",
   "heading": "Run the whole show.",
   "subheading": "Plan it, staff it, fill it and keep everyone in the loop, all from one place.",
-  "details": "Become one of our organisers and build your event from the first idea to the last guest. Publish your schedule, line-up and photos, then find and hire verified vendors and freelancers without chasing contacts. Manage stall applications, allocate spaces and keep everyone updated from one place.",
   "cards": [
     {
       "title": "Event creation & promotion",
       "point": "Publish events with schedules, line-ups, photos and reels.",
-      "img": "/images/marketing/organiser/organiser-1.png",
-      "bg": "#536f82",
-      "ink": "#ffffff"
+      "img": "/images/marketing/organiser/organiser-1.webp"
     },
     {
       "title": "Verified hiring",
       "point": "Discover and hire verified vendors and freelancers.",
-      "img": "/images/marketing/organiser/organiser-2.png",
-      "bg": "#d7e0ec",
-      "ink": "#282829"
+      "img": "/images/marketing/organiser/organiser-2.webp"
     },
     {
       "title": "Stall management",
       "point": "Manage stall applications, allocate spaces and connect with vendors.",
-      "img": "/images/marketing/organiser/organiser-3.png",
-      "bg": "#70a98c",
-      "ink": "#ffff"
+      "img": "/images/marketing/organiser/organiser-3.webp"
     },
     {
       "title": "Centralised communication",
       "point": "Share updates, engage attendees and manage event discussions.",
-      "img": "/images/marketing/organiser/organiser-4.png",
-      "bg": "#ffffff",
-      "ink": "#282829"
+      "img": "/images/marketing/organiser/organiser-4.webp"
     }
   ]
 }

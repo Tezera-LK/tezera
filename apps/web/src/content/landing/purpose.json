@@ -1,12 +1,34 @@
 {
-  "vision": {
-    "heading": "Our Vision",
-    "text": "Every event in Sri Lanka, easy to find, easy to run and easy to trust.",
-    "img": "/images/marketing/purpose/vision.svg"
-  },
+  "kicker": "Why we're building it",
+  "statement": [
+    {
+      "text": "Every event in Sri Lanka, easy to "
+    },
+    {
+      "text": "find",
+      "role": "att"
+    },
+    {
+      "text": ", easy to "
+    },
+    {
+      "text": "run",
+      "role": "org"
+    },
+    {
+      "text": " and easy to "
+    },
+    {
+      "text": "trust",
+      "role": "ven"
+    },
+    {
+      "text": "."
+    }
+  ],
   "mission": {
-    "heading": "Our Mission",
-    "text": "To bring organisers, vendors, freelancers and attendees into one place, so organisers can hire verified people with confidence, vendors and freelancers can win work on their record, and attendees can find what is on and who is going.",
-    "img": "/images/marketing/purpose/mission.svg"
+    "lead": "We're bringing ",
+    "who": "organisers, vendors, freelancers and attendees",
+    "rest": " into one place, so organisers can hire verified people with confidence, vendors and freelancers win work on their record, and attendees find what's on and who's going."
   }
 }

@@ -21,15 +21,12 @@ import { Amplify } from "aws-amplify";
 import outputs from "../../amplify_outputs.json";
 
 // Runs once, when this file is first loaded in the browser.
-// ssr: true keeps the login tokens in COOKIES instead of the browser's
-// localStorage. Cookies go to the server with every request, so the
-// portal's server code (src/proxy.ts, lib/auth/session.ts) can see who is
-// logged in and which role group they're in (EN-04-T4).
-Amplify.configure(outputs, { ssr: true });
+// ssr: true would also share the login with server code; we don't need
+// that yet, because every auth call happens in the browser.
+Amplify.configure(outputs);
 
 // Renders nothing. Its only job is to make sure the line above has run
-// before any form calls Amplify. The (auth)/[role] layout and the portal
-// (components/portal/PortalShell.tsx, for Log out) include it.
+// before any form calls Amplify. The (auth)/[role] layout includes it.
 export default function ConfigureAmplify() {
   return null;
 }

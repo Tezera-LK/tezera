@@ -1,0 +1,235 @@
+/* The organiser's profile (Figma O27, O45), editing it (O42), followers (O43) and sharing it
+   (O44). The header card and tiles come from ../hiring/Hiring.module.css and
+   ../events/EventPages.module.css. */
+
+/* "Edit profile": a 40px pill on the right of the header card */
+a.editButton {
+  align-self: center;
+  height: 40px;
+  margin-left: auto;
+  padding: 0 22px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+a.tileLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.tileLink:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.notice {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--pill);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* "Upcoming · Past events · Reviews": a white track with the current one filled */
+.tabs {
+  display: flex;
+  justify-self: start;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 21px;
+  background: var(--card);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 17px;
+  color: var(--t);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tab[aria-current="page"] {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* an upcoming event: an 80 x 56 picture, the title and "Sat 12 Dec · Viharamahadevi Park · 1,284 going" */
+.eventRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 76px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.eventRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+/* "Track record": five tiles */
+.track {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.pastTable {
+  min-width: 560px;
+}
+
+.pastTable thead th:nth-child(1) { width: 277px; }
+.pastTable thead th:nth-child(2) { width: 171px; }
+.pastTable thead th:nth-child(3) { width: 144px; }
+
+a.rowLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.rowLink:hover {
+  text-decoration: underline;
+}
+
+.bigNumber {
+  margin: 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+/* ---------- Edit profile (O42) ---------- */
+/* the whole page is one form; it lays out as if it weren't there */
+.contents {
+  display: contents;
+}
+
+.media {
+  grid-template-columns: 88px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.logoText {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  line-height: 0;
+}
+
+.cover > span:first-child {
+  width: 100% !important;
+}
+
+.coverButton {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+}
+
+.plain {
+  background: transparent;
+}
+
+textarea.about {
+  min-height: 90px;
+}
+
+.switchRow {
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+/* ---------- Followers (O43) ---------- */
+.personRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+}
+
+/* ---------- Share your profile (O44) ---------- */
+.linkBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 0 4px 0 14px;
+  border-radius: 12px;
+  background: var(--page);
+  font-size: 14px;
+}
+
+.shareGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* a 90px green tile with a square and a label */
+.shareTile {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  min-height: 90px;
+  padding: 8px;
+  border-radius: 16px;
+  background: var(--pill);
+  color: var(--t);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+a.shareTile:hover {
+  box-shadow: inset 0 0 0 2px var(--p);
+}
+
+.shareIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: var(--avatar);
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width: 900px) {
+  .track {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .media {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .cover {
+    grid-column: 1 / -1;
+  }
+
+  .shareGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

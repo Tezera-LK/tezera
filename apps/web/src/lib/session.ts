@@ -8,6 +8,7 @@
 
 import { fetchAuthSession, fetchUserAttributes, getCurrentUser, updateUserAttributes } from "aws-amplify/auth";
 import { ROLE_INFO, isRole, type Role } from "./roles";
+import { apiFetch } from "./api";
 import { routes } from "./routes";
 
 // How far through setting up a user is (stored on their Cognito account
@@ -78,6 +79,8 @@ export async function checkRoleAfterLogin(
 ): Promise<{ ok: true; path: string } | { ok: false; actualRole: Role | null }> {
   const user = await getSignedInUser();
   if (user && user.groups.includes(role)) {
+    // Make the user's row in the API database on first log in.
+    await apiFetch("/me").catch(() => undefined);
     return { ok: true, path: pathAfterLogin(role, user.setup) };
   }
   // .find(isRole) = the first group that's one of our four roles.

@@ -1,28 +1,31 @@
-/* The signed-in portal frame, laid out like the team's wireframes (the consumer-flow layout):
+/* The signed-in portal frame, drawn after the team's Figma high-fid files (organiser O05, 19 Nov):
    a top bar across the page, the sidebar card in the role's colour on the left, then the page.
-   Sizes are the wireframes' at 1440px: a 224px card, 36px gutters and, on pages that have one,
-   a 340px right-hand column, so the page area is 1112px wide.
-   Colours come from the generic palette variables that Palette.module.css sets from the role.
+   Sizes are Figma's at 1440px: an 84px top bar, a 224px card 32px from the left edge, a 36px gutter,
+   a 744px main column, a 28px gap and a 340px right-hand column, so the page area is 1112px wide.
+   Colours come from the variables that Palette.module.css sets from the role.
+   Body text is Instrument Sans; titles are Bricolage Grotesque (--font).
    Below 900px the search moves to its own row and the card folds away behind a Menu button. */
 
 .shell {
-  /* The wireframes' colour roles: card = primary, pills and panels = secondary, search = accent. */
+  /* Figma's colour roles: card = primary, pills and panels = --pill, search and top-bar buttons = --field,
+     white cards on a tinted page. */
   --side: var(--p);
   --on-side: var(--on-p);
-  --tint: color-mix(in srgb, var(--s) 30%, var(--b));
-  --tint-strong: color-mix(in srgb, var(--s) 48%, var(--b));
-  --field: color-mix(in srgb, var(--a) 45%, var(--b));
-  --field-strong: color-mix(in srgb, var(--a) 65%, var(--b));
+  --tint: var(--pill);
+  --tint-strong: color-mix(in srgb, var(--pill) 55%, #fff);
   /* the current page's pill */
   --current: #fff;
-  --on-current: var(--t);
-  --line: color-mix(in srgb, var(--t) 12%, transparent);
+  --on-current: var(--current-ink);
+  --card: #fff;
+  --line: var(--page);
+  --title-font: var(--font);
   --gutter: 36px;
 
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--b);
+  background: var(--page);
   color: var(--t);
+  font-family: var(--font-instrument), var(--font);
 }
 
 /* Light theme only for now, like the rest of the site (see Palette.module.css). The dark rules that
@@ -30,9 +33,31 @@
 
 /* PR #14 moved globals.css's `body { margin: 0 }` onto the landing page only, which left an 8px
    border round the portal. Put it back while the portal is on screen; delete this once globals.css
-   resets the margin for every page again. */
+   resets the margin for every page again.
+   The background matters too: globals.css keeps space for the scrollbar (scrollbar-gutter: stable),
+   and on a page too short to scroll that empty strip shows the body's colour, the site's pink. */
 :global(body):has(> .shell) {
   margin: 0;
+  background: var(--scroll-track);
+}
+
+/* The window's scrollbar belongs to <html>, outside the shell, so it can't read the palette variables.
+   These repeat each palette's --page (Palette.module.css) for the track, with a thumb in its primary
+   colour. Without them the site's pink track shows down the right-hand edge. The body rule above
+   reuses --scroll-track for the strip that's left when the page doesn't scroll. */
+:global(html):has(.shell) {
+  --scroll-track: #d7dfea;
+  --scroll-thumb: color-mix(in srgb, #526c80 55%, transparent);
+}
+
+:global(html):has(.shell[data-palette="ven"]) {
+  --scroll-track: #e9e7e2;
+  --scroll-thumb: color-mix(in srgb, #70a992 70%, transparent);
+}
+
+:global(html):has(.shell[data-palette="att"]) {
+  --scroll-track: #f7f0ed;
+  --scroll-thumb: color-mix(in srgb, #d77e70 55%, transparent);
 }
 
 /* "Skip to content" link: hidden until it gets keyboard focus */
@@ -67,37 +92,41 @@
 }
 
 /* ---------- Top bar ---------- */
+/* Three columns, so the 500px search box sits in the middle of the window as in Figma.
+   Figma's edges are 28px (logo) and 32px (avatar); 30px each side plus the 2px nudges below keep
+   the search box centred. */
 .topBar {
   position: sticky;
   z-index: 10;
   top: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 500px) minmax(0, 1fr);
   align-items: center;
-  gap: 12px 24px;
+  column-gap: 24px;
   box-sizing: border-box;
-  min-height: 84px;
-  padding: 12px var(--gutter) 12px 28px;
-  background: var(--b);
-  border-bottom: 1px solid var(--line);
+  height: 84px;
+  padding: 0 30px;
+  background: var(--page);
 }
 
+/* the logo links home: two dots and "tezera" in the title font, 26px */
 .logo {
+  justify-self: start;
+  margin-left: -2px;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  font-size: 24px;
-  letter-spacing: -.02em;
+  gap: 12px;
+  font: 700 26px/1.2 var(--title-font);
   color: inherit;
   text-decoration: none;
 }
 
-/* two overlapping dots, primary over secondary, as drawn in both wireframes */
+/* two overlapping 24px dots, primary under the second colour, as drawn in Figma */
 .logoMark {
   position: relative;
   flex: none;
-  width: 32px;
-  height: 20px;
+  width: 38px;
+  height: 24px;
 }
 
 .logoMark::before,
@@ -105,31 +134,32 @@
   content: "";
   position: absolute;
   top: 0;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
 }
 
 .logoMark::before {
-  left: 12px;
-  background: var(--s);
-}
-
-.logoMark::after {
   left: 0;
   background: var(--p);
 }
 
+.logoMark::after {
+  left: 14px;
+  background: var(--logo-2);
+}
+
+/* the 500 x 36 search pill in the middle of the bar; the icon and the input sit in a row inside it */
 .search {
-  flex: 0 1 500px;
-  margin-inline: auto;
+  /* Figma draws the box 2px lower than the buttons */
+  margin-top: 4px;
   display: flex;
   align-items: center;
   gap: 10px;
   box-sizing: border-box;
-  height: 40px;
+  height: 36px;
   padding: 0 16px;
-  border-radius: 999px;
+  border-radius: 18px;
   background: var(--field);
 }
 
@@ -139,11 +169,15 @@
   outline-offset: 2px;
 }
 
+/* Figma's icons are white at 85% on the field colour */
 .searchIcon {
   flex: none;
-  opacity: .75;
+  width: 16px;
+  height: 16px;
+  color: rgb(255 255 255 / .85);
 }
 
+/* the input itself has no box: the .search pill around it is the box */
 .searchInput {
   flex: 1;
   min-width: 0;
@@ -151,162 +185,243 @@
   border: 0;
   outline: none;
   background: transparent;
-  color: inherit;
-  font: 400 15px var(--font);
+  color: var(--field-ink);
+  font: 400 13px var(--font-instrument), var(--font);
 }
 
+/* the hint is the full field-ink colour; browsers fade placeholders by default */
 .searchInput::placeholder {
-  color: inherit;
-  opacity: .75;
+  color: var(--field-ink);
+  opacity: 1;
 }
 
+/* disabled until the search page exists, but it shouldn't look broken */
 .searchInput:disabled {
   cursor: default;
 }
 
+/* messages, notifications, the role chip and the avatar, on the right. Buttons are 10px apart;
+   .roleChip and .avatar add margins to make Figma's 14px and 28px gaps. */
 .topActions {
+  justify-self: end;
+  margin-right: -2px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+/* a 36px round button for messages and notifications; the avatar reuses it */
 .iconButton {
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--field);
-  color: inherit;
+  color: rgb(255 255 255 / .85);
   text-decoration: none;
 }
 
-a.iconButton:hover {
-  background: var(--field-strong);
+.iconButton svg {
+  width: 16px;
+  height: 16px;
 }
 
+/* the bell and the avatar are <button>s: drop the browser's button look */
+button.iconButton {
+  position: relative;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
+button.iconButton:hover {
+  background: color-mix(in srgb, var(--field) 80%, var(--t));
+}
+
+button.avatar:hover {
+  background: color-mix(in srgb, var(--avatar) 80%, var(--t));
+}
+
+/* the button whose panel is open */
+.iconButtonOpen {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 45%, transparent);
+}
+
+/* the bell's red dot while something is unread: 9px, over its top-right edge (O05) */
+.badge {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d9534f;
+}
+
+/* only real links react on hover; unbuilt ones stay still */
+a.iconButton:hover {
+  background: color-mix(in srgb, var(--field) 80%, var(--t));
+}
+
+/* a button whose page doesn't exist yet: no hand cursor, so it doesn't promise a click */
 .iconSoon {
   cursor: default;
 }
 
-/* the account menu's avatar is a <button>, not a link */
-button.iconButton {
-  padding: 0;
-  border: 0;
-  font: inherit;
-  cursor: pointer;
-}
-
+/* the profile circle, 28px from the role chip; a plain colour until profiles have photos */
 .avatar {
-  margin-left: 4px;
-  background: var(--tint);
+  margin-left: 18px;
+  background: var(--avatar);
 }
 
-button.avatar:hover,
-button.avatar[aria-expanded="true"] {
-  background: var(--tint-strong);
-}
-
-/* ---------- Account menu (AccountMenu.tsx): the panel under the avatar ---------- */
-.account {
-  position: relative;
-}
-
-.accountPanel {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 10px);
-  right: 0;
-  display: grid;
-  gap: 14px;
-  box-sizing: border-box;
-  width: 264px;
-  max-width: calc(100vw - 2 * var(--gutter));
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 18px 18px 5px 18px;
-  /* brand shape: one small corner bottom-right */
-  background: var(--b);
-  color: var(--t);
-  box-shadow: 0 16px 36px -14px color-mix(in srgb, var(--t) 38%, transparent);
-}
-
-.accountPanel[hidden] {
-  display: none;
-}
-
-.accountWho {
-  display: grid;
-  gap: 2px;
-}
-
-.accountName {
-  margin: 0;
-  font-weight: 700;
-  font-size: 15px;
-  /* long email addresses wrap instead of widening the panel */
-  overflow-wrap: anywhere;
-}
-
-.accountRole {
-  margin: 0;
-  font-size: 14px;
-  opacity: .8;
-}
-
-.accountLinks {
-  margin: 0;
-  padding: 12px 0 0;
-  border-top: 1px solid var(--line);
-  list-style: none;
-  display: grid;
-  gap: 2px;
-}
-
-.accountLinks a {
-  display: block;
-  padding: 7px 10px;
-  border-radius: 10px 10px 3px 10px;
-  color: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.accountLinks a:hover {
-  background: var(--tint);
-}
-
-/* Log out: the outlined .button, as wide as the panel */
-.accountPanel .button {
-  justify-content: center;
-  width: 100%;
-  cursor: pointer;
-}
-
-.accountPanel .button:disabled {
-  cursor: progress;
-  opacity: .7;
-}
-
-.accountError {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
+/* the role's name in a 26px pill filled with the role colour, e.g. "Organiser" */
 .roleChip {
-  padding: 4px 14px;
-  border-radius: 999px;
+  margin-left: 4px;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 22px;
+  border-radius: 13px;
   background: var(--p);
   color: var(--on-p);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 26px;
   white-space: nowrap;
 }
 
+/* ---------- Top-bar panels: notifications dropdown (O81) and profile menu (O82) ---------- */
+/* Both hang 76px from the top of the window with their right edge 30px in, over the page, as
+   Figma draws them. Figma gives them no shadow; they're told apart from the page by their tint. */
+.popoverAnchor {
+  display: contents;
+}
+
+.popover {
+  position: fixed;
+  z-index: 20;
+  top: 76px;
+  right: 30px;
+  box-sizing: border-box;
+  max-height: calc(100dvh - 92px);
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--pill);
+  color: var(--t);
+}
+
+.popover[hidden] {
+  display: none;
+}
+
+.notificationsPopover {
+  width: 420px;
+}
+
+.profilePopover {
+  width: 310px;
+}
+
+/* "Notifications" and "Mark all read" on one line, 13px above the first row */
+.popoverHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 3px;
+}
+
+.popoverTitle {
+  margin: 0;
+  font: 700 16px/1.2 var(--title-font);
+}
+
+.popoverList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* one notification: 58px tall, a 32px picture, the time on the right in 11px */
+.popoverRow {
+  min-height: 58px;
+}
+
+.popoverTime {
+  flex: none;
+  align-self: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.popoverEmpty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* "See all notifications" sits on the panel's own tint in Figma, so it reads as text */
+.popover .popoverSeeAll {
+  margin-top: -1px;
+  background: transparent;
+}
+
+/* the profile menu's header: a 48px circle, the name and "email · role" */
+.profileHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profileWho {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.profileName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.profileMeta {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* one 56px white row of the profile menu */
+.profileItem {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.profileItem:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
 /* ---------- Below the top bar: sidebar card + page ---------- */
+/* two columns under the top bar: the 224px card, then the page */
 .body {
   display: grid;
   grid-template-columns: 224px minmax(0, 1fr);
@@ -314,22 +429,24 @@ button.avatar[aria-expanded="true"] {
   padding: 0 var(--gutter) 0 32px;
 }
 
-/* the card stays in view, 28px under the top bar, and scrolls inside if it's taller than the window */
+/* The card stays in view, 28px under the top bar and 40px above the window's bottom edge.
+   On a short window the links scroll inside it (.nav below), not the card itself: a scrollbar on the
+   card was drawn over its rounded right-hand edge. The right padding is 12px, not 20px, because the
+   links keep an 8px lane for their scrollbar; 12 + 8 keeps the pills 20px from the edge, as in Figma. */
 .sidebar {
   position: sticky;
   top: 112px;
   align-self: start;
   box-sizing: border-box;
-  height: calc(100vh - 140px);
-  height: calc(100dvh - 140px);
+  height: calc(100vh - 152px);
+  height: calc(100dvh - 152px);
   margin-top: 28px;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 26px 20px 20px;
-  border-radius: 26px 26px 6px 26px;
-  /* brand shape: one small corner bottom-right */
+  padding: 30px 12px 20px 20px;
+  border-radius: 24px;
   background: var(--side);
   color: var(--on-side);
 }
@@ -338,6 +455,13 @@ button.avatar[aria-expanded="true"] {
 .sidebar a:focus-visible,
 .sidebar button:focus-visible {
   outline-color: var(--on-side);
+}
+
+/* The links sit in a scrolling box, which would cut off a ring drawn outside them, so theirs is
+   drawn inside the pill, in the card colour, which shows on both the pale and the white pills. */
+.nav a:focus-visible {
+  outline-color: var(--side);
+  outline-offset: -3px;
 }
 
 /* only visible on narrow screens, where the links fold away behind it */
@@ -350,10 +474,11 @@ button.avatar[aria-expanded="true"] {
   border: 0;
   background: transparent;
   color: inherit;
-  font: 700 17px var(--font);
+  font: 700 17px var(--title-font);
   cursor: pointer;
 }
 
+/* the chevron: a bordered square turned 45deg, flipped to point up when the menu is open */
 .menuButton::after {
   content: "";
   width: 8px;
@@ -368,42 +493,72 @@ button.avatar[aria-expanded="true"] {
   transform: translateY(2px) rotate(225deg);
 }
 
+/* the part of the card that scrolls; the 8px lane is kept even when nothing scrolls, so the pills
+   don't change width between a tall window and a short one */
 .nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
   display: grid;
-  gap: 26px;
+  gap: 24px;
   align-content: start;
 }
 
-.groupTitle {
-  margin: 0 0 12px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -.01em;
+/* a thin thumb in the card's text colour on no track, instead of the site's 12px pink bar */
+.nav::-webkit-scrollbar {
+  width: 8px;
 }
 
+.nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav::-webkit-scrollbar-thumb,
+.nav::-webkit-scrollbar-thumb:hover {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--on-side) 45%, transparent) padding-box;
+}
+
+/* Firefox only, as in globals.css: browsers that support ::-webkit-scrollbar skip this */
+@supports not selector(::-webkit-scrollbar) {
+  .nav {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--on-side) 45%, transparent) transparent;
+  }
+}
+
+/* "General" and "<role> tools", centred over their pills, 14px above the first one */
+.groupTitle {
+  margin: 0 0 14px;
+  text-align: center;
+  font: 700 18px/1.2 var(--title-font);
+}
+
+/* the pills under one heading, 9px apart */
 .list {
   margin: 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 8px;
+  gap: 9px;
 }
 
-/* one pill in the card: a link, or a dashed placeholder for a page that isn't built yet */
+/* one pill in the card: a link, or plain text for a page that isn't built yet */
 .item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   box-sizing: border-box;
-  min-height: 38px;
-  padding: 7px 14px;
-  border-radius: 11px 11px 3px 11px;
+  min-height: 34px;
+  padding: 4px 14px;
+  border-radius: 8px;
   background: var(--tint);
-  color: var(--t);
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--pill-ink);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.22;
   text-decoration: none;
 }
 
@@ -417,11 +572,9 @@ a.item[aria-current="page"] {
   font-weight: 700;
 }
 
-/* no fill, so its text sits on the card itself and takes the card's text colour */
+/* Figma draws every item the same, so a page that isn't built yet looks like the rest; it just
+   isn't a link. Screen readers and the tooltip say "coming soon". */
 .soon {
-  border: 1.5px dashed color-mix(in srgb, var(--on-side) 50%, transparent);
-  background: transparent;
-  color: color-mix(in srgb, var(--on-side) 85%, transparent);
   cursor: default;
 }
 
@@ -464,19 +617,23 @@ a.item[aria-current="page"] {
 }
 
 /* ---------- Page area ---------- */
+/* the page area to the right of the card: at most 744 + 28 + 340 = 1112px wide, 28px below the
+   top bar so its first line lines up with the top of the card */
 .main {
   min-width: 0;
   max-width: 1112px;
   display: grid;
-  gap: 24px;
+  gap: 20px;
   align-content: start;
-  padding: 28px 0 56px;
+  padding: 28px 0 40px;
 }
 
 .main:focus {
   outline: none;
 }
 
+/* PageHeader.tsx: the title and description on the left, the buttons on the right; the buttons
+   wrap under the title when the column gets narrow */
 .pageHeader {
   display: flex;
   flex-wrap: wrap;
@@ -485,55 +642,59 @@ a.item[aria-current="page"] {
   gap: 16px 24px;
 }
 
+/* the title and the description, 6px apart */
 .pageHeading {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
+/* the page's h1, Bricolage 26px */
 .pageTitle {
   margin: 0;
-  font-weight: 800;
-  font-size: clamp(26px, 2.4vw, 32px);
-  line-height: 1.1;
-  letter-spacing: -.02em;
+  font: 700 26px/1.2 var(--title-font);
 }
 
+/* the grey line under the title */
 .lede {
   margin: 0;
   max-width: 60ch;
-  font-size: 16px;
-  opacity: .8;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.22;
 }
 
+/* the buttons beside the title, 8px apart */
 .pageActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* outlined by default; the primary one is filled in the role's colour with --on-p text */
+/* white by default; the primary one is filled in the role's colour with --on-p text */
 .button {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  min-height: 40px;
-  padding: 7px 18px;
-  border: 2px solid var(--p);
-  border-radius: 12px 12px 3px 12px;
-  background: var(--b);
+  height: 40px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--card);
   color: var(--t);
-  font: 600 15px var(--font);
+  font: 700 14px/1.22 var(--font-instrument), var(--font);
   text-decoration: none;
+  white-space: nowrap;
 }
 
+/* the page's one main action, e.g. "Create event" */
 .buttonPrimary {
   background: var(--p);
   color: var(--on-p);
 }
 
-/* a ring rather than a new fill, so the text keeps its contrast in every palette */
-.button:hover {
+/* a ring rather than a new fill, so the text keeps its contrast in every palette; only real links */
+a.button:hover {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
 }
 
@@ -545,35 +706,54 @@ a.item[aria-current="page"] {
   align-items: start;
 }
 
+/* each column stacks its blocks 20px apart */
 .column {
   min-width: 0;
   display: grid;
-  gap: 24px;
+  gap: 20px;
   align-content: start;
+}
+
+/* the right-hand column's panels are 16px apart */
+.aside {
+  gap: 16px;
 }
 
 /* one card in the right-hand column (Panel.tsx) */
 .panel {
   display: grid;
-  gap: 12px;
-  padding: 18px 20px 20px;
-  border-radius: 22px 22px 5px 22px;
+  gap: 10px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
   background: var(--tint);
 }
 
-.panelTitle {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -.01em;
+/* the panel's heading; the 5px margin plus the 10px gap makes Figma's 15px to the first row */
+/* the title row, when the panel has a link on the right ("Your rank … Leaderboards") */
+.panelHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 
+.panelHead .panelTitle {
+  margin-bottom: 0;
+}
+
+.panelTitle {
+  margin: 0 0 5px;
+  font: 700 16px/1.2 var(--title-font);
+}
+
+/* the one white row a panel shows while it has nothing to list */
 .panelEmpty {
   margin: 0;
-  padding: 14px 16px;
-  border-radius: 12px 12px 3px 12px;
-  background: var(--b);
-  font-size: 15px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 13px;
 }
 
 /* ---------- Narrower windows: the right-hand column moves under the main one ---------- */
@@ -591,19 +771,38 @@ a.item[aria-current="page"] {
 
   .topBar {
     position: static;
+    display: flex;
     flex-wrap: wrap;
-    min-height: 0;
+    gap: 10px 16px;
+    height: auto;
     padding: 10px var(--gutter);
+  }
+
+  .logo {
+    margin-left: 0;
   }
 
   .topActions {
     margin-left: auto;
+    margin-right: 0;
+  }
+
+  .avatar {
+    margin-left: 4px;
   }
 
   .search {
     order: 1;
     flex: 1 1 100%;
     margin: 0;
+  }
+
+  /* the panels span the window, 16px in from each side, under the first row of the top bar */
+  .popover {
+    top: 64px;
+    right: var(--gutter);
+    left: var(--gutter);
+    width: auto;
   }
 
   .body {
@@ -618,15 +817,18 @@ a.item[aria-current="page"] {
     overflow: visible;
     gap: 12px;
     padding: 10px 16px;
-    border-radius: 20px 20px 5px 20px;
+    border-radius: 20px;
   }
 
   .menuButton {
     display: flex;
   }
 
+  /* the card grows to fit its links here, so nothing scrolls and no lane is needed */
   .nav {
     display: none;
+    overflow: visible;
+    scrollbar-gutter: auto;
     padding-bottom: 10px;
   }
 

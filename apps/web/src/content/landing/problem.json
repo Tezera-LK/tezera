@@ -1,0 +1,249 @@
+{
+  "label": "The problem and how Tezera solves it",
+  "before": {
+    "kicker": "The problem",
+    "heading": "The people exist. Finding them doesn't.",
+    "body": "Caterers, crews and stall-holders are out there, but they're spread across group chats, phone books and old flyers. Organisers spend weeks chasing, good vendors wait to be found, and the crowd misses what's on."
+  },
+  "after": {
+    "kicker": "How Tezera solves it",
+    "heading": "One stage for the whole show.",
+    "body": "Organisers hire verified vendors and freelancers, fill stalls and share the venue map. Attendees find what's on and who's going. Every finished job leaves a review the next organiser can read, so work is won on track record, not contacts."
+  },
+  "notes": [
+    {
+      "kind": "chat",
+      "avatar": "CF",
+      "colour": "#e6c76a",
+      "name": "Caterers · Colombo Fair",
+      "text": "Priya: who confirmed the rice and curry?",
+      "badge": "99+",
+      "time": ""
+    },
+    {
+      "kind": "miss",
+      "avatar": "",
+      "colour": "",
+      "name": "Missed call",
+      "text": "Unknown number · 4 times",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "NS",
+      "colour": "#8fb0c6",
+      "name": "Nimal (sound)",
+      "text": "Machan, still need the PA or not?",
+      "badge": "3",
+      "time": ""
+    },
+    {
+      "kind": "file",
+      "avatar": "XL",
+      "colour": "#7cc4a4",
+      "name": "stalls_v3_FINAL.xlsx",
+      "text": "Edited by 6 people",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "voice",
+      "avatar": "KD",
+      "colour": "#f09eb4",
+      "name": "Kasun Decor",
+      "text": "2:41",
+      "badge": "1",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "EC",
+      "colour": "#c48fd6",
+      "name": "Event Crew 2026",
+      "text": "Shan: advance first, then I'll come",
+      "badge": "147",
+      "time": ""
+    },
+    {
+      "kind": "seen",
+      "avatar": "",
+      "colour": "",
+      "name": "Seen 9:42 PM",
+      "text": "No reply from the venue",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "file",
+      "avatar": "JP",
+      "colour": "#ef8f7f",
+      "name": "Flyer_final_REAL.jpg",
+      "text": "3rd version this week",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "+94",
+      "colour": "#b9b0b3",
+      "name": "+94 71 ••• 4410",
+      "text": "Is this the food fair group?",
+      "badge": "1",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "VK",
+      "colour": "#e6c76a",
+      "name": "Vendors · Kandy Fair",
+      "text": "Can I bring a stall last minute?",
+      "badge": "213",
+      "time": ""
+    },
+    {
+      "kind": "miss",
+      "avatar": "",
+      "colour": "",
+      "name": "Missed call",
+      "text": "Venue manager",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "DJ",
+      "colour": "#8fb0c6",
+      "name": "DJ Ravi",
+      "text": "Cancelled for Saturday. Any backup?",
+      "badge": "2",
+      "time": ""
+    },
+    {
+      "kind": "file",
+      "avatar": "XL",
+      "colour": "#7cc4a4",
+      "name": "ticket_list_who_paid.xlsx",
+      "text": "Last opened 3 days ago",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "IG",
+      "colour": "#f09eb4",
+      "name": "Instagram DM",
+      "text": "is this event still on??",
+      "badge": "12",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "FB",
+      "colour": "#8fb0c6",
+      "name": "Facebook event",
+      "text": "12 interested · 3 going",
+      "badge": "",
+      "time": "9:14 PM"
+    },
+    {
+      "kind": "voice",
+      "avatar": "AM",
+      "colour": "#e6c76a",
+      "name": "Amma",
+      "text": "0:58",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "PH",
+      "colour": "#c48fd6",
+      "name": "Photographers LK",
+      "text": "Who has Dilshan's number?",
+      "badge": "64",
+      "time": ""
+    },
+    {
+      "kind": "seen",
+      "avatar": "",
+      "colour": "",
+      "name": "Seen yesterday",
+      "text": "Tent supplier",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "GN",
+      "colour": "#ef8f7f",
+      "name": "Generator guy",
+      "text": "Diesel extra. Tell before Friday",
+      "badge": "1",
+      "time": ""
+    },
+    {
+      "kind": "file",
+      "avatar": "JP",
+      "colour": "#ef8f7f",
+      "name": "Flyer_draft2.jpg",
+      "text": "Sent to 4 groups",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "TL",
+      "colour": "#7cc4a4",
+      "name": "Tuk-tuk Lights",
+      "text": "Rate went up, sorry",
+      "badge": "5",
+      "time": ""
+    },
+    {
+      "kind": "miss",
+      "avatar": "",
+      "colour": "",
+      "name": "Missed call ×2",
+      "text": "Caterer (Hasini)",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "OR",
+      "colour": "#8fb0c6",
+      "name": "Org team",
+      "text": "Did anyone book the photographer??",
+      "badge": "38",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "SN",
+      "colour": "#e6c76a",
+      "name": "Sanduni",
+      "text": "Which gate do we use?",
+      "badge": "1",
+      "time": ""
+    },
+    {
+      "kind": "file",
+      "avatar": "PD",
+      "colour": "#c48fd6",
+      "name": "venue_map_old.pdf",
+      "text": "Wrong hall marked",
+      "badge": "",
+      "time": ""
+    },
+    {
+      "kind": "chat",
+      "avatar": "BS",
+      "colour": "#f09eb4",
+      "name": "Bakery stall",
+      "text": "Still waiting for the stall number",
+      "badge": "7",
+      "time": ""
+    }
+  ]
+}

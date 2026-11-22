@@ -30,6 +30,14 @@ type SampleProvider = {
 
 export const sampleOrganisers: SampleOrganiser[] = [
   {
+    // the organiser the portal's event store belongs to (lib/data/event-store.ts)
+    id: "org-agastra",
+    name: "Agastra Events",
+    description: "Concerts and night markets around Colombo.",
+    district: "Colombo",
+    verified: true,
+  },
+  {
     id: "org-sample-1",
     name: "Lotus Pond Events (sample)",
     description: "Food festivals and night markets around Colombo, run by a small team of four.",

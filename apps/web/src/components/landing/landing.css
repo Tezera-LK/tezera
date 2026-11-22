@@ -1,0 +1,350 @@
+/* The landing page: one dark LED stage. Everything is scoped under .tz so it never leaks into the
+   portal; html.tz-opening / html.tz-cursor are set by the stage script while the page is mounted. */
+/* The beat (--pulse) and the lead light colour (--lamp) change almost every frame. The stage writes them
+   only on the elements that use them, and they don't inherit, so a change restyles those few elements
+   instead of the whole page. Their initial values match the .tz defaults below. */
+@property --pulse { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --lamp { syntax: "*"; inherits: false; initial-value: 240, 128, 108; }
+.tz {
+  --ink: #f6efeb;
+  --ink-soft: rgba(246, 239, 235, 0.76);
+  --ink-faint: rgba(246, 239, 235, 0.55);
+  --coral: #e96b58;
+  --coral-rgb: 233, 107, 88;
+  --nav-h: 64px;
+  --gutter: clamp(16px, 4vw, 64px);
+  --font: var(--font-bricolage), "Segoe UI", system-ui, sans-serif;
+  --body: var(--font-instrument), "Segoe UI", system-ui, sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --pulse: 0;
+  --lamp: 240, 128, 108; /* the stage's lead light colour, set every frame */
+  --org: 143, 176, 198;
+  --ven: 124, 196, 164;
+  --fre: 169, 191, 208;
+  --att: 239, 143, 127;
+  /* darker fills of the same colours, for white text on solid buttons and chips (all 4.7:1 or better) */
+  --org-fill: 82, 108, 128;
+  --ven-fill: 67, 122, 99;
+  --att-fill: 192, 80, 63;
+  /* the section on stage right now: light tint and fill, cross-faded by the camera's position */
+  --sec: 239, 143, 127;
+  --sec-fill: 192, 80, 63;
+  --led-dots: radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1.6px) 0 0 / 6px 6px;
+}
+.tz, .tz * { box-sizing: border-box; margin: 0; }
+html:has(.tz) { background: #0e0c0d; scrollbar-color: #3a3436 #0e0c0d; }
+body:has(.tz) { background: #0e0c0d; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+/* the page root carries the text style (its font variables are defined here, not on body) */
+.tz { color: var(--ink); font: 400 17px/1.55 var(--body); }
+.tz button { font: inherit; color: inherit; }
+.tz :focus-visible { outline: 2px solid rgb(var(--sec)); outline-offset: 3px; border-radius: 999px; }
+.tz .skip-link { position: fixed; left: 16px; top: -60px; z-index: 100; padding: 10px 18px; border-radius: 999px; background: #fff; color: #111; font-weight: 700; text-decoration: none; }
+.tz .skip-link:focus { top: 12px; }
+.tz #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; }
+.tz .stage-grid { position: fixed; left: 0; top: 0; display: block; z-index: 0; pointer-events: none; }
+/* ---------- nav ---------- */
+.tz .nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); background: linear-gradient(rgba(14, 12, 13, 0.85), rgba(14, 12, 13, 0)); }
+.tz .nav .logo { font: 800 26px var(--font); letter-spacing: -0.02em; color: var(--ink); text-decoration: none; text-shadow: 0 0 24px rgba(var(--lamp), 0.35); }
+.tz .nav ul { display: flex; gap: 4px; list-style: none; padding: 4px; border-radius: 999px; background: rgba(14, 12, 13, 0.6); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); backdrop-filter: blur(8px); }
+.tz .nav a.l { display: block; padding: 7px 13px; border-radius: 999px; font: 600 13.5px var(--body); color: var(--ink-soft); text-decoration: none; transition: color 0.2s, background-color 0.2s; }
+.tz .nav a.l:hover { color: var(--ink); background: rgba(255, 255, 255, 0.06); }
+.tz .nav a.l[aria-current="true"] { color: #fff; background: rgb(var(--sec-fill)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.tz .nav .cta-mini { display: none; }
+@media (max-width: 1020px) {
+  .tz .nav ul { display: none; }
+  .tz .nav .cta-mini { display: inline-flex; }
+}
+/* ---------- the journey: a scroll runway; stops are fixed layers over the stage ---------- */
+.tz .journey { position: relative; z-index: 1; }
+.tz .stop { position: fixed; inset: 0; z-index: 5; pointer-events: none; visibility: hidden; }
+.tz .stop.on { visibility: visible; }
+/* stops that aren't on stage skip style and layout entirely (they are hidden anyway). Not the hero and the
+   problem: their will-change layers must be created at page load, at scale 1, or they would freeze their
+   raster at whatever zoom they first appear at (blurrier text) */
+.tz .stop:not(.on):not(#hero):not(#problem) { content-visibility: hidden; }
+.tz .stop.on .live { pointer-events: auto; }
+.tz .px { -webkit-mask-size: 16px 16px; mask-size: 16px 16px; }
+/* phones fade the lines in instead of dissolving them (see setLevel): each on its own layer, so the fade and
+   rise never re-raster the stop. The hero screen keeps its transform layer too */
+.tz.tz-touch .px { will-change: opacity, translate; }
+.tz.tz-touch .hung.px { will-change: transform, opacity, translate; }
+/* phones: what changes every frame sits on its own layer, so the compositor moves or fades it without re-rastering
+   what's around it (progress bars scale, LED dots and the "ONE" glow pulse with the beat) */
+.tz.tz-touch .prog i, .tz.tz-touch .tabs button .bar { will-change: transform; }
+.tz.tz-touch .led { will-change: opacity; }
+/* phones: "ONE" keeps a fixed tight glow, and a copy of the word underneath carries the wide glow, faded with the
+   beat on the compositor (a changing blur radius would re-raster the whole hero screen every frame) */
+.tz.tz-touch .one { --pi: var(--pulse); position: relative; z-index: 0; text-shadow: 0 0 10px rgba(var(--coral-rgb), 0.35); will-change: auto; }
+.tz.tz-touch .one::after { content: attr(data-glow); position: absolute; left: 0; top: 0; z-index: -1; color: transparent; text-shadow: 0 0 36px rgba(var(--coral-rgb), 0.8); opacity: var(--pi); will-change: opacity; pointer-events: none; }
+/* phones: the hero screen's layers keep one raster while the camera zooms (the boot settle, the push-in as you scroll);
+   otherwise each re-rasters at every zoom step, the big blurred glows especially */
+.tz.tz-touch #hero-main .face { will-change: transform; }
+.tz.tz-touch #hero-main::before, .tz.tz-touch #hero-main::after, .tz.tz-touch #hero-main .one::after, .tz.tz-touch #hero-main .led { will-change: transform, opacity; }
+/* phones: the opening holds the page still without toggling its overflow (see show.js) */
+html.tz-opening:has(.tz.tz-touch) { overflow: visible; touch-action: none; }
+/* phones: the parts that fade in or out around the opening stay on their own layers, so tapping Enter doesn't make the
+   whole page layer repaint (it would, the moment each one's fade starts) */
+/* phones: no CSS halo round the screens (the LED wall draws their glow, see show.js), and the big headings keep a
+   tight glow: a wide text glow on large type is very slow to draw the first time on a phone */
+.tz.tz-touch .screen::before, .tz.tz-touch .screen::after { content: none; }
+.tz.tz-touch #hero-main h1 { text-shadow: 0 0 14px rgba(var(--lamp), 0.3); }
+.tz.tz-touch .lit h2 { text-shadow: 0 0 14px rgba(var(--lamp), 0.28); }
+.tz.tz-touch .gate, .tz.tz-touch .nav, .tz.tz-touch .deck, .tz.tz-touch .rail, .tz.tz-touch .prog { will-change: opacity, transform; }
+/* phones: panels hold a steady glow (the pulse's mid value) instead of re-rastering on every beat */
+.tz.tz-touch .panel { box-shadow: inset 0 0 0 1px rgba(var(--c), 0.3), inset 0 0 28px rgba(var(--c), 0.0815), 0 0 15.7px rgba(var(--c), 0.156); }
+/* buttons: a solid pill in the section's colour, or a dark outlined one, each with a round arrow chip */
+.tz .btn { --bf: var(--sec-fill); position: relative; display: inline-flex; align-items: center; gap: 14px; height: 52px; padding: 0 6px 0 24px; border: 0; border-radius: 999px; font: 700 15px var(--body); letter-spacing: 0.01em; cursor: pointer; text-decoration: none; white-space: nowrap; transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background-color 0.25s; }
+.tz .btn .chip { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 50%; transition: transform 0.3s var(--ease); }
+.tz .btn .chip svg { width: 16px; height: 16px; }
+.tz .btn:hover .chip { transform: translateX(3px); }
+.tz .btn.down:hover .chip { transform: translateY(2px); }
+.tz .btn:active { transform: scale(0.98); }
+.tz .btn.solid { color: #fff; background: rgb(var(--bf)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 10px 28px -14px rgba(var(--bf), 0.9); }
+.tz .btn.solid .chip { background: #fff; color: rgb(var(--bf)); }
+.tz .btn.solid:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 14px 34px -10px rgba(var(--bf), 1); }
+.tz .btn.ghost { color: var(--ink); background: rgba(14, 12, 13, 0.72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24); }
+.tz .btn.ghost .chip { color: var(--ink); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32); }
+.tz .btn.ghost:hover { background: rgba(30, 26, 28, 0.85); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4); }
+.tz .btn.sm { height: 44px; padding-left: 18px; gap: 12px; font-size: 14px; }
+.tz .btn.sm .chip { width: 34px; height: 34px; }
+.tz .btn.sm .chip svg { width: 14px; height: 14px; }
+/* LED panels and screens */
+.tz .panel { --c: var(--lamp); position: relative; border-radius: 20px; padding: 18px 20px; color: var(--ink); background: var(--led-dots), rgba(12, 10, 11, 0.86); box-shadow: inset 0 0 0 1px rgba(var(--c), 0.3), inset 0 0 28px rgba(var(--c), calc(0.05 + 0.09 * var(--pulse))), 0 0 calc(8px + 22px * var(--pulse)) rgba(var(--c), calc(0.1 + 0.16 * var(--pulse))); backdrop-filter: blur(3px); }
+.tz .lab { display: flex; align-items: center; gap: 8px; font: 700 11.5px var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: rgb(var(--c, var(--lamp))); }
+.tz .led { width: 8px; height: 8px; border-radius: 50%; background: rgb(var(--c, var(--lamp))); box-shadow: 0 0 10px rgb(var(--c, var(--lamp))); opacity: calc(0.55 + 0.45 * var(--pulse)); flex: none; }
+.tz .panel b { display: block; margin-top: 6px; font: 700 19px/1.2 var(--font); letter-spacing: -0.01em; }
+.tz .panel small { display: block; margin-top: 4px; color: var(--ink-soft); font-size: 14px; }
+.tz .meter { margin-top: 10px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.tz .meter i { display: block; height: 100%; width: 68%; border-radius: inherit; background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0.8px, transparent 1.3px) 0 0 / 4px 4px, rgb(var(--c)); box-shadow: 0 0 10px rgb(var(--c)); }
+/* a hung screen: a dark bezel round an LED face with faint scanlines */
+.tz .screen { --c: var(--lamp); --pi: var(--pulse); position: relative; border-radius: 28px; padding: 6px; background: linear-gradient(180deg, #2b2628, #141113); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 40px 80px -40px #000; }
+/* the screen's glow pulses with the beat by cross-fading a tight and a wide fixed blur on their own layers, so the
+   GPU never re-blurs it (--pi passes the non-inherited --pulse down to the two pseudo-elements) */
+.tz .screen::before, .tz .screen::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; will-change: opacity; }
+.tz .screen::before { box-shadow: 0 0 24px rgba(var(--c), 0.1); opacity: calc(1 - var(--pi)); }
+.tz .screen::after { box-shadow: 0 0 70px rgba(var(--c), 0.22); opacity: var(--pi); z-index: -1; }
+.tz .screen > .face { position: relative; border-radius: 22px; overflow: hidden; background: var(--led-dots), radial-gradient(120% 90% at 50% 0%, rgba(var(--c), 0.16), transparent 62%), #0b090a; }
+.tz .screen > .face::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px); pointer-events: none; }
+.tz .lit h2 { color: #fff; text-shadow: 0 0 42px rgba(var(--lamp), 0.28); letter-spacing: -0.03em; }
+.tz .lit p { color: var(--ink-soft); }
+.tz .one { color: var(--coral); text-shadow: 0 0 calc(10px + 26px * var(--pulse)) rgba(var(--coral-rgb), calc(0.35 + 0.45 * var(--pulse))); }
+/* section names: a solid chip in the section's colour, so each part of the show is named in its own colour */
+.tz .kick { --kf: var(--sec-fill); display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 12px; border-radius: 999px; font: 800 12.5px var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: #fff; background: rgb(var(--kf)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 0 4px rgba(var(--kf), 0.22), 0 10px 26px -10px rgba(var(--kf), 0.9); }
+.tz .kick .led { --c: 255, 255, 255; width: 7px; height: 7px; }
+/* ---------- hero: the show's main screen, hung in the rig (placed in world space by the script) ---------- */
+.tz .hung { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.tz #hero-main .face { padding: clamp(24px, 3vw, 46px) clamp(22px, 3.4vw, 52px) 0; }
+.tz .onair { display: inline-flex; align-items: center; gap: 9px; font: 700 11.5px var(--body); letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; }
+.tz .onair i { width: 9px; height: 9px; border-radius: 50%; background: #ff4d3d; box-shadow: 0 0 10px #ff4d3d; animation: tz-blink 1.4s steps(2, jump-none) infinite; }
+@keyframes tz-blink { 50% { opacity: 0.25; } }
+.tz #hero-main h1 { margin-top: 14px; font: 800 clamp(2.3rem, 1.3rem + 3.4vw, 4.4rem)/1 var(--font); letter-spacing: -0.03em; color: #fff; text-shadow: 0 0 40px rgba(var(--lamp), 0.3); }
+.tz #hero-main .value { margin-top: 16px; max-width: 52ch; color: var(--ink-soft); font-size: clamp(15.5px, 0.9rem + 0.3vw, 18px); }
+.tz #hero-main .cta { margin-top: 26px; display: flex; gap: 12px; flex-wrap: wrap; }
+.tz .ticker { margin: 28px calc(-1 * clamp(22px, 3.4vw, 52px)) 0; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.02); overflow: hidden; white-space: nowrap; font: 600 13px var(--body); color: var(--ink-faint); }
+.tz .ticker > div { display: inline-flex; gap: 40px; padding-left: 40px; animation: tz-tick 38s linear infinite; }
+.tz .ticker span { display: inline-flex; align-items: center; gap: 8px; }
+.tz .ticker b { color: var(--ink); font-weight: 700; }
+@keyframes tz-tick { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .tz .ticker > div, .tz .onair i { animation: none; }
+}
+/* ---------- the problem, and the fix ---------- */
+.tz .pwrap { position: absolute; inset: calc(var(--nav-h) + 4vh) var(--gutter) 12vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 4vw; }
+.tz .ptext { display: grid; }
+.tz .ptext > div { grid-area: 1 / 1; }
+.tz .ptext h2, .tz .info h2 { margin-top: 18px; font: 800 clamp(2.1rem, 1.3rem + 2.6vw, 3.8rem)/1.02 var(--font); }
+.tz .ptext p.body { margin-top: 16px; max-width: 46ch; font-size: 18px; }
+.tz .pstage { position: relative; height: min(420px, 52vh); }
+.tz .pstage { height: min(540px, 64vh); }
+.tz .note { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; gap: 10px; max-width: 270px; padding: 9px 12px 9px 9px; border-radius: 16px; background: rgba(30, 26, 28, 0.96); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09), 0 12px 26px -14px #000; font: 500 12.5px/1.3 var(--body); color: var(--ink-soft); white-space: nowrap; will-change: transform, opacity; opacity: 0; }
+.tz .note .av { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 50%; font: 800 11px var(--font); color: #141113; background: var(--avc, #b9b0b3); }
+.tz .note .tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tz .note b { display: block; color: var(--ink); font: 700 12.5px/1.25 var(--body); overflow: hidden; text-overflow: ellipsis; }
+.tz .note .badge { margin-left: 4px; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px; background: #e5483a; color: #fff; font: 800 11px/20px var(--body); text-align: center; flex: none; }
+.tz .note time { margin-left: 4px; font-size: 10.5px; color: var(--ink-faint); flex: none; }
+.tz .note.miss { background: rgba(70, 20, 17, 0.96); color: #ffc2b8; }
+.tz .note.miss .av { background: #e5483a; color: #fff; }
+.tz .note.file .av { border-radius: 8px; }
+.tz .note .wave { display: inline-flex; align-items: center; gap: 2px; height: 14px; margin-right: 4px; vertical-align: middle; }
+.tz .note .wave i { width: 2px; border-radius: 1px; background: currentColor; }
+.tz .note.seen { color: var(--ink-faint); font-style: italic; }
+.tz .hub { position: absolute; left: 50%; top: 50%; width: min(340px, 84%); margin: 0; transform: translate(-50%, -50%); z-index: 2; text-align: center; padding: 26px 22px; }
+.tz .hub .brand { font: 800 40px var(--font); letter-spacing: -0.02em; color: #fff; text-shadow: 0 0 30px rgba(var(--lamp), 0.5); }
+.tz .hub .roles4 { margin-top: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.tz .hub .roles4 span { --c: inherit; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font: 700 11px var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: rgb(var(--c)); background: rgba(var(--c), 0.12); }
+/* ---------- who's in the show ---------- */
+.tz #audience .wrap { position: absolute; left: var(--gutter); right: var(--gutter); top: calc(var(--nav-h) + 7vh); text-align: center; }
+.tz #audience h2 { font: 800 clamp(2.2rem, 1.5rem + 3vw, 4rem)/1 var(--font); }
+.tz #audience p.sub { margin: 14px auto 0; max-width: 50ch; font-size: 18px; }
+.tz .roles { margin: 34px auto 0; max-width: 980px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; }
+.tz .roles .panel { display: block; padding: 22px; cursor: pointer; border: 0; text-align: left; transition: transform 0.3s var(--ease); }
+.tz .roles .panel:hover { transform: translateY(-4px); }
+.tz .roles .panel b { font-size: 25px; }
+.tz .roles .panel em { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font: 700 12px var(--body); font-style: normal; letter-spacing: 0.1em; text-transform: uppercase; color: rgb(var(--c)); }
+/* ---------- role stops: info + a screenshot screen on the left, the camera's subject on the right ---------- */
+.tz .role .info { position: absolute; left: var(--gutter); top: calc(var(--nav-h) + 2vh); bottom: 3vh; width: min(540px, 44vw); display: flex; flex-direction: column; justify-content: center; }
+.tz .role .eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 700 12px var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); }
+.tz .role .eyebrow .led { width: 6px; height: 6px; }
+.tz .role .rname { margin-top: 6px; font: 800 clamp(2.9rem, 1.6rem + 3.8vw, 5.2rem)/0.92 var(--font); letter-spacing: -0.02em; text-transform: uppercase; color: rgb(var(--c)); text-shadow: 0 0 44px rgba(var(--c), 0.45); }
+.tz .role .tagline { margin-top: 12px; font: 800 clamp(1.35rem, 0.95rem + 1vw, 2rem)/1.12 var(--font); letter-spacing: -0.02em; color: #fff; }
+.tz .role h2 { font-size: clamp(2rem, 1.2rem + 2.2vw, 3.3rem); margin-top: 14px; }
+.tz .role .sub { margin-top: 10px; font-size: 17px; line-height: 1.5; }
+.tz .shot { margin-top: 20px; border-radius: 22px; padding: 5px; }
+.tz .shot > .face { border-radius: 17px; }
+.tz .shot .imgs { position: relative; aspect-ratio: 5 / 3; }
+.tz .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tz .shot img.flick { animation: tz-scan 0.5s steps(10, end) both; }
+@keyframes tz-scan { 0% { clip-path: inset(0 0 100% 0); filter: brightness(1.7) saturate(0.4); } 100% { clip-path: inset(0); filter: none; } }
+/* phones: the new screenshot fades in (runs on the compositor) instead of the scan, whose clip-path and filter steps
+   re-raster the whole image ten times, right as a stop arrives */
+.tz.tz-touch .shot img.flick { animation: tz-shot-in 0.4s var(--ease) both; }
+@keyframes tz-shot-in { from { opacity: 0; } }
+.tz .shot .cap { position: relative; padding: 12px 16px 14px; font-size: 14px; color: var(--ink-soft); border-top: 1px solid rgba(255, 255, 255, 0.07); min-height: 2.9em; }
+.tz .shot .cap b { color: var(--ink); font: 700 15px var(--font); margin-right: 6px; }
+.tz .tabs { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.tz .tabs button { position: relative; display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 11px; border: 0; border-radius: 14px; background: rgba(14, 12, 13, 0.72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); color: var(--ink-faint); font: 600 12.5px/1.2 var(--body); text-align: left; cursor: pointer; transition: color 0.2s, background-color 0.2s, box-shadow 0.2s; }
+.tz .tabs button:hover { color: var(--ink); }
+.tz .tabs button[aria-selected="true"] { color: var(--ink); background: rgba(var(--c), 0.14); box-shadow: inset 0 0 0 1px rgba(var(--c), 0.5), 0 0 14px rgba(var(--c), 0.2); }
+.tz .tabs button .led { width: 6px; height: 6px; opacity: 0.35; }
+.tz .tabs button[aria-selected="true"] .led { opacity: 1; }
+.tz .tabs button .bar { position: absolute; left: 10px; right: 10px; bottom: 4px; height: 2px; border-radius: 2px; background: rgba(var(--c), 0.9); transform-origin: 0 50%; transform: scaleX(0); }
+.tz .role .go { margin-top: 16px; align-self: flex-start; }
+@media (max-width: 900px) {
+  .tz .pwrap { grid-template-columns: 1fr; align-content: end; inset: calc(var(--nav-h) + 2vh) var(--gutter) 92px; gap: 0; }
+  .tz .pstage { position: absolute; left: 0; right: 0; top: 0; height: 42vh; }
+  .tz .note { max-width: 210px; font-size: 11.5px; }
+  .tz .ptext h2 { font-size: 2rem; }
+  .tz .ptext p.body { font-size: 15.5px; }
+  /* "Who's in the show" on phones: heading and all three cards fit under the nav with room to spare */
+  .tz #audience .wrap { top: calc(var(--nav-h) + 2vh); }
+  .tz #audience h2 { font-size: 1.95rem; }
+  .tz #audience p.sub { margin-top: 8px; font-size: 15px; }
+  .tz .roles { grid-template-columns: 1fr; gap: 8px; margin-top: 18px; }
+  .tz .roles .panel { padding: 11px 14px 12px; border-radius: 16px; }
+  .tz .roles .panel b { font-size: 17px; }
+  .tz .roles .panel .lab { font-size: 10.5px; }
+  .tz .roles .panel em { margin-top: 6px; font-size: 11px; }
+  .tz .role .info { top: auto; bottom: 84px; right: var(--gutter); width: auto; display: block; will-change: transform; }
+  .tz .role .rname { font-size: 2.6rem; margin-top: 4px; }
+  .tz .role .tagline { font-size: 1.2rem; margin-top: 6px; }
+  .tz .role .sub, .tz .role .eyebrow { display: none; }
+  .tz .shot { margin-top: 12px; }
+  .tz .shot .imgs { aspect-ratio: auto; height: min(22vh, 200px); }
+  .tz .shot .cap { display: none; }
+  /* one swipeable row of feature tabs, so the stage keeps the top half of the screen */
+  .tz .tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); }
+  .tz .tabs::-webkit-scrollbar { display: none; }
+  .tz .tabs button { flex: none; min-height: 36px; font-size: 12.5px; white-space: nowrap; }
+  .tz .role .go { margin-top: 10px; }
+}
+/* ---------- after the set ---------- */
+.tz .after { position: relative; z-index: 2; padding: 12vh var(--gutter) 140px; display: grid; gap: 16vh; }
+.tz .after h2 { font: 800 clamp(2.2rem, 1.5rem + 3vw, 4rem)/1 var(--font); }
+.tz .after .sub { margin-top: 12px; font-size: 18px; color: var(--ink-soft); }
+.tz .manifesto { display: grid; justify-items: center; text-align: center; padding: 6vh 0; }
+.tz .manifesto .statement { margin-top: 26px; max-width: 20ch; font: 800 clamp(2.2rem, 1.3rem + 3.4vw, 4.6rem)/1.06 var(--font); letter-spacing: -0.03em; color: #fff; text-wrap: balance; }
+.tz .manifesto .statement span { color: rgb(var(--c)); text-shadow: 0 0 34px rgba(var(--c), 0.45); }
+.tz .manifesto .mission { margin-top: 28px; max-width: 60ch; font-size: clamp(16.5px, 1rem + 0.25vw, 19px); line-height: 1.6; color: var(--ink-soft); text-wrap: pretty; }
+.tz .manifesto .mission b { color: var(--ink); font-weight: 600; }
+.tz .manifesto .tri { margin-top: 30px; display: flex; gap: 8px; }
+.tz .manifesto .tri i { width: 44px; height: 6px; border-radius: 999px; background: rgb(var(--c)); box-shadow: 0 0 14px rgb(var(--c)); }
+.tz .team { margin-top: 32px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.tz .team .panel { padding: 12px 12px 16px; }
+.tz .team img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; background: #1a1617; }
+.tz .team b { font-size: 17px; margin-top: 12px; }
+.tz .team small { font-size: 13px; }
+.tz .team .lab { margin-top: 8px; }
+.tz .join { text-align: center; display: grid; justify-items: center; }
+.tz .join .cta { margin-top: 26px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.tz .join .kick { margin-bottom: 18px; }
+.tz footer.panel { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; padding: 30px; }
+.tz footer .brand { font: 800 34px var(--font); letter-spacing: -0.02em; }
+.tz footer h3 { font: 700 12px var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px; }
+/* one per line, but only as wide as the word, so the cursor ring and the hover hug the text */
+.tz footer a, .tz footer .linkish { display: block; width: fit-content; color: var(--ink-soft); text-decoration: none; margin: 4px 0; background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-align: left; }
+.tz footer a:hover, .tz footer .linkish:hover { color: var(--ink); }
+.tz footer .credit { grid-column: 1 / -1; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px; color: var(--ink-faint); }
+/* fixed, as a modal dialog should be (.panel's position: relative would put it at the top of the page, and opening it
+   would scroll there to focus its button) */
+.tz dialog.panel { position: fixed; max-width: min(620px, calc(100vw - 32px)); margin: auto; padding: 30px; border: 0; color: var(--ink); }
+.tz dialog::backdrop { background: rgba(8, 7, 8, 0.72); backdrop-filter: blur(4px); }
+.tz dialog h2 { font: 800 30px var(--font); }
+.tz dialog p { margin-top: 12px; color: var(--ink-soft); font-size: 15.5px; }
+.tz dialog .btn { margin-top: 22px; }
+@media (max-width: 900px) {
+  /* phones: the team is a row that loops forever and moves on by itself; it can't be swiped (loop and timing in show.js) */
+  .tz .team { position: relative; display: flex; gap: 12px; overflow-x: hidden; touch-action: pan-y; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
+  .tz .team::-webkit-scrollbar { display: none; }
+  .tz #team { min-width: 0; } /* a grid item: without this it grows to the whole row of cards */
+  .tz .team > .panel { flex: 0 0 68%; scroll-snap-align: center; }
+  .tz footer.panel { grid-template-columns: 1fr; }
+}
+/* progress through the show (phones and tablets) */
+.tz .prog { position: fixed; left: 0; right: 0; top: 0; z-index: 21; height: 3px; display: none; background: rgba(255, 255, 255, 0.08); }
+.tz .prog i { display: block; height: 100%; background: rgb(var(--sec)); box-shadow: 0 0 10px rgb(var(--sec)); transform-origin: 0 50%; transform: scaleX(var(--prog, 0)); }
+@media (max-width: 900px) {
+  .tz .prog { display: block; }
+}
+html.tz-opening .tz .prog { opacity: 0; }
+/* stop rail */
+.tz .rail { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 15; display: grid; gap: 12px; padding: 10px 6px; border-radius: 999px; background: rgba(14, 12, 13, 0.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.tz .rail button { width: 12px; height: 12px; border: 0; border-radius: 50%; padding: 0; background: rgba(255, 255, 255, 0.2); cursor: pointer; transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease); }
+.tz .rail button:hover { transform: scale(1.3); }
+.tz .rail button[aria-current="true"] { background: rgb(var(--sec)); box-shadow: 0 0 12px rgb(var(--sec)); }
+@media (max-width: 900px) {
+  .tz .rail { right: 6px; gap: 9px; padding: 8px 5px; }
+  .tz .rail button { width: 8px; height: 8px; }
+}
+@media (max-width: 700px) {
+  .tz .rail { display: none; }
+}
+/* ---------- music deck ---------- */
+.tz .deck { position: fixed; left: 16px; bottom: 16px; z-index: 30; display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; background: var(--led-dots), rgba(14, 12, 13, 0.84); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09), 0 10px 30px -12px rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); max-width: calc(100vw - 32px); font: 600 13px var(--body); }
+.tz .deck .ic { width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; cursor: pointer; color: var(--ink-soft); transition: background-color 0.2s, color 0.2s; }
+.tz .deck .ic:hover { background: rgba(255, 255, 255, 0.08); color: var(--ink); }
+.tz .deck svg { width: 16px; height: 16px; fill: currentColor; }
+.tz .sw { display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 8px 0 12px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; color: var(--ink-soft); transition: background-color 0.2s, color 0.2s; }
+.tz .sw:hover { background: rgba(255, 255, 255, 0.06); color: var(--ink); }
+.tz .sw .track { position: relative; width: 36px; height: 20px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); transition: background-color 0.3s; }
+.tz .sw .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #9a9193; transition: transform 0.3s var(--ease), background-color 0.3s, box-shadow 0.3s; }
+.tz .sw[aria-checked="true"] { color: var(--ink); }
+.tz .sw[aria-checked="true"] .track { background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0.8px, transparent 1.3px) 0 0 / 4px 4px, var(--coral); box-shadow: 0 0 calc(8px + 10px * var(--pulse)) rgba(var(--coral-rgb), 0.6); }
+.tz .sw[aria-checked="true"] .track::after { transform: translateX(16px); background: #fff; box-shadow: 0 0 8px #fff; }
+.tz .sw .state { min-width: 22px; text-align: left; }
+.tz .vol { --v: 50%; -webkit-appearance: none; appearance: none; width: 88px; height: 28px; margin: 0 6px 0 2px; background: transparent; cursor: pointer; }
+.tz .vol::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0.9px, transparent 1.4px) 0 0 / 5px 8px, linear-gradient(90deg, rgba(var(--coral-rgb), 0.95) var(--v), rgba(255, 255, 255, 0.1) var(--v)); }
+.tz .vol::-moz-range-track { height: 8px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0.9px, transparent 1.4px) 0 0 / 5px 8px, linear-gradient(90deg, rgba(var(--coral-rgb), 0.95) var(--v), rgba(255, 255, 255, 0.1) var(--v)); }
+.tz .vol::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px rgba(var(--coral-rgb), 0.8); }
+.tz .vol::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 10px rgba(var(--coral-rgb), 0.8); }
+.tz .vol:focus-visible { outline: none; }
+.tz .vol:focus-visible::-webkit-slider-thumb { outline: 2px solid #fff; outline-offset: 2px; }
+.tz .vol.off::-webkit-slider-runnable-track { filter: grayscale(1) brightness(0.7); }
+.tz .vol.off::-moz-range-track { filter: grayscale(1) brightness(0.7); }
+.tz .now { display: grid; padding: 0 14px 0 6px; line-height: 1.2; min-width: 0; }
+.tz .now span, .tz .now small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+.tz .now span { color: var(--ink); }
+.tz .now small { color: var(--ink-faint); font-weight: 500; font-size: 11.5px; }
+@media (max-width: 560px) {
+  .tz .now, .tz .vol { display: none; }
+}
+/* ---------- cursor: an LED dot with a ring that hugs what it's over (mouse and trackpad only) ---------- */
+.tz .cur { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; display: none; }
+html.tz-cursor .tz .cur { display: block; }
+/* the cursor is a manual popover: while a dialog is open it's raised into the top layer above it (see show.js), so it
+   needs the popover defaults undone */
+.tz .cur[popover] { inset: auto; left: 0; top: 0; width: 0; height: 0; margin: 0; padding: 0; border: 0; background: none; overflow: visible; color: inherit; }
+html.tz-cursor, html.tz-cursor * { cursor: none !important; }
+.tz .cur .dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: rgb(var(--sec)); box-shadow: 0 0 12px rgb(var(--sec)), 0 0 1px 1px rgba(255, 255, 255, 0.8); transition: transform 0.15s var(--ease), opacity 0.2s; }
+.tz .cur .ring { position: fixed; left: 0; top: 0; border-radius: 999px; box-shadow: inset 0 0 0 1.5px rgba(var(--sec), 0.8), 0 0 18px rgba(var(--sec), 0.3); transition: opacity 0.25s; }
+.tz .cur.down .dot { transform: scale(0.55); }
+.tz .cur.out { opacity: 0; }
+/* the opening */
+.tz .gate { position: fixed; left: 0; right: 0; top: 60vh; z-index: 25; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 0 16px; opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), visibility 0s 0.4s; }
+.tz .gate.on { opacity: 1; visibility: visible; transform: none; transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.tz .gate p { flex-basis: 100%; text-align: center; font-size: 13px; color: var(--ink-faint); margin-top: 4px; }
+html.tz-opening { overflow: hidden; }
+.tz .nav, .tz .deck { transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.tz .rail { transition: opacity 0.8s var(--ease); }
+html.tz-opening .tz .nav, html.tz-opening .tz .deck, html.tz-opening .tz .rail { opacity: 0; pointer-events: none; }
+html.tz-opening .tz .nav { transform: translateY(-10px); }
+.tz .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -1,0 +1,211 @@
+/* The organiser dashboard's own blocks (Figma O05). Shared pieces (chips, rows, buttons) are in
+   ../ui.module.css. Sizes are Figma's in the 744px main column. */
+
+/* ---------- The next event: photo, details, two number tiles ---------- */
+/* 220px photo, 16px gap, the details, then a 150px column of tiles; 16px padding all round */
+.featured {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 150px;
+  gap: 16px;
+  align-items: start;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.photo {
+  display: block;
+  line-height: 0;
+}
+
+/* "Tonight", the name, the date line, the chips and the two buttons */
+.featuredBody {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+}
+
+.featuredTitle {
+  margin: 11px 0 0;
+  font: 700 22px/1.2 var(--title-font);
+}
+
+.featuredMeta {
+  margin-top: 14px;
+}
+
+/* the status chips, 8px apart, 9px under the date line */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+/* "Manage event" and "Update status", 12px under the chips */
+.featuredActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* the two white tiles stacked 12px apart */
+.stats {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+/* one tile: the number on top, the label 8px under it */
+.stat {
+  display: grid;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 85px;
+  padding: 15px 16px;
+  border-radius: 18px;
+  background: var(--card);
+}
+
+.statValue {
+  margin: 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+/* the label comes first in the HTML (a <dt> before its <dd>) but shows under the number */
+.statLabel {
+  order: 1;
+}
+
+/* ---------- "Your events" table ---------- */
+.events {
+  display: grid;
+  gap: 20px;
+}
+
+/* the white card round the table; it scrolls sideways on narrow screens instead of squashing */
+.tableCard {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+/* Column widths from where O05's columns start: Status at 198px, Going 313, Interested 397,
+   Bookings 492, Stalls 576, the link 660 (measured from the card's padding edge). */
+/* fixed layout, so the widths below are the columns' real widths, padding included */
+.table {
+  width: 100%;
+  min-width: 640px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.22;
+  text-align: left;
+}
+
+/* rows are 57px: 11px above and below two lines of text */
+.table th,
+.table td {
+  box-sizing: border-box;
+  padding: 11px 8px 11px 0;
+  vertical-align: middle;
+  font-weight: 400;
+}
+
+.table thead th {
+  padding-top: 3px;
+  padding-bottom: 11px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table thead th:nth-child(1) { width: 198px; }
+.table thead th:nth-child(2) { width: 115px; }
+.table thead th:nth-child(3) { width: 84px; }
+.table thead th:nth-child(4) { width: 95px; }
+.table thead th:nth-child(5),
+.table thead th:nth-child(6) { width: 84px; }
+
+/* 1px lines between rows, in the page colour */
+.table tbody tr + tr > * {
+  border-top: 1px solid var(--line);
+}
+
+.table tbody tr:last-child > * {
+  padding-bottom: 0;
+}
+
+/* the event's name over its date */
+.table tbody th span {
+  display: block;
+}
+
+.table tbody th span + span {
+  margin-top: 3px;
+}
+
+.eventName {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* the Going number is bold in Figma */
+.table .strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- Right-hand column ---------- */
+/* attention rows are 58px with a 36px picture */
+.attentionRow {
+  min-height: 58px;
+  padding-block: 11px;
+}
+
+/* "#4 of organisers" and the stars on the left, the badge on the right */
+.rank {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.rankText {
+  display: grid;
+  gap: 3px;
+}
+
+.rankPosition {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+/* ---------- Narrow windows ---------- */
+/* the tiles move under the details, side by side */
+@media (max-width: 1100px) {
+  .featured {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .stats {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* on phones the photo goes on top and fills the width */
+@media (max-width: 640px) {
+  .featured {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .photo > span {
+    width: 100% !important;
+  }
+}

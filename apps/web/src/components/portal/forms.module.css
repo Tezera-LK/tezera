@@ -1,0 +1,355 @@
+/* Form pieces for the portal, sized from the Figma organiser forms (O08 create event, O54 edit,
+   O10 postpone, O53 cancel, O56 announcement, O15 answers). */
+
+/* the whole form: its sections 20px apart, like the page */
+.form {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* one section: its heading ("Basics") 19px above a white card */
+.section {
+  display: grid;
+  gap: 19px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* the white card that holds a section's fields: 16px padding, fields 11px apart */
+.card {
+  display: grid;
+  gap: 11px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+/* fields side by side: two (category and age rating) or three (date and times) */
+.row2,
+.row3 {
+  display: grid;
+  gap: 12px;
+}
+
+.row2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.row3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* one field: its label 8px above the input */
+.field {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+/* inputs are 46px pills of the page colour with 14px text, radius 12 */
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--page);
+  color: var(--t);
+  font: 400 14px/1.22 var(--font-instrument), var(--font);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--p);
+}
+
+.input[aria-invalid="true"] {
+  border-color: #b3261e;
+}
+
+/* the description and answer boxes: 96px tall, text from the top */
+textarea.input {
+  min-height: 96px;
+  padding-block: 12px;
+  resize: vertical;
+}
+
+/* a native select with the arrow drawn in, like Figma's "▾" */
+select.input {
+  appearance: none;
+  padding-right: 36px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* grey help text under a field or a card */
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.22;
+}
+
+/* what's wrong with a field, under it */
+.error {
+  margin: 0;
+  color: #b3261e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* the message at the top of a form after a failed save */
+.alert {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #f3d6d2;
+  color: #7a1b14;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ---------- Line-up rows (O08) ---------- */
+/* a 110px time, the act, and a 36px round remove button */
+.lineupRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.roundButton {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--page);
+  color: var(--t);
+  font: 700 14px/1 var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+.roundButton:hover {
+  background: color-mix(in srgb, var(--page) 80%, var(--t));
+}
+
+/* "+ Add a row": bold link-style text */
+.textButton {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--current-ink);
+  font: 700 13px/1.22 var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+.textButton:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Choice cards: radio options drawn as 58px rows (O08 entry, O09 status, O10) ---------- */
+/* The real radio input is hidden; the 18px circle on the right shows which one is picked. */
+.choice {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  cursor: pointer;
+}
+
+/* a choice that is a link to another dialog (O10 ↔ O53) */
+a.choice {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.choice:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.choice:has(input:checked) {
+  background: var(--pill);
+}
+
+.choice:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.choice input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choiceText {
+  display: grid;
+  gap: 3px;
+}
+
+.choiceTitle {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* the circle: grey when off, filled in the role colour when picked */
+.choiceDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #c2cdd9;
+}
+
+.choice:has(input:checked) .choiceDot {
+  background: var(--p);
+}
+
+/* white cards on a tinted panel, the picked one pale green-grey (O09 live status) */
+.choiceWhite {
+  background: var(--card);
+}
+
+.choiceWhite:has(input:checked) {
+  background: var(--unread);
+}
+
+/* extra fields that open inside a picked choice, e.g. postpone's new date */
+.choiceMore {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+/* ---------- Switches (O56 audience) ---------- */
+/* a 46 x 26 track; the real checkbox sits on top, invisible, so clicks and keys work */
+.switch {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border-radius: 13px;
+  background: #c2cdd9;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.switch:has(input:checked) {
+  background: var(--p);
+}
+
+.switch:has(input:checked)::after {
+  transform: translateX(20px);
+}
+
+.switch:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.switch input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch::after {
+    transition: none;
+  }
+}
+
+/* ---------- Buttons at the end of a form ---------- */
+/* two 48px buttons sharing the width (O08 bottom, O10, O53, O56) */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.bigButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--card);
+  color: var(--t);
+  font: 700 15px/1.22 var(--font-instrument), var(--font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bigButton:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p) 35%, transparent);
+}
+
+.bigButtonPrimary {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* "Keep the event as it is": pale, on a white dialog */
+.bigButtonQuiet {
+  background: var(--page);
+}
+
+/* "Cancel event": the one red action (O53) */
+.bigButtonDanger {
+  background: #f3d6d2;
+  color: #b3261e;
+}
+
+.bigButton:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width: 640px) {
+  .row2,
+  .row3,
+  .actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lineupRow {
+    grid-template-columns: 90px minmax(0, 1fr) 36px;
+  }
+}

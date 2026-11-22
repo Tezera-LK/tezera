@@ -1,0 +1,235 @@
+/* Verification (Figma O28, O38–O41). Panels, rows and the hero come from
+   ../hiring/Hiring.module.css. */
+
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.error {
+  margin: 0;
+  color: #b3261e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+/* the 150px drop zone; it's the file input's label */
+.drop {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+  min-height: 150px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--page);
+  text-align: center;
+  cursor: pointer;
+}
+
+.drop:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dropIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--avatar);
+}
+
+/* one document: a square, its name and kind, and Remove or a chip */
+.docRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.docIcon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--avatar);
+}
+
+select.kindSelect {
+  flex: none;
+  width: auto;
+  height: 34px;
+  background-color: var(--card);
+  font-size: 12px;
+}
+
+.plain {
+  background: transparent;
+}
+
+/* "Documents sent for review": pale, with a dot */
+.softNotice,
+.dangerNotice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: var(--soft);
+}
+
+.dangerNotice {
+  background: #f3d6d2;
+}
+
+.dot,
+.dangerDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--p);
+}
+
+.dangerDot {
+  background: #b3261e;
+}
+
+/* the two stand-in admin buttons under the documents (O38) */
+.devRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.devButton {
+  height: 40px;
+  padding: 0 22px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* the steps on the right: a 30px number, green once done; the current one tinted */
+.stepNumber {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--current-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.stepDone {
+  background: #d4ebda;
+}
+
+div.stepCurrent {
+  background: var(--unread);
+}
+
+/* "Now unlocked" rows (O40) */
+.unlockRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.unlockRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.greenDot {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #d4ebda;
+}
+
+.lockIcon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--avatar);
+}
+
+/* ---------- Locked dialog (O41) ---------- */
+.bang {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--soft);
+  font: 700 34px/1 var(--title-font);
+}
+
+.lockedCard {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--pill);
+}
+
+.lockedList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lockedItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--page);
+  font-size: 14px;
+  font-weight: 700;
+}

@@ -1,0 +1,933 @@
+/* The hiring pages: an event's Hiring tab (Figma O14), Find providers (O17), a provider's profile
+   (O18), a booking request (O19, O77, O78) and a job post (O20, O79, O21, O89). Tables and
+   sections come from ../tables.module.css; fields and big buttons from ../forms.module.css. */
+
+/* ---------- Hiring tab tables (O14) ---------- */
+.requestsTable {
+  min-width: 640px;
+}
+
+.requestsTable thead th:nth-child(1) { width: 220px; }
+.requestsTable thead th:nth-child(2) { width: 142px; }
+.requestsTable thead th:nth-child(3) { width: 177px; }
+
+/* the request with a quote to answer: a pale band, inset 8px like Figma */
+.quotedRow > * {
+  background: var(--unread);
+}
+
+.quotedRow > :first-child {
+  padding-left: 8px;
+  border-radius: 12px 0 0 12px;
+}
+
+.quotedRow > :last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.jobsTable {
+  min-width: 640px;
+}
+
+.jobsTable thead th:nth-child(1) { width: 245px; }
+.jobsTable thead th:nth-child(2) { width: 94px; }
+.jobsTable thead th:nth-child(3) { width: 128px; }
+.jobsTable thead th:nth-child(4) { width: 105px; }
+
+.bookingsTable {
+  min-width: 640px;
+}
+
+.bookingsTable thead th:nth-child(1) { width: 193px; }
+.bookingsTable thead th:nth-child(2) { width: 157px; }
+.bookingsTable thead th:nth-child(3) { width: 121px; }
+.bookingsTable thead th:nth-child(4) { width: 132px; }
+
+/* the price stays bold over the table's plain cells */
+.bookingsTable td.price {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* a white 58px row in a right-hand panel: a picture, a title and a grey line */
+.whiteRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  text-decoration: none;
+}
+
+/* the grey line under a white row's title */
+.sub {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+a.whiteRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+/* ---------- Page headings (O17, O19, O20, O21, O78) ---------- */
+.pageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pageHeadText {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pageTitle {
+  margin: -1px 0 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* "Post a job" at the top right of O17: a 40px white pill */
+a.bigPill {
+  height: 40px;
+  padding: 0 22px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* ---------- Find providers (O17) ---------- */
+.search {
+  display: grid;
+  gap: 16px;
+}
+
+input.searchBox {
+  background: var(--card);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* a 28px filter pill: white, or filled when it's set. Dropdowns keep the ▾ Figma draws. */
+.filterPill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filterPill:has(input:checked),
+.filterOn {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.filterPill:has(:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.filterPill input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.filterPill > span {
+  padding: 0 12px;
+}
+
+.filterPill select {
+  height: 28px;
+  padding: 0 26px 0 12px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  appearance: none;
+  /* as wide as the picked option, not the longest one */
+  field-sizing: content;
+  cursor: pointer;
+}
+
+.filterPill select:focus {
+  outline: none;
+}
+
+.filterPill:has(select)::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+}
+
+.filterPill option {
+  background: var(--card);
+  color: var(--t);
+}
+
+.resultCount {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* one provider: a 56px picture, name and chips, two grey lines, and the two buttons */
+.providerCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 90px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.providerText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.nameLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+
+.providerName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stats {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cardButtons {
+  display: flex;
+  flex: none;
+  gap: 12px;
+}
+
+/* "Not finding the right person?": the pale strip at the end of the list */
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+/* ---------- Provider profile (O18) ---------- */
+/* the green header card: a 88px picture, name, chips and the two buttons, then four tiles */
+.profileCard {
+  display: grid;
+  gap: 11px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.profileTop {
+  display: flex;
+  gap: 16px;
+}
+
+.profileName {
+  margin: 2px 0 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.profileButtons {
+  display: grid;
+  gap: 8px;
+  flex: none;
+  width: 191px;
+  margin-left: auto;
+}
+
+.profileButtons > * {
+  justify-content: center;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.bio {
+  margin: 0;
+  font-size: 12px;
+}
+
+.profileTiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 0;
+}
+
+.servicesTable thead th:nth-child(1) { width: 479px; }
+
+.servicesTable td.servicePrice {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.portfolio {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portfolio li {
+  position: relative;
+  overflow: hidden;
+  height: 110px;
+  border-radius: 12px;
+  line-height: 0;
+}
+
+.portfolio li > span:first-child {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* the white "Video" pill on a portfolio item */
+.videoTag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* the reviews card: the score and its parts on the left, the reviews on the right */
+.reviewsCard {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 16px 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.bigScore {
+  margin: 0;
+  font: 700 40px/1.2 var(--title-font);
+}
+
+.parts {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 8px;
+  margin: 7px 0 0;
+  font-size: 12px;
+}
+
+/* each label and value pair is wrapped for the HTML, but lays out as two grid cells */
+.partRow {
+  display: contents;
+}
+
+.parts dt,
+.parts dd {
+  margin: 0;
+}
+
+.parts dd {
+  font-weight: 700;
+}
+
+.reviewList {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.stars {
+  color: var(--current-ink);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.reviewFilters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.reviewFilters > .filterChip {
+  height: 28px;
+  border-radius: 14px;
+  background: var(--page);
+}
+
+/* chips in a right-hand panel: districts, free dates */
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.whiteChip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.darkChip {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.panelStrong {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* the pale note panel ("How booking works", "Accepting confirms the booking") */
+.notePanel {
+  display: grid;
+  gap: 10px;
+  padding: 17px 16px 16px;
+  border-radius: 20px;
+  background: var(--soft);
+}
+
+.notePanelTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- Booking request and job forms (O19, O20) ---------- */
+.formActions {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.formActions > * {
+  background: var(--card);
+}
+
+.formActions > .send {
+  background: var(--p);
+}
+
+/* "3,000 people": the number with its unit inside the field */
+.withUnit {
+  position: relative;
+  width: min(240px, 100%);
+}
+
+.withUnit input {
+  width: 100%;
+  padding-right: 64px;
+}
+
+.unit {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* "Prefilled from the booking" above a job form made from a cancelled booking (O86) */
+.prefilled {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 67px;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: var(--pill);
+}
+
+.prefilledDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--p);
+}
+
+/* the District field is a third of the card wide, as in Figma */
+.narrowField {
+  width: min(240px, 100%);
+}
+
+.plainFieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.plainFieldset legend {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+/* the budget range: two fields with "to" between them */
+.range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.range > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  font: 700 16px/1.2 var(--title-font);
+}
+
+/* the payments table in a booking request: label, amount, due date, remove */
+.payments {
+  display: grid;
+  gap: 0;
+  margin: 8px 16px 0;
+}
+
+.paymentRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 36px;
+  align-items: center;
+  gap: 12px;
+  min-height: 57px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.paymentRow:first-child {
+  min-height: 29px;
+  border-top: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.paymentRow:nth-child(2) {
+  border-top: 0;
+}
+
+.paymentLabel {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.paymentRow input {
+  height: 38px;
+}
+
+/* "Taken from the event": shown, but not changed here */
+input.readOnly {
+  color: var(--muted);
+}
+
+.addLink {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--current-ink);
+  font: 700 13px/1.22 var(--font-instrument), var(--font);
+  cursor: pointer;
+}
+
+.addLink:hover {
+  text-decoration: underline;
+}
+
+.attach {
+  justify-self: start;
+}
+
+/* "If you cancel … / If Tharindu cancels …" */
+.terms {
+  display: grid;
+  grid-template-columns: 162px minmax(0, 1fr);
+  gap: 11px 0;
+  margin: 0;
+  font-size: 13px;
+}
+
+.terms dt {
+  color: var(--muted);
+}
+
+.terms dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* the provider at the top right of O19 and O78 */
+.providerBox {
+  display: grid;
+  gap: 10px;
+}
+
+/* ---------- Sent and posted (O77, O79) ---------- */
+.hero {
+  display: grid;
+  justify-items: center;
+  padding: 48px 24px;
+  border-radius: 20px;
+  background: var(--card);
+  text-align: center;
+}
+
+.heroDot {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #d4ebda;
+}
+
+.heroTitle {
+  margin: 30px 0 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.heroText {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.heroNote {
+  max-width: 420px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.heroChip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  margin-top: 18px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--page);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.heroChips {
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.heroActions > * {
+  min-height: 48px;
+}
+
+/* "Message Tharindu", "Edit post": text-only buttons beside the main one */
+.heroActions > .plainButton {
+  background: transparent;
+}
+
+/* ---------- Review a quote (O78) ---------- */
+.quotePair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.quoteCard {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.quoteCardTheirs {
+  background: var(--pill);
+}
+
+.quoteFacts {
+  display: grid;
+  grid-template-columns: 162px minmax(0, 1fr);
+  gap: 11px 0;
+  margin: 0;
+  font-size: 13px;
+}
+
+.quoteFacts dt {
+  color: var(--muted);
+}
+
+.quoteFacts dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.messageCard {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.messageText {
+  margin: 0;
+  font-size: 12px;
+}
+
+.quoteActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+}
+
+.quoteActions form {
+  display: grid;
+}
+
+/* ---------- Compare quotes (O21, O89) ---------- */
+.compareBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  font-size: 12px;
+}
+
+.sortPill {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--t);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.compareBar strong {
+  font-weight: 700;
+}
+
+.quoteGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* one quote: white, or green once "Accept this quote" is ticked */
+.quote {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.quote:has(input:checked),
+.quoteAccepted {
+  background: var(--pill);
+}
+
+.quoteHead {
+  display: flex;
+  gap: 12px;
+}
+
+.quotePrice {
+  margin: 4px 0 0;
+  font: 700 30px/1.2 var(--title-font);
+}
+
+.quoteFactsSmall {
+  grid-template-columns: 162px minmax(0, 1fr);
+}
+
+.accept {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* an 18px square tick box in the role colour */
+.accept input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--p);
+}
+
+/* "2 quotes selected · LKR 70,000" and the button, along the bottom */
+.selectedBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.selectedBar button {
+  min-width: 243px;
+}
+
+/* a picked quote in the dialog: the page colour on the white dialog */
+.pageRow {
+  background: var(--page);
+}
+
+.closeChoice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.closeChoice input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--p);
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width: 900px) {
+  .quoteGrid,
+  .quotePair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portfolio {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .reviewsCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .providerCard,
+  .profileTop {
+    flex-wrap: wrap;
+  }
+
+  .profileButtons {
+    width: 100%;
+  }
+
+  .profileTiles {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formActions,
+  .quoteActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .terms,
+  .quoteFacts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
