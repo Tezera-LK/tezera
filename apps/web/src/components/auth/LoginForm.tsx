@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { resendSignUpCode, signIn, signOut } from "aws-amplify/auth";
 // Where Amplify keeps the login tokens (see "Keep me logged in" below).
 import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
-import { defaultStorage, sessionStorage } from "aws-amplify/utils";
+import { CookieStorage } from "aws-amplify/utils";
 
 import Button from "./Button";
 import Divider from "./Divider";
@@ -107,10 +107,17 @@ export default function LoginForm({ role, verified = false }: LoginFormProps) {
       // signIn would fail with "UserAlreadyAuthenticatedException".
       await signOut();
 
-      // KEEP ME LOGGED IN: tokens normally live in localStorage, which
-      // survives closing the browser. Unticked, sessionStorage is used,
-      // which the browser clears when the tab or window closes.
-      cognitoUserPoolsTokenProvider.setKeyValueStorage(remember ? defaultStorage : sessionStorage);
+      // KEEP ME LOGGED IN: tokens live in cookies, so the server can see who is
+      // signed in (lib/auth/session.ts). Ticked, the cookies last 30 days.
+      // Unticked, they have no expiry date, so the browser clears them when it closes.
+      cognitoUserPoolsTokenProvider.setKeyValueStorage(
+        new CookieStorage({
+          expires: remember ? 30 : undefined,
+          path: "/",
+          sameSite: "lax",
+          secure: window.location.protocol === "https:",
+        }),
+      );
 
       // Phone: no password, ask for a texted code. Email: password.
       const { nextStep } =

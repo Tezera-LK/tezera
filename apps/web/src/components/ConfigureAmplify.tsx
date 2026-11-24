@@ -21,9 +21,10 @@ import { Amplify } from "aws-amplify";
 import outputs from "../../amplify_outputs.json";
 
 // Runs once, when this file is first loaded in the browser.
-// ssr: true would also share the login with server code; we don't need
-// that yet, because every auth call happens in the browser.
-Amplify.configure(outputs);
+// ssr: true keeps the login tokens in cookies instead of localStorage, so
+// server code can read them too (lib/auth/session.ts checks them to decide
+// who may open the portal).
+Amplify.configure(outputs, { ssr: true });
 
 // Renders nothing. Its only job is to make sure the line above has run
 // before any form calls Amplify. The (auth)/[role] layout includes it.
