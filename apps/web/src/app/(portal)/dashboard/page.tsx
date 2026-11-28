@@ -4,9 +4,11 @@ import Columns from "@/components/portal/Columns";
 import PageHeader from "@/components/portal/PageHeader";
 import Panel from "@/components/portal/Panel";
 import OrganiserDashboard from "@/components/portal/dashboard/OrganiserDashboard";
+import ProviderHome from "@/components/portal/provider/ProviderHome";
 import EmptyState from "@/components/states/EmptyState";
 import { requireSession } from "@/lib/auth/session";
 import { getOrganiserDashboard } from "@/lib/data/portal";
+import { getProviderState } from "@/lib/data/provider";
 import type { PortalRole } from "@/lib/portal-roles";
 import { routes } from "@/lib/routes";
 
@@ -52,7 +54,7 @@ const DASHBOARD: Record<PortalRole, Dashboard> = {
       title: "No bookings yet",
       description: "Booking requests and job posts that match you will show up here.",
     },
-    tools: { label: "Freelancer tools", href: routes.freelancerTools },
+    tools: { label: "Freelancer tools", href: routes.vendorTools },
     panels: [{ title: "Coming up", empty: "Events you're booked for will show up here." }, RECENT_MESSAGES],
   },
   attendee: {
@@ -75,8 +77,10 @@ const DASHBOARD: Record<PortalRole, Dashboard> = {
   },
 };
 
+type Props = { searchParams: Promise<{ filter?: string; comments?: string; share?: string; promo?: string }> };
+
 // The one "after you sign in, go here" page. Every role shares the URL and sees its own dashboard.
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: Props) {
   // signed in is enough: requiring a role here would bounce a user with no role between redirects forever
   const session = await requireSession();
   const { role } = session;
@@ -93,11 +97,16 @@ export default async function DashboardPage() {
     );
   }
 
-  // Organisers get Figma's dashboard (O05) once there's data for it; the other roles' dashboards
-  // come with their own slices, so they keep the placeholder below.
+  // Organisers get Figma's dashboard (O05), vendors and freelancers their home feed (V06, F06),
+  // once there's data for them; the other roles' dashboards come with their own slices, so they
+  // keep the placeholder below.
   if (role === "organiser") {
     const data = await getOrganiserDashboard(session);
     if (data) return <OrganiserDashboard data={data} now={new Date()} />;
+  }
+  if (role === "vendor" || role === "freelancer") {
+    const state = await getProviderState(session);
+    if (state) return <ProviderHome state={state} now={new Date()} query={await searchParams} />;
   }
 
   const { description, empty, tools, panels } = DASHBOARD[role];

@@ -1,24 +1,9 @@
-import type { Metadata } from "next";
-import PageHeader from "@/components/portal/PageHeader";
-import EmptyState from "@/components/states/EmptyState";
+import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/session";
+import { routes } from "@/lib/routes";
 
-export const metadata: Metadata = { title: "Vendor tools" };
-
+// /vendor on its own: the sidebar has no "tools" page, so the first tool, Booking requests, stands in.
 export default async function VendorToolsPage() {
-  // this page's own check: the layout's check doesn't re-run when you move between pages inside it
-  await requireRole("vendor");
-
-  return (
-    <>
-      <PageHeader
-        title="Vendor tools"
-        description="Booking requests, job posts, stalls, your bookings and payments."
-      />
-      <EmptyState
-        title="Nothing here yet"
-        description="Each tool in the sidebar comes from its own ticket and will appear here once it's built."
-      />
-    </>
-  );
+  await requireRole("vendor", "freelancer");
+  redirect(routes.vendorArea.requests);
 }

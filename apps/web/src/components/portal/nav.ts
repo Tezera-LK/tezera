@@ -40,24 +40,27 @@ const SHARED = {
 // Vendors and freelancers have one "Reviews and rank" page; organisers have Leaderboards and Reviews.
 function general(role: PortalRole | null): NavGroup {
   const providers = role === "vendor" || role === "freelancer";
-  // pages built for the organiser so far; other roles get theirs in their own slices
+  // pages built for the organiser and for providers so far; other roles get theirs in their own slices
   const organiser = role === "organiser";
+  // each built role's own page for a General item, or no link yet
+  const own = (item: NavItem, forOrganiser: string, forProviders: string): NavItem =>
+    organiser ? { ...item, href: forOrganiser } : providers ? { ...item, href: forProviders } : item;
   return {
     title: "General",
     items: [
       SHARED.home,
-      organiser ? { ...SHARED.messages, href: routes.messages } : SHARED.messages,
-      organiser ? { ...SHARED.community, href: routes.community } : SHARED.community,
+      own(SHARED.messages, routes.messages, routes.vendorArea.messages),
+      own(SHARED.community, routes.community, routes.vendorArea.community),
       SHARED.notifications,
       ...(providers
-        ? [SHARED.reviewsAndRank]
+        ? [{ ...SHARED.reviewsAndRank, href: routes.vendorArea.reviews }]
         : [
             organiser ? { ...SHARED.leaderboards, href: routes.leaderboards } : SHARED.leaderboards,
             // everyone else writes or gets reviews; admins only moderate them, from their own tools
             ...(role === "admin" ? [] : [organiser ? { ...SHARED.reviews, href: routes.reviews } : SHARED.reviews]),
           ]),
-      organiser ? { ...SHARED.profile, href: routes.myProfile } : SHARED.profile,
-      organiser ? { ...SHARED.settings, href: routes.settings } : SHARED.settings,
+      own(SHARED.profile, routes.myProfile, routes.vendorArea.profile),
+      own(SHARED.settings, routes.settings, routes.vendorArea.settings),
     ],
   };
 }
@@ -66,13 +69,18 @@ function general(role: PortalRole | null): NavGroup {
 // order and names from the Figma vendor and freelancer files
 function vendorTools(withStalls: boolean): NavItem[] {
   return [
-    { label: "Booking requests" },
-    { label: "Job posts" },
-    { label: "My bookings" },
-    ...(withStalls ? [{ label: "Stalls" }, { label: "My stall listing" }] : []),
-    { label: "Availability" },
-    { label: "Payments" },
-    { label: "Verification" },
+    { label: "Booking requests", href: routes.vendorArea.requests },
+    { label: "Job posts", href: routes.vendorArea.jobs },
+    { label: "My bookings", href: routes.vendorArea.bookings },
+    ...(withStalls
+      ? [
+          { label: "Stalls", href: routes.vendorArea.stalls },
+          { label: "My stall listing", href: routes.vendorArea.listing },
+        ]
+      : []),
+    { label: "Availability", href: routes.vendorArea.availability },
+    { label: "Payments", href: routes.vendorArea.payments },
+    { label: "Verification", href: routes.vendorArea.verification },
   ];
 }
 
@@ -135,10 +143,19 @@ export const NOTIFICATIONS_TEXT = {
   unread: "unread",
 } as const;
 
-// The avatar's menu (O82), in Figma's order. None of these pages exist yet; Log out becomes a
-// link to O98's confirmation when the Account slice is built.
-// The organiser's go to their pages; other roles get theirs in their own slices.
+// The avatar's menu (O82, V105), in Figma's order. Log out asks first (O98, V104).
+// The organiser's and providers' go to their pages; other roles get theirs in their own slices.
 export function profileMenu(role: PortalRole | null): NavItem[] {
+  if (role === "vendor" || role === "freelancer") {
+    const p = routes.vendorArea;
+    return [
+      { label: "My profile", href: p.profile },
+      { label: "Edit profile", href: p.editProfile },
+      { label: "Payments", href: p.payments },
+      { label: "Settings", href: p.settings },
+      { label: "Log out", href: `${p.settings}?dialog=logout` },
+    ];
+  }
   const organiser = role === "organiser";
   return [
     { label: "My profile", href: organiser ? routes.myProfile : undefined },

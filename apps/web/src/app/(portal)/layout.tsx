@@ -16,7 +16,8 @@ export default async function PortalLayout({ children }: { children: React.React
   const [summary, account] = await Promise.all([getNotificationSummary(session), getAccount(session)]);
 
   // Worded and formatted here, on the server, so times are Sri Lanka time and the browser gets
-  // plain strings. No links yet: each row opens a screen from a later slice (O22, O21, O13).
+  // plain strings. Rows link where the role has the page (vendors and freelancers so far); the
+  // organiser's open screens from later slices (O22, O21, O13).
   const now = new Date();
   const notifications = {
     unread: summary.unread,
@@ -25,6 +26,7 @@ export default async function PortalLayout({ children }: { children: React.React
       title: n.shortTitle,
       detail: n.shortDetail,
       when: formatWhen(n.at, now, true),
+      href: n.action.href,
     })),
   };
 

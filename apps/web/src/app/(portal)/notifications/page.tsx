@@ -6,10 +6,12 @@ import PageHeader from "@/components/portal/PageHeader";
 import Panel from "@/components/portal/Panel";
 import Tabs from "@/components/portal/Tabs";
 import shell from "@/components/portal/PortalShell.module.css";
+import ProviderNotifications from "@/components/portal/provider/ProviderNotifications";
 import ui from "@/components/portal/ui.module.css";
 import EmptyState from "@/components/states/EmptyState";
 import { requireSession } from "@/lib/auth/session";
 import { filterNotifications, getNotifications } from "@/lib/data/portal";
+import { getProviderNotifications, getProviderState } from "@/lib/data/provider";
 import type { NotificationType, PortalNotification } from "@/lib/data/portal-types";
 import { daysFrom, formatWhen } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -52,15 +54,20 @@ function pickType(value: string | string[] | undefined): NotificationType | unde
 }
 
 // Every notification for the signed-in user (Figma O06), split into Today and Earlier, with tabs
-// to show one type. Shared by every role; only organisers have sample data so far.
+// to show one type. Shared by every role; vendors and freelancers get their own tabs (V23, F23).
 export default async function NotificationsPage({
   searchParams,
 }: {
   searchParams: Promise<{ type?: string | string[] }>;
 }) {
   const session = await requireSession();
-  const type = pickType((await searchParams).type);
   const now = new Date();
+  if (session.role === "vendor" || session.role === "freelancer") {
+    const state = await getProviderState(session);
+    const raw = (await searchParams).type;
+    if (state) return <ProviderNotifications state={state} list={await getProviderNotifications(session)} now={now} type={typeof raw === "string" ? raw : undefined} />;
+  }
+  const type = pickType((await searchParams).type);
   const shown = filterNotifications(await getNotifications(session), type);
   const today = shown.filter((n) => daysFrom(now, n.at) === 0);
   const earlier = shown.filter((n) => daysFrom(now, n.at) !== 0);

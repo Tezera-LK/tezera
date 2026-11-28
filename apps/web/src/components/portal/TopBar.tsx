@@ -16,9 +16,17 @@ export type TopBarProps = {
   account: { name: string; email: string } | null;
 };
 
+// Where the messages button goes for each role; undefined while that role has no Messages page.
+function messagesFor(role: PortalRole | null): string | undefined {
+  if (role === "organiser") return routes.messages;
+  if (role === "vendor" || role === "freelancer") return routes.vendorArea.messages;
+  return undefined;
+}
+
 // The bar across the top of every signed-in page (Figma O05): logo, search, messages,
-// notifications, the role and the profile. The messages button opens the organiser's
-// conversations; other roles get theirs with their own pages (EP-09).
+// notifications, the role and the profile. The messages button opens the organiser's or the
+// provider's conversations; other roles get theirs with their own pages (EP-09).
+
 export default function TopBar({ role, notifications, account }: TopBarProps) {
   return (
     <header className={styles.topBar}>
@@ -41,7 +49,7 @@ export default function TopBar({ role, notifications, account }: TopBarProps) {
       </form>
 
       <div className={styles.topActions}>
-        <Shortcut item={role === "organiser" ? { ...TOP_BAR.messages, href: routes.messages } : TOP_BAR.messages}>
+        <Shortcut item={{ ...TOP_BAR.messages, href: messagesFor(role) }}>
           <MessageIcon />
         </Shortcut>
         <NotificationsMenu {...notifications} text={NOTIFICATIONS_TEXT} />

@@ -82,6 +82,7 @@ import type {
 import type { Session } from "@/lib/auth/session";
 import { newestFirst } from "@/lib/format";
 import { previewMode } from "@/lib/preview";
+import { getProviderNotifications, providerKind } from "@/lib/data/provider";
 import { routes } from "@/lib/routes";
 
 // The only way signed-in portal pages read data, like lib/data/public.ts for public pages.
@@ -201,9 +202,10 @@ export async function updateMyEvent(
   return event ? { ok: true, event } : { ok: false, error: "That event doesn't exist any more." };
 }
 
-// The user's notifications, newest first. Only the organiser has samples, because only the
-// organiser's Figma file draws them; other roles see the empty state.
+// The user's notifications, newest first. Organisers, vendors and freelancers have samples (their
+// Figma files draw them); other roles see the empty state.
 export const getNotifications = cache(async (session: Session): Promise<PortalNotification[]> => {
+  if (providerKind(session)) return getProviderNotifications(session);
   if (!useSamples || session.role !== "organiser") return [];
   return sampleNotifications(new Date()).sort((a, b) => newestFirst(a.at, b.at));
 });

@@ -84,8 +84,65 @@ export const routes = {
   eventDialog: (eventId: string, dialog: "postpone" | "cancel" | "announce") =>
     `/organiser/events/${segment(eventId)}?dialog=${dialog}`,
   vendorTools: "/vendor",
-  freelancerTools: "/freelancer",
   adminTools: "/admin",
+
+  // Vendors and freelancers share one tools area at /vendor (Figma vendor V… and freelancer F…
+  // files; freelancers don't see stalls). Don't add /vendor/login, /signup, /setup, /verify,
+  // /verification, /reset-password or /home: the auth screens use those (app/(auth)/[role]), so
+  // verification lives at /vendor/verify-business.
+  vendorArea: {
+    // booking requests (V47, V08), sending a quote (V09) and a request just accepted (V49)
+    requests: "/vendor/requests",
+    request: (id: string) => `/vendor/requests/${segment(id)}`,
+    quote: (id: string) => `/vendor/requests/${segment(id)}/quote`,
+    accepted: (id: string) => `/vendor/requests/${segment(id)}/accepted`,
+    // an organiser as providers see them (V54)
+    organiser: (id: string) => `/vendor/organisers/${segment(id)}`,
+    // job posts (V10, V57), applying (V11, V58) and the quotes sent (V59–V61)
+    jobs: "/vendor/jobs",
+    job: (id: string) => `/vendor/jobs/${segment(id)}`,
+    apply: (id: string) => `/vendor/jobs/${segment(id)}/apply`,
+    applied: (id: string) => `/vendor/jobs/${segment(id)}/sent`,
+    applications: "/vendor/applications",
+    application: (id: string) => `/vendor/applications/${segment(id)}`,
+    // bookings (V12, V13) and proposing new terms (V65)
+    bookings: "/vendor/bookings",
+    booking: (id: string) => `/vendor/bookings/${segment(id)}`,
+    changeTerms: (id: string) => `/vendor/bookings/${segment(id)}/terms`,
+    // stalls (V14; applying V74 and an invitation V76 open as dialogs), the listing for one (V15,
+    // V77, V82) and the venue map (V81); vendors only
+    stalls: "/vendor/stalls",
+    applyForStall: (id: string) => `/vendor/stalls?dialog=apply&stall=${segment(id)}`,
+    listing: "/vendor/listing",
+    venueMap: "/vendor/listing/map",
+    availability: "/vendor/availability",
+    // payments (V21), a receipt (V70), the payment account (V71) and paying a stall fee (V78–V80)
+    payments: "/vendor/payments",
+    receipt: (id: string) => `/vendor/payments/receipts/${segment(id)}`,
+    connect: "/vendor/payments/connect",
+    payStall: (id: string) => `/vendor/payments/stall/${segment(id)}`,
+    stallPaid: (id: string) => `/vendor/payments/stall/${segment(id)}/done`,
+    stallPayFailed: (id: string) => `/vendor/payments/stall/${segment(id)}/failed`,
+    verification: "/vendor/verify-business",
+    // reviews and rank (V19), the leaderboard (V40) and reviewing an organiser (V20, V98)
+    reviews: "/vendor/reviews",
+    leaderboard: "/vendor/reviews/leaderboard",
+    reviewOrganiser: (id: string) => `/vendor/reviews/write/${segment(id)}`,
+    reviewSent: (id: string) => `/vendor/reviews/write/${segment(id)}/done`,
+    // the provider's profile (V16, V36), editing it (V35) and the organiser's view of it (V39)
+    profile: "/vendor/profile",
+    editProfile: "/vendor/profile/edit",
+    profilePreview: "/vendor/profile/preview",
+    // an event as providers see it (V07, V88, V89)
+    event: (id: string) => `/vendor/events/${segment(id)}`,
+    messages: "/vendor/messages",
+    community: "/vendor/community",
+    communities: "/vendor/community/browse",
+    thread: (id: string) => `/vendor/community/threads/${segment(id)}`,
+    board: (id: string) => `/vendor/community/boards/${segment(id)}`,
+    settings: "/vendor/settings",
+    blocked: "/vendor/settings/blocked",
+  },
 
   // public teasers: anyone, even without logging in
   event: (eventId: string) => `/events/${segment(eventId)}`,

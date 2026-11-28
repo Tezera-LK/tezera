@@ -1,8 +1,9 @@
 import { requireRole } from "@/lib/auth/session";
 
-// Gate for everything under /vendor. Pages inside check again with requireRole().
-// Vendors only: freelancers have their own tools at /freelancer (since 18 Nov), matching /freelancer/login.
+// Gate for everything under /vendor. "vendor" is the URL word for vendors AND freelancers: the
+// Figma freelancer file is the vendor file without stalls, so both share these pages. Their Cognito
+// groups stay separate, so both are listed. Pages inside check again with requireRole().
 export default async function VendorToolsLayout({ children }: { children: React.ReactNode }) {
-  await requireRole("vendor");
+  await requireRole("vendor", "freelancer");
   return <>{children}</>;
 }

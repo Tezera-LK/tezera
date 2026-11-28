@@ -6,10 +6,12 @@ import PageHeader from "@/components/portal/PageHeader";
 import Panel from "@/components/portal/Panel";
 import Tabs from "@/components/portal/Tabs";
 import Thumb from "@/components/portal/Thumb";
+import ProviderSearch from "@/components/portal/provider/ProviderSearch";
 import ui from "@/components/portal/ui.module.css";
 import EmptyState from "@/components/states/EmptyState";
 import { requireSession } from "@/lib/auth/session";
 import { getRecentSearches, searchPortal } from "@/lib/data/portal";
+import { getProviderState } from "@/lib/data/provider";
 import type { CommunityResult, EventResult, ProviderResult, SearchTab } from "@/lib/data/portal-types";
 import { formatCount, formatDayMonth } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -49,14 +51,20 @@ function pickTab(value: string | string[] | undefined): SearchTab {
 
 // Search results for the top bar's box (Figma O80): providers, events and communities, with a tab
 // for each. The providers tab also lists matching events under the providers, as Figma draws it.
+// Vendors and freelancers look for work instead, so they get their own results (V84, F84).
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string | string[]; tab?: string | string[] }>;
+  searchParams: Promise<{ q?: string | string[]; tab?: string | string[]; only?: string | string[] }>;
 }) {
   const session = await requireSession();
   const params = await searchParams;
   const query = typeof params.q === "string" ? params.q.trim() : "";
+  if (session.role === "vendor" || session.role === "freelancer") {
+    const state = await getProviderState(session);
+    const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
+    if (state) return <ProviderSearch state={state} query={query} tab={one(params.tab)} only={one(params.only)} now={new Date()} />;
+  }
   const tab = pickTab(params.tab);
   // only organisers hire, so only they get links to profiles and Find providers
   const hiring = session.role === "organiser";

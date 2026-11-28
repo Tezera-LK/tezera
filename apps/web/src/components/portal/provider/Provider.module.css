@@ -1,0 +1,765 @@
+/* The vendor and freelancer pages (Figma V… and F… files). Most of the look comes from the shared
+   modules (ui, forms, hiring, EventPages); this file holds what only these pages draw. Sizes are
+   the Figma frames'. Colours come from the palette variables, so the vendor palette applies. */
+
+/* a heading over a group of rows, e.g. "New", "Quotes sent" (V47) */
+.groupLabel {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* a 60px white row with a round picture, a 17px title and a chip on the right (V47) */
+.bigRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.bigRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.bigRowTitle {
+  margin: 0;
+  font: 700 17px/1.22 var(--title-font);
+}
+
+/* a grey row inside a white card, e.g. one booking in "December" (V12) or one item (V15) */
+.greyRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--page);
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.greyRow:hover {
+  box-shadow: inset 0 0 0 2px var(--pill);
+}
+
+.amount {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* a card in the role's pale colour, holding white rows (V08's terms, V06's notice) */
+.tint {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.tintRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 52px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: var(--card);
+}
+
+/* two cards side by side, one under the other on a phone */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* the three buttons under a request: Accept, Send my own quote, Decline (V08) */
+.decide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+/* one line of four buttons under a booking (V13) */
+.buttonRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+/* the tinted line at the top of a page, e.g. "2 new booking requests…" (V06) or an invitation (V14) */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 52px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: var(--pill);
+  color: var(--t);
+  text-decoration: none;
+}
+
+.bannerText {
+  flex: 1;
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--p);
+}
+
+.warnBanner {
+  background: #f6e3b4;
+}
+
+.dangerBanner {
+  background: #f3d6d2;
+}
+
+.infoBanner {
+  background: var(--soft);
+}
+
+/* the big centred result on a done page: a tick in a circle, a title and two buttons (V49, V58) */
+.done {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 40px 24px 32px;
+  border-radius: 20px;
+  background: var(--card);
+  text-align: center;
+}
+
+.doneMark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--pill);
+  font: 700 30px/1 var(--title-font);
+}
+
+.doneMarkBad {
+  background: #f3d6d2;
+  color: #b3261e;
+}
+
+.doneTitle {
+  margin: 0;
+  font: 700 26px/1.2 var(--title-font);
+}
+
+.doneButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* a timeline of steps with a tick or chip on the right (V13, V51) */
+.steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tick {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 22px;
+  border-radius: 11px;
+  background: #d4ebda;
+  color: #2b6b38;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* a row of pill-shaped filter links (V10's "F&B stall ×", V14's stall types) */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 15px;
+  background: var(--card);
+  color: var(--t);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pillOn {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.pillGrey {
+  background: var(--page);
+}
+
+/* a job post or stall card: a white card with a title, chips, a facts line and buttons (V10, V14) */
+.post {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.postHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.postTitle {
+  margin: 0;
+  font: 700 17px/1.22 var(--title-font);
+}
+
+.postFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.postFacts strong {
+  color: var(--t);
+}
+
+.postButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* a stall card: a picture on the left, the text, and two buttons on the right (V14) */
+.stallCard {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.stallButtons {
+  display: grid;
+  gap: 8px;
+  min-width: 150px;
+}
+
+/* the month calendar (V17) */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.weekday {
+  padding: 0 4px 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  min-height: 86px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--t);
+  font: 700 13px/1.2 var(--font-instrument), var(--font);
+  text-align: left;
+  text-decoration: none;
+}
+
+.dayLabel {
+  font-size: 11px;
+}
+
+.dayBooked {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+.dayOff {
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.dayQuote {
+  background: color-mix(in srgb, var(--a) 40%, #fff);
+}
+
+.dayPicked {
+  box-shadow: inset 0 0 0 3px var(--t);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--page);
+}
+
+/* score bars on Reviews and rank (V19) */
+.bars {
+  display: grid;
+  grid-template-columns: minmax(0, 120px) minmax(0, 1fr) 32px;
+  gap: 9px 16px;
+  align-items: center;
+  margin: 0;
+  font-size: 12px;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--page);
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--p);
+}
+
+/* the profile's cover and the logo over its edge (V16) */
+.cover {
+  position: relative;
+  height: 180px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.profileHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: -64px;
+  padding: 0 16px;
+}
+
+.logo {
+  border: 6px solid var(--page);
+  border-radius: 50%;
+}
+
+/* portfolio tiles, three across (V16, V36) */
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tileTag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.tileCaption {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* the feed's two-across event cards (V06), also the search page's events (V84) */
+.feed {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* the promo viewer's buttons, at the bottom beside the picture (V86) */
+.promoActions {
+  display: grid;
+  gap: 10px;
+  align-content: end;
+}
+
+.feedCard {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 10px 10px 12px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.feedText {
+  display: grid;
+  gap: 4px;
+  padding: 4px 6px 0;
+}
+
+.feedLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.feedLine strong {
+  color: var(--t);
+}
+
+.feedButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 6px 0;
+}
+
+/* chat (V22): the list on the left, the conversation on the right */
+.chat {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 560px;
+}
+
+.chatList {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 20px;
+  background: var(--pill);
+}
+
+.chatPane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.bubbles {
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bubble {
+  justify-self: start;
+  max-width: 70%;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: var(--page);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.bubbleMine {
+  justify-self: end;
+  background: var(--pill);
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+/* a short line of grey text under a block */
+.foot {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.right {
+  margin-left: auto;
+}
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .pair,
+  .decide,
+  .feed,
+  .chat {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stallCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .grid3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calendar {
+    gap: 3px;
+  }
+
+  .day {
+    min-height: 56px;
+    padding: 6px;
+  }
+
+  .dayLabel {
+    display: none;
+  }
+}
+
+/* a form holding one button, so the button fills its grid cell like the links beside it */
+.formFill {
+  display: grid;
+}
+
+/* the short white field on the right of a grey row, e.g. a cancellation term (V09) */
+.termInput {
+  max-width: 260px;
+  background: var(--card);
+}
+
+/* Choice.tsx: hides a checkbox the way forms.choice hides a radio, and squares its mark */
+.choice input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boxDot {
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+}
+
+.choice:has(input:checked) .boxDot::after {
+  content: "✓";
+  color: var(--on-p);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* a score tile on a white card (V54) */
+.greyTile {
+  background: var(--page);
+}
+
+/* rows and text blocks that are links keep the text colour, no underline */
+a.tintRow,
+.plainLink {
+  color: var(--t);
+  text-decoration: none;
+}
+
+a.tintRow:hover {
+  box-shadow: inset 0 0 0 2px var(--p);
+}
+
+a.plainLink:hover {
+  text-decoration: underline;
+}
+
+/* a status chip above a stall card's buttons sits at its natural width (V14) */
+.stallButtons > span {
+  justify-self: end;
+}
+
+/* a field drawn white on a tinted panel, e.g. the example search on V15 */
+.whiteField {
+  background: var(--card);
+}
+
+/* a search field with its button on the right */
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.swatchFree {
+  background: var(--card);
+}
+
+/* a full-width button filled in the role colour, e.g. "Pay LKR 12,000 (test)" (V21) */
+.primaryWide {
+  background: var(--p);
+  color: var(--on-p);
+}
+
+/* stretches a Thumb placeholder to its box's width; Thumb sets a fixed width inline, so only
+   !important can override it */
+.fluid > span[aria-hidden="true"] {
+  width: 100% !important;
+}
+
+/* Reviews and rank (V19): the big average beside the score bars */
+.scoreCard {
+  grid-template-columns: 140px minmax(0, 1fr);
+  align-items: center;
+}
+
+.bigScore {
+  margin: 0;
+  font: 700 40px/1 var(--title-font);
+}
+
+.bars dd {
+  margin: 0;
+}
+
+/* the provider's own line on a leaderboard (V19, V40) */
+.youRow {
+  background: color-mix(in srgb, var(--a) 30%, #fff);
+}
+
+.replyButton {
+  background: var(--pill);
+}
+
+@media (max-width: 760px) {
+  .scoreCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Edit profile (V35): the districts as a grid of small choices, and one service per row */
+.districts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.districts > label {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+
+.serviceRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, 0.8fr);
+  gap: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.serviceRow > legend {
+  float: left;
+  grid-column: 1 / -1;
+}
+
+.serviceRow > label {
+  grid-column: 1 / -1;
+  min-height: 40px;
+  background: var(--card);
+}
+
+@media (max-width: 760px) {
+  .serviceRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* a thread with its vote column on the left (V24, V94, V97) */
+.threadCard {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+}
